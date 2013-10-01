@@ -25,6 +25,7 @@ PKG_MAINTAINER:=Michael Heimpold <mhei@heimpold.de>
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_DEPENDS:=binutils
 
 include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
