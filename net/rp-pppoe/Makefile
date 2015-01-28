@@ -122,6 +122,8 @@ define Package/rp-pppoe-relay/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(CP) $(PKG_INSTALL_DIR)/usr/sbin/pppoe-relay $(1)/usr/sbin/
 	$(INSTALL_DATA) ./files/pppoe-relay.default $(1)/etc/uci-defaults/
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_BIN) ./files/pppoe.hotplug $(1)/etc/hotplug.d/iface/65-pppoe
 endef
 
 define Package/rp-pppoe-server/install
