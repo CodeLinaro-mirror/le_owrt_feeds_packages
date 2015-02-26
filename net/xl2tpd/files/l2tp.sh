@@ -30,6 +30,7 @@ proto_l2tp_setup() {
 	json_get_var server server && {
 		for ip in $(resolveip -t 5 "$server"); do
 			( proto_add_host_dependency "$interface" "$ip" )
+			echo "$ip" >> /tmp/server.l2tp-${interface}
 			serv_addr=1
 		done
 	}
@@ -114,6 +115,7 @@ proto_l2tp_teardown() {
 			echo "xl2tpd-control: Remove l2tp-$interface failed" >&2
 		}
 	fi
+	rm -f /tmp/server.l2tp-${interface}
 	# Wait for interface to go down
         while [ -d /sys/class/net/l2tp-${interface} ]; do
 		sleep 1
