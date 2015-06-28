@@ -108,7 +108,6 @@ define Package/libunbound/description
 endef
 
 CONFIGURE_ARGS += \
-	--disable-ecdsa \
 	--disable-gost \
 	--enable-allsymbols \
 	--with-libexpat="$(STAGING_DIR)/usr" \
