@@ -72,6 +72,7 @@ define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
 		OPTFLAGS="$(TARGET_CFLAGS) -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE" \
+		LDFLAGS="$(TARGET_LDFLAGS)" \
 		PREFIX="/usr" \
 		SBINDIR="/usr/sbin" \
 		LDFLAGS="$(LDFLAGS)" \
@@ -80,6 +81,7 @@ define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
 		OPTFLAGS="$(TARGET_CFLAGS) -D_FILE_OFFSET_BITS=64" \
+		LDFLAGS="$(TARGET_LDFLAGS)" \
 		PREFIX="$(PKG_INSTALL_DIR)/usr" \
 		SBINDIR="$(PKG_INSTALL_DIR)/usr/sbin" \
 		install-bin
