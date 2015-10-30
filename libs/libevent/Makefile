@@ -8,13 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libevent
-PKG_VERSION:=1.4.14b
-PKG_RELEASE:=2
+PKG_VERSION:=2.1.5-beta
+PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-stable
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-stable.tar.gz
-PKG_SOURCE_URL:=http://www.monkey.org/~provos/
-PKG_MD5SUM:=a00e037e4d3f9e4fe9893e8a2d27918c
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/libevent/libevent.git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=0b49ae34594533daa82c06a506078de9e336a013
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -26,7 +27,7 @@ define Package/libevent
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=Event notification library
-  DEPENDS:=+librt
+  DEPENDS:=+librt +libopenssl
   URL:=http://www.monkey.org/~provos/libevent/
 endef
 
