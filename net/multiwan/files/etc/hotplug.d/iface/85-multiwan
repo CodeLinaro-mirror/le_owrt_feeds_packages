@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. /lib/functions.sh
+. /lib/functions/network.sh
+
+restart_service(){
+	/etc/init.d/multiwan stop
+	/etc/init.d/multiwan start
+}
+[ "$ACTION" = "ifup" ] && restart_service
