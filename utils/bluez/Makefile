@@ -34,7 +34,7 @@ $(call Package/bluez/Default)
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE+= python example apps
-  DEPENDS:=+python
+  DEPENDS:=
 endef
 
 define Package/bluez-examples/description
