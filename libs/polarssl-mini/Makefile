@@ -1,4 +1,5 @@
 # 
+# Copyright (c) 2015 The Linux Foundation. All rights reserved.
 # Copyright (C) 2006 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -8,72 +9,66 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=polarssl
-PKG_VERSION:=0.10.1
+PKG_NAME:=polarssl-mini
+PKG_VERSION:=1.3.4
 PKG_RELEASE:=1
+PKG_USE_MIPS16:=0
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-gpl.tgz
-PKG_SOURCE_URL:=http://polarssl.org/code/releases/
-PKG_MD5SUM:=49bd1c6b46a8699d8bf215d3a318899e
+PKG_SOURCE:=polarssl-$(PKG_VERSION)-gpl.tgz
+PKG_SOURCE_URL:=https://polarssl.org/code/releases/
+PKG_MD5SUM:=30a75c5f171be49f805f3bf64a0af054
+
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/polarssl/Default
-  TITLE:=Embedded SSL
+define Package/polarssl-mini
+  SUBMENU:=SSL
+  TITLE:=Embedded SSL(mini)
+  SECTION:=libs
+  CATEGORY:=Libraries
+  ABI_VERSION:=$(PKG_VERSION)
   URL:=http://polarssl.org/
 endef
 
-define Package/libpolarssl/Default/description
- The aim of the PolarSSL project is to provide a quality, open-source 
- cryptographic library written in C and targeted at embedded systems.
+define Package/polarssl-mini/description
+Static library only for sha256 sum and RSA verification, derived from polarssl.
 endef
 
-define Package/libpolarssl
-$(call Package/polarssl/Default)
-  SECTION:=libs
-  CATEGORY:=Libraries
-  TITLE+= (library)
+define Build/Prepare
+	$(TAR) -C $(DL_DIR) -zxf $(DL_DIR)/polarssl-$(PKG_VERSION)-gpl.tgz
+	rm -rf $(PKG_BUILD_DIR)
+	mv $(DL_DIR)/polarssl-$(PKG_VERSION) $(PKG_BUILD_DIR)
+	$(Build/Patch)
 endef
-
-define Package/polarssl-progs
-$(call Package/polarssl/Default)
-  SECTION:=utils
-  CATEGORY:=Utilities
-  DEPENDS:=+libpolarssl
-  TITLE+= (programs)
-endef
-
-define Build/Configure
-endef
-
-TARGET_CFLAGS += $(FPIC)
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR) \
-		$(TARGET_CONFIGURE_OPTS) \
-		OFLAGS="$(TARGET_CFLAGS)" \
-		all
-	$(MAKE) -C $(PKG_BUILD_DIR) \
-		DESTDIR="$(PKG_INSTALL_DIR)/usr" \
-		install
 endef
+
+POLARSSL-MINI-SOURCES = \
+	$(PKG_BUILD_DIR)/include/polarssl/asn1.h \
+	$(PKG_BUILD_DIR)/include/polarssl/bignum.h \
+	$(PKG_BUILD_DIR)/include/polarssl/bn_mul.h \
+	$(PKG_BUILD_DIR)/include/polarssl/md.h \
+	$(PKG_BUILD_DIR)/include/polarssl/md_wrap.h \
+	$(PKG_BUILD_DIR)/include/polarssl/oid.h \
+	$(PKG_BUILD_DIR)/include/polarssl/rsa.h \
+	$(PKG_BUILD_DIR)/include/polarssl/sha256.h \
+	$(PKG_BUILD_DIR)/library/asn1parse.c \
+	$(PKG_BUILD_DIR)/library/bignum.c \
+	$(PKG_BUILD_DIR)/library/md.c \
+	$(PKG_BUILD_DIR)/library/md_wrap.c \
+	$(PKG_BUILD_DIR)/library/oid.c \
+	$(PKG_BUILD_DIR)/library/rsa.c \
+	$(PKG_BUILD_DIR)/library/sha256.c
+
 
 define Build/InstallDev
-	mkdir -p $(1)/usr/include
-	$(CP) $(PKG_INSTALL_DIR)/usr/include/polarssl $(1)/usr/include/
-	mkdir -p $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libpolarssl.{a,so} $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/include/polarssl-mini
+	$(foreach header_file,$(POLARSSL-MINI-SOURCES), $(CP) $(header_file) $(1)/usr/include/polarssl-mini;)
 endef
 
-define Package/libpolarssl/install
-	$(INSTALL_DIR) $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/libpolarssl.so $(1)/usr/lib/
+define Package/polarssl-mini/install
 endef
 
-define Package/polarssl-progs/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/polarssl_* $(1)/usr/bin/
-endef
-
-$(eval $(call BuildPackage,libpolarssl))
-$(eval $(call BuildPackage,polarssl-progs))
+$(eval $(call BuildPackage,polarssl-mini))
