@@ -24,6 +24,7 @@ failover() {
     local failover_to_wanid=$(query_config wanid $failover_to)
 
     local existing_failover=$(iptables -n -L FW${wanid}MARK -t mangle | echo $(($(wc -l) - 2)))
+    local iprule=$(($wanid * 10))
 
     add() {
 
@@ -35,11 +36,15 @@ failover() {
 	if [ "$existing_failover" == "2" ]; then
 	    if [ "$failover_to" != "balancer" -a "$failover_to" != "fastbalancer" -a "$failover_to" != "disable" -a "$failover_to_wanid" != "$wanid" ]; then
 		iptables -I FW${wanid}MARK 2 -t mangle -j FW${failover_to_wanid}MARK
+		iptables -I MultiWanRules 2 -t mangle -j FW${failover_to_wanid}MARK -m mark --mark 0x${iprule}
 	    elif [ "$failover_to" == "balancer" ]; then
 		iptables -I FW${wanid}MARK 2 -t mangle -j LoadBalancer
+		iptables -I MultiWanRules 2 -t mangle -j LoadBalancer -m mark --mark 0x${iprule}
 	    elif [ "$failover_to" == "fastbalancer" ]; then
 		iptables -I FW${wanid}MARK 2 -t mangle -j FastBalancer
+		iptables -I MultiWanRules 2 -t mangle -j FastBalancer -m mark --mark 0x${iprule}
 	    fi
+	    echo 1 >> /sys/kernel/debug/ecm/ecm_db/defunct_all
 	fi
 	mwnote "$1 has failed and is currently offline."
     }
@@ -52,6 +57,7 @@ failover() {
 
 	if [ "$existing_failover" == "3" ]; then
 	    iptables -D FW${wanid}MARK 2 -t mangle
+	    iptables -D MultiWanRules 2 -t mangle
 	fi
 	mwnote "$1 has recovered and is back online!"
     }
@@ -721,6 +727,7 @@ flush() {
     echo "## Flushing IP Rules & Routes ##"
 
     ip rule flush > /dev/null 2>&1
+    ip rule add lookup local prio 1 > /dev/null 2>&1
     ip rule add lookup main prio 32766 > /dev/null 2>&1
     ip rule add lookup default prio 32767 > /dev/null 2>&1
 
