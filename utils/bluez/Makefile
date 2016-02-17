@@ -150,6 +150,10 @@ define Package/bluez-daemon/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/profiles/proximity/proximity.conf $(1)/etc/bluetooth/proximity.conf
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/bluetoothd.init $(1)/etc/init.d/bluetoothd
+	$(INSTALL_BIN) ./files/bluez-bccmd.init $(1)/etc/init.d/bluez-bccmd
+	$(INSTALL_DIR) $(1)/etc/bluetooth
+	$(INSTALL_DATA) ./files/csr8x11-a12-bt4.2-patch.psr $(1)/etc/bluetooth/
+	$(INSTALL_DATA) ./files/csr8x11-coex.psr $(1)/etc/bluetooth/
 endef
 
 $(eval $(call BuildPackage,bluez-examples))
