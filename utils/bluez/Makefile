@@ -53,6 +53,7 @@ define Package/bluez/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/dbus-1/system.d
 	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/etc/bluetooth
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/bccmd $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/hciattach $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/hcidump $(1)/usr/bin/
@@ -70,6 +71,9 @@ define Package/bluez/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/hid2hci $(1)/usr/bin/
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/src/bluetooth.conf $(1)/etc/dbus-1/system.d/bluetooth.conf
 	$(INSTALL_BIN) ./files/bluetooth.init $(1)/etc/init.d/bluetooth
+	$(INSTALL_BIN) ./files/bluez-bccmd.init $(1)/etc/init.d/bluez-bccmd
+	$(INSTALL_DATA) ./files/csr8x11-a12-bt4.2-patch.psr $(1)/etc/bluetooth/
+	$(INSTALL_DATA) ./files/csr8x11-coex.psr $(1)/etc/bluetooth/
 endef
 
 $(eval $(call BuildPackage,bluez))
