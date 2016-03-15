@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openslp
-PKG_VERSION:=1.2.1
-PKG_RELEASE:=4
+PKG_VERSION:=2.0.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/openslp
-PKG_MD5SUM:=ff9999d1b44017281dd00ed2c4d32330
+PKG_MD5SUM:=18cf7940bcc444e32592cf34e84f833f
 
 PKG_INSTALL:=1
 PKG_FIXUP:=autoreconf
@@ -23,12 +23,13 @@ include $(INCLUDE_DIR)/package.mk
 define Package/openslp
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libopenssl
+  DEPENDS:=+libopenssl +libpthread
   TITLE:=openslp
   URL:=http://www.openslp.org/
 endef
 
-#CONFIGURE_ARGS += \
+CONFIGURE_ARGS += \
+	ac_cv_func_fnmatch_works=yes
 #	--disable-libwrap 
 
 #MAKE_FLAGS += \
