@@ -8,16 +8,16 @@
 // Signal Configuration
 // --------------------
 // PSKEY_COEX_PIO_UNITY_3_BT_ACTIVE
-// BT_ACTIVE (PIO=1, polarity=active high)
-&2483 = 0001 0001
+// BT_ACTIVE (PIO=0, polarity=active high)
+&2483 = 0000 0001
 
 // PSKEY_COEX_PIO_UNITY_3_BT_STATUS
-// BT_STATUS (PIO=2, polarity=active high)
-&2484 = 0002 0001
+// BT_STATUS (PIO=1, polarity=active high)
+&2484 = 0001 0001
 
 // PSKEY_COEX_PIO_UNITY_3_WLAN_DENY
-// WLAN_DENY (PIO=5, polarity=active high)
-&2485 = 0005 0001
+// WLAN_DENY (PIO=2, polarity=active high)
+&2485 = 0002 0001
 
 // Priority Configuration
 // ----------------------
