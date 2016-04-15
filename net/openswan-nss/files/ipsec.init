@@ -372,11 +372,11 @@ script_command() {
 load_nss_fastpath() {
 	/etc/init.d/firewall stop
 	/etc/init.d/qca-nss-ecm start
-	/etc/init.d/qca-nss-ecm enable
+	/etc/init.d/qca-nss-ecm enable_ecm
 }
 
 unload_nss_fastpath() {
-	/etc/init.d/qca-nss-ecm disable
+	/etc/init.d/qca-nss-ecm disable_ecm
 	/etc/init.d/firewall start
 }
 
