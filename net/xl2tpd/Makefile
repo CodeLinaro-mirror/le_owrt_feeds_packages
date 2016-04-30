@@ -8,14 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=xl2tpd
-PKG_VERSION:=1.3.1
-PKG_RELEASE:=2
+PKG_VERSION:=1.3.6
+PKG_RELEASE:=1
+PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
 
+PKG_RELEASE=$(PKG_SOURCE_VERSION)
+
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/xelerance/xl2tpd.git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=5619e1771048e74b729804e8602f409af0f3faea
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-# Host seems to be down.
-#PKG_SOURCE_URL:=ftp://ftp.xelerance.com/xl2tpd/
-PKG_MD5SUM:=cf61576fef5c2d6c68279a408ec1f0d5
-PKG_SOURCE_URL:=http://pkgs.fedoraproject.org/lookaside/pkgs/xl2tpd/xl2tpd-$(PKG_VERSION).tar.gz/$(PKG_MD5SUM)/
 
 PKG_INSTALL:=1
 
@@ -27,7 +30,7 @@ define Package/xl2tpd
   TITLE:=An L2TP (Layer 2 Tunneling Protocol) daemon
   URL:=http://www.xelerance.com/software/xl2tpd/
   SUBMENU:=VPN
-  DEPENDS:=+ppp-mod-pppol2tp +resolveip
+  DEPENDS:=+ppp-mod-pppol2tp +ip +resolveip
 endef
 
 define Package/xl2tpd/description

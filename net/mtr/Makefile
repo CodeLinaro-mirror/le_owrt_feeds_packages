@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2012 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mtr
-PKG_VERSION:=0.82
+PKG_VERSION:=0.85
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ftp://ftp.bitwizard.nl/mtr
-PKG_MD5SUM:=10601ea543fda3e51545c4bce195b64c
+PKG_MD5SUM:=5e665c617e5659b6ec3e201ee7488eb1
 
 PKG_INSTALL:=1
 
@@ -27,6 +27,7 @@ define Package/mtr
   DEPENDS:=+libncurses
   TITLE:=Full screen ncurses traceroute tool
   URL:=http://www.bitwizard.nl/mtr/
+  MAINTAINER:=Jonathan McCrohan <jmccrohan@gmail.com>
 endef
 
 define Package/mtr/description
@@ -42,9 +43,7 @@ endef
 
 CONFIGURE_ARGS += \
 	--without-gtk \
-
-#CONFIGURE_VARS += \
-#	ac_cv_lib_resolv_res_mkquery=no \
+	--without-glib \
 
 define Build/Configure
 	(cd $(PKG_BUILD_DIR); touch \

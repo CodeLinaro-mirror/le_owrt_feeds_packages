@@ -25,6 +25,7 @@ define Package/luafilesystem
   CATEGORY:=Languages
   TITLE:=LuaFileSystem
   URL:=http://keplerproject.github.com/luafilesystem/
+  MAINTAINER:=W. Michael Petullo <mike@flyn.org>
   DEPENDS:=+liblua
 endef
 

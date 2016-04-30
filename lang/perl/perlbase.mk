@@ -6,18 +6,6 @@ URL:=http://www.cpan.org/
 DEPENDS:=perl
 endef
 
-define Package/perlbase-abbrev
-$(call Package/perlbase-template)
-TITLE:=abbrev perl module
-endef
-
-define Package/perlbase-abbrev/install
-$(call perlmod/Install,$(1),abbrev.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-abbrev))
-
-
 define Package/perlbase-anydbm-file
 $(call Package/perlbase-template)
 TITLE:=AnyDBM_File perl module
@@ -42,18 +30,6 @@ endef
 $(eval $(call BuildPackage,perlbase-archive))
 
 
-define Package/perlbase-assert
-$(call Package/perlbase-template)
-TITLE:=assert perl module
-endef
-
-define Package/perlbase-assert/install
-$(call perlmod/Install,$(1),assert.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-assert))
-
-
 define Package/perlbase-attribute
 $(call Package/perlbase-template)
 TITLE:=Attribute perl module
@@ -72,22 +48,10 @@ TITLE:=attributes perl module
 endef
 
 define Package/perlbase-attributes/install
-$(call perlmod/Install,$(1),attributes.pm,)
+$(call perlmod/Install,$(1),attributes.pm auto/attributes,)
 endef
 
 $(eval $(call BuildPackage,perlbase-attributes))
-
-
-define Package/perlbase-attrs
-$(call Package/perlbase-template)
-TITLE:=attrs perl module
-endef
-
-define Package/perlbase-attrs/install
-$(call perlmod/Install,$(1),attrs.pm auto/attrs,)
-endef
-
-$(eval $(call BuildPackage,perlbase-attrs))
 
 
 define Package/perlbase-autoloader
@@ -162,25 +126,13 @@ endef
 $(eval $(call BuildPackage,perlbase-benchmark))
 
 
-define Package/perlbase-bigfloat
-$(call Package/perlbase-template)
-TITLE:=bigfloat perl module
-endef
-
-define Package/perlbase-bigfloat/install
-$(call perlmod/Install,$(1),bigfloat.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-bigfloat))
-
-
 define Package/perlbase-bigint
 $(call Package/perlbase-template)
 TITLE:=bigint perl module
 endef
 
 define Package/perlbase-bigint/install
-$(call perlmod/Install,$(1),bigint.pl bigint.pm,)
+$(call perlmod/Install,$(1),bigint.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-bigint))
@@ -196,18 +148,6 @@ $(call perlmod/Install,$(1),bignum.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-bignum))
-
-
-define Package/perlbase-bigrat
-$(call Package/perlbase-template)
-TITLE:=bigrat perl module
-endef
-
-define Package/perlbase-bigrat/install
-$(call perlmod/Install,$(1),bigrat.pl bigrat.pm,)
-endef
-
-$(eval $(call BuildPackage,perlbase-bigrat))
 
 
 define Package/perlbase-blib
@@ -234,18 +174,6 @@ endef
 $(eval $(call BuildPackage,perlbase-bytes))
 
 
-define Package/perlbase-cacheout
-$(call Package/perlbase-template)
-TITLE:=cacheout perl module
-endef
-
-define Package/perlbase-cacheout/install
-$(call perlmod/Install,$(1),cacheout.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-cacheout))
-
-
 define Package/perlbase-cgi
 $(call Package/perlbase-template)
 TITLE:=CGI perl module
@@ -264,7 +192,7 @@ TITLE:=charnames perl module
 endef
 
 define Package/perlbase-charnames/install
-$(call perlmod/Install,$(1),charnames.pm,)
+$(call perlmod/Install,$(1),charnames.pm _charnames.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-charnames))
@@ -280,18 +208,6 @@ $(call perlmod/Install,$(1),Class,)
 endef
 
 $(eval $(call BuildPackage,perlbase-class))
-
-
-define Package/perlbase-complete
-$(call Package/perlbase-template)
-TITLE:=complete perl module
-endef
-
-define Package/perlbase-complete/install
-$(call perlmod/Install,$(1),complete.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-complete))
 
 
 define Package/perlbase-compress
@@ -312,7 +228,7 @@ TITLE:=Config perl module
 endef
 
 define Package/perlbase-config/install
-$(call perlmod/Install,$(1),Config Config.pm Config_heavy.pl,)
+$(call perlmod/Install,$(1),Config Config.pm Config_heavy.pl Config_git.pl,)
 endef
 
 $(eval $(call BuildPackage,perlbase-config))
@@ -328,30 +244,6 @@ $(call perlmod/Install,$(1),CPAN CPAN.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-cpan))
-
-
-define Package/perlbase-cpanplus
-$(call Package/perlbase-template)
-TITLE:=CPANPLUS perl module
-endef
-
-define Package/perlbase-cpanplus/install
-$(call perlmod/Install,$(1),CPANPLUS CPANPLUS.pm,CPANPLUS/FAQ.pod CPANPLUS/Hacking.pod CPANPLUS/Shell/Default/Plugins/HOWTO.pod)
-endef
-
-$(eval $(call BuildPackage,perlbase-cpanplus))
-
-
-define Package/perlbase-ctime
-$(call Package/perlbase-template)
-TITLE:=ctime perl module
-endef
-
-define Package/perlbase-ctime/install
-$(call perlmod/Install,$(1),ctime.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-ctime))
 
 
 define Package/perlbase-cwd
@@ -464,18 +356,6 @@ endef
 $(eval $(call BuildPackage,perlbase-dirhandle))
 
 
-define Package/perlbase-dotsh
-$(call Package/perlbase-template)
-TITLE:=dotsh perl module
-endef
-
-define Package/perlbase-dotsh/install
-$(call perlmod/Install,$(1),dotsh.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-dotsh))
-
-
 define Package/perlbase-dumpvalue
 $(call Package/perlbase-template)
 TITLE:=Dumpvalue perl module
@@ -506,7 +386,7 @@ TITLE:=DynaLoader perl module
 endef
 
 define Package/perlbase-dynaloader/install
-$(call perlmod/Install,$(1),DynaLoader.pm auto/DynaLoader,)
+$(call perlmod/Install,$(1),DynaLoader.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-dynaloader))
@@ -578,22 +458,10 @@ TITLE:=essential perl module
 endef
 
 define Package/perlbase-essential/install
-$(call perlmod/Install,$(1),Carp Carp.pm Exporter Exporter.pm constant.pm lib.pm locale.pm overload.pm strict.pm subs.pm vars.pm warnings warnings.pm,)
+$(call perlmod/Install,$(1),Carp Carp.pm Exporter Exporter.pm constant.pm lib.pm locale.pm overload.pm overloading.pm parent.pm strict.pm subs.pm vars.pm warnings warnings.pm deprecate.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-essential))
-
-
-define Package/perlbase-exceptions
-$(call Package/perlbase-template)
-TITLE:=exceptions perl module
-endef
-
-define Package/perlbase-exceptions/install
-$(call perlmod/Install,$(1),exceptions.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-exceptions))
 
 
 define Package/perlbase-extutils
@@ -606,18 +474,6 @@ $(call perlmod/Install,$(1),ExtUtils,ExtUtils/MakeMaker/FAQ.pod ExtUtils/MakeMak
 endef
 
 $(eval $(call BuildPackage,perlbase-extutils))
-
-
-define Package/perlbase-fastcwd
-$(call Package/perlbase-template)
-TITLE:=fastcwd perl module
-endef
-
-define Package/perlbase-fastcwd/install
-$(call perlmod/Install,$(1),fastcwd.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-fastcwd))
 
 
 define Package/perlbase-fatal
@@ -728,18 +584,6 @@ endef
 $(eval $(call BuildPackage,perlbase-filter))
 
 
-define Package/perlbase-find
-$(call Package/perlbase-template)
-TITLE:=find perl module
-endef
-
-define Package/perlbase-find/install
-$(call perlmod/Install,$(1),find.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-find))
-
-
 define Package/perlbase-findbin
 $(call Package/perlbase-template)
 TITLE:=FindBin perl module
@@ -750,30 +594,6 @@ $(call perlmod/Install,$(1),FindBin.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-findbin))
-
-
-define Package/perlbase-finddepth
-$(call Package/perlbase-template)
-TITLE:=finddepth perl module
-endef
-
-define Package/perlbase-finddepth/install
-$(call perlmod/Install,$(1),finddepth.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-finddepth))
-
-
-define Package/perlbase-flush
-$(call Package/perlbase-template)
-TITLE:=flush perl module
-endef
-
-define Package/perlbase-flush/install
-$(call perlmod/Install,$(1),flush.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-flush))
 
 
 define Package/perlbase-gdbm-file
@@ -789,40 +609,16 @@ endef
 $(eval $(call BuildPackage,perlbase-gdbm-file))
 
 
-define Package/perlbase-getcwd
-$(call Package/perlbase-template)
-TITLE:=getcwd perl module
-endef
-
-define Package/perlbase-getcwd/install
-$(call perlmod/Install,$(1),getcwd.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-getcwd))
-
-
 define Package/perlbase-getopt
 $(call Package/perlbase-template)
 TITLE:=Getopt perl module
 endef
 
 define Package/perlbase-getopt/install
-$(call perlmod/Install,$(1),Getopt newgetopt.pl,)
+$(call perlmod/Install,$(1),Getopt,)
 endef
 
 $(eval $(call BuildPackage,perlbase-getopt))
-
-
-define Package/perlbase-getoptpl
-$(call Package/perlbase-template)
-TITLE:=getoptpl perl module
-endef
-
-define Package/perlbase-getoptpl/install
-$(call perlmod/Install,$(1),getopt.pl getopts.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-getoptpl))
 
 
 define Package/perlbase-hash
@@ -835,18 +631,6 @@ $(call perlmod/Install,$(1),Hash auto/Hash,)
 endef
 
 $(eval $(call BuildPackage,perlbase-hash))
-
-
-define Package/perlbase-hostname
-$(call Package/perlbase-template)
-TITLE:=hostname perl module
-endef
-
-define Package/perlbase-hostname/install
-$(call perlmod/Install,$(1),hostname.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-hostname))
 
 
 define Package/perlbase-i18n
@@ -873,18 +657,6 @@ endef
 $(eval $(call BuildPackage,perlbase-if))
 
 
-define Package/perlbase-importenv
-$(call Package/perlbase-template)
-TITLE:=importenv perl module
-endef
-
-define Package/perlbase-importenv/install
-$(call perlmod/Install,$(1),importenv.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-importenv))
-
-
 define Package/perlbase-integer
 $(call Package/perlbase-template)
 TITLE:=integer perl module
@@ -900,6 +672,9 @@ $(eval $(call BuildPackage,perlbase-integer))
 define Package/perlbase-io
 $(call Package/perlbase-template)
 TITLE:=IO perl module
+DEPENDS+=+perlbase-symbol +perlbase-selectsaver +perlbase-essential \
+         +perlbase-xsloader +perlbase-fcntl +perlbase-tie \
+         +perlbase-file +perlbase-errno
 endef
 
 define Package/perlbase-io/install
@@ -957,30 +732,6 @@ endef
 $(eval $(call BuildPackage,perlbase-locale))
 
 
-define Package/perlbase-log
-$(call Package/perlbase-template)
-TITLE:=Log perl module
-endef
-
-define Package/perlbase-log/install
-$(call perlmod/Install,$(1),Log,)
-endef
-
-$(eval $(call BuildPackage,perlbase-log))
-
-
-define Package/perlbase-look
-$(call Package/perlbase-template)
-TITLE:=look perl module
-endef
-
-define Package/perlbase-look/install
-$(call perlmod/Install,$(1),look.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-look))
-
-
 define Package/perlbase-math
 $(call Package/perlbase-template)
 TITLE:=Math perl module
@@ -1035,7 +786,7 @@ TITLE:=mro perl module
 endef
 
 define Package/perlbase-mro/install
-$(call perlmod/Install,$(1),mro.pm,)
+$(call perlmod/Install,$(1),mro.pm auto/mro,)
 endef
 
 $(eval $(call BuildPackage,perlbase-mro))
@@ -1077,18 +828,6 @@ endef
 $(eval $(call BuildPackage,perlbase-o))
 
 
-define Package/perlbase-object
-$(call Package/perlbase-template)
-TITLE:=Object perl module
-endef
-
-define Package/perlbase-object/install
-$(call perlmod/Install,$(1),Object,)
-endef
-
-$(eval $(call BuildPackage,perlbase-object))
-
-
 define Package/perlbase-opcode
 $(call Package/perlbase-template)
 TITLE:=Opcode perl module
@@ -1107,7 +846,7 @@ TITLE:=open perl module
 endef
 
 define Package/perlbase-open/install
-$(call perlmod/Install,$(1),open.pm open2.pl open3.pl,)
+$(call perlmod/Install,$(1),open.pm,)
 endef
 
 $(eval $(call BuildPackage,perlbase-open))
@@ -1196,18 +935,6 @@ endef
 $(eval $(call BuildPackage,perlbase-posix))
 
 
-define Package/perlbase-pwd
-$(call Package/perlbase-template)
-TITLE:=pwd perl module
-endef
-
-define Package/perlbase-pwd/install
-$(call perlmod/Install,$(1),pwd.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-pwd))
-
-
 define Package/perlbase-re
 $(call Package/perlbase-template)
 TITLE:=re perl module
@@ -1292,30 +1019,6 @@ endef
 $(eval $(call BuildPackage,perlbase-selfloader))
 
 
-define Package/perlbase-shell
-$(call Package/perlbase-template)
-TITLE:=Shell perl module
-endef
-
-define Package/perlbase-shell/install
-$(call perlmod/Install,$(1),Shell.pm,)
-endef
-
-$(eval $(call BuildPackage,perlbase-shell))
-
-
-define Package/perlbase-shellwords
-$(call Package/perlbase-template)
-TITLE:=shellwords perl module
-endef
-
-define Package/perlbase-shellwords/install
-$(call perlmod/Install,$(1),shellwords.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-shellwords))
-
-
 define Package/perlbase-sigtrap
 $(call Package/perlbase-template)
 TITLE:=sigtrap perl module
@@ -1352,18 +1055,6 @@ endef
 $(eval $(call BuildPackage,perlbase-sort))
 
 
-define Package/perlbase-stat
-$(call Package/perlbase-template)
-TITLE:=stat perl module
-endef
-
-define Package/perlbase-stat/install
-$(call perlmod/Install,$(1),stat.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-stat))
-
-
 define Package/perlbase-storable
 $(call Package/perlbase-template)
 TITLE:=Storable perl module
@@ -1374,18 +1065,6 @@ $(call perlmod/Install,$(1),Storable.pm auto/Storable,)
 endef
 
 $(eval $(call BuildPackage,perlbase-storable))
-
-
-define Package/perlbase-switch
-$(call Package/perlbase-template)
-TITLE:=Switch perl module
-endef
-
-define Package/perlbase-switch/install
-$(call perlmod/Install,$(1),Switch.pm,)
-endef
-
-$(eval $(call BuildPackage,perlbase-switch))
 
 
 define Package/perlbase-symbol
@@ -1412,30 +1091,6 @@ endef
 $(eval $(call BuildPackage,perlbase-sys))
 
 
-define Package/perlbase-syslog
-$(call Package/perlbase-template)
-TITLE:=syslog perl module
-endef
-
-define Package/perlbase-syslog/install
-$(call perlmod/Install,$(1),syslog.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-syslog))
-
-
-define Package/perlbase-tainted
-$(call Package/perlbase-template)
-TITLE:=tainted perl module
-endef
-
-define Package/perlbase-tainted/install
-$(call perlmod/Install,$(1),tainted.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-tainted))
-
-
 define Package/perlbase-term
 $(call Package/perlbase-template)
 TITLE:=Term perl module
@@ -1446,18 +1101,6 @@ $(call perlmod/Install,$(1),Term,)
 endef
 
 $(eval $(call BuildPackage,perlbase-term))
-
-
-define Package/perlbase-termcap
-$(call Package/perlbase-template)
-TITLE:=termcap perl module
-endef
-
-define Package/perlbase-termcap/install
-$(call perlmod/Install,$(1),termcap.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-termcap))
 
 
 define Package/perlbase-test
@@ -1481,7 +1124,7 @@ TITLE:=Text perl module
 endef
 
 define Package/perlbase-text/install
-$(call perlmod/Install,$(1),Text auto/Text,)
+$(call perlmod/Install,$(1),Text,)
 endef
 
 $(eval $(call BuildPackage,perlbase-text))
@@ -1517,7 +1160,7 @@ TITLE:=Tie perl module
 endef
 
 define Package/perlbase-tie/install
-$(call perlmod/Install,$(1),Tie,)
+$(call perlmod/Install,$(1),Tie auto/Tie,)
 endef
 
 $(eval $(call BuildPackage,perlbase-tie))
@@ -1533,18 +1176,6 @@ $(call perlmod/Install,$(1),Time auto/Time,)
 endef
 
 $(eval $(call BuildPackage,perlbase-time))
-
-
-define Package/perlbase-timelocal
-$(call Package/perlbase-template)
-TITLE:=timelocal perl module
-endef
-
-define Package/perlbase-timelocal/install
-$(call perlmod/Install,$(1),timelocal.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-timelocal))
 
 
 define Package/perlbase-unicode
@@ -1607,25 +1238,13 @@ endef
 $(eval $(call BuildPackage,perlbase-utf8))
 
 
-define Package/perlbase-validate
-$(call Package/perlbase-template)
-TITLE:=validate perl module
-endef
-
-define Package/perlbase-validate/install
-$(call perlmod/Install,$(1),validate.pl,)
-endef
-
-$(eval $(call BuildPackage,perlbase-validate))
-
-
 define Package/perlbase-version
 $(call Package/perlbase-template)
 TITLE:=version perl module
 endef
 
 define Package/perlbase-version/install
-$(call perlmod/Install,$(1),version.pm,)
+$(call perlmod/Install,$(1),version.pm version,)
 endef
 
 $(eval $(call BuildPackage,perlbase-version))

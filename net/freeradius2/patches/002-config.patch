@@ -259,7 +259,7 @@
  
  # Should likely be ${localstatedir}/lib/radiusd
  db_dir = ${raddbdir}
-@@ -290,7 +290,7 @@ listen {
+@@ -323,7 +323,7 @@ listen {
  	#  If your system does not support this feature, you will
  	#  get an error if you try to use it.
  	#
@@ -268,7 +268,7 @@
  
  	#  Per-socket lists of clients.  This is a very useful feature.
  	#
-@@ -317,7 +317,7 @@ listen {
+@@ -350,7 +350,7 @@ listen {
  #	ipv6addr = ::
  	port = 0
  	type = acct
@@ -277,7 +277,7 @@
  #	clients = per_socket_clients
  }
  
-@@ -541,8 +541,8 @@ security {
+@@ -584,8 +584,8 @@ security {
  #
  #  allowed values: {no, yes}
  #
@@ -288,7 +288,7 @@
  
  
  # CLIENTS CONFIGURATION
-@@ -739,7 +739,7 @@ instantiate {
+@@ -782,7 +782,7 @@ instantiate {
  	#  The entire command line (and output) must fit into 253 bytes.
  	#
  	#  e.g. Framed-Pool = `%{exec:/bin/echo foo}`
@@ -297,7 +297,7 @@
  
  	#
  	#  The expression module doesn't do authorization,
-@@ -756,15 +756,15 @@ instantiate {
+@@ -799,15 +799,15 @@ instantiate {
  	#  other xlat functions such as md5, sha1 and lc.
  	#
  	#  We do not recommend removing it's listing here.
@@ -316,7 +316,7 @@
  
  	# subsections here can be thought of as "virtual" modules.
  	#
-@@ -788,7 +788,7 @@ instantiate {
+@@ -831,7 +831,7 @@ instantiate {
  #	to multiple times.
  #
  ######################################################################
@@ -325,7 +325,7 @@
  
  ######################################################################
  #
-@@ -798,9 +798,9 @@ $INCLUDE policy.conf
+@@ -841,9 +841,9 @@ $INCLUDE policy.conf
  #	match the regular expression: /[a-zA-Z0-9_.]+/
  #
  #	It allows you to define new virtual servers simply by placing
@@ -337,7 +337,7 @@
  
  ######################################################################
  #
-@@ -808,7 +808,7 @@ $INCLUDE sites-enabled/
+@@ -851,7 +851,7 @@ $INCLUDE sites-enabled/
  #	"authenticate {}", "accounting {}", have been moved to the
  #	the file:
  #

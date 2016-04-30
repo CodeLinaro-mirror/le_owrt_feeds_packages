@@ -15,8 +15,8 @@ PKG_RELEASE:=2
 PKG_SOURCE:=$(PKG_NAME)_$(PKG_VERSION)+dfsg.orig.tar.gz
 PKG_SOURCE_URL:=http://ftp2.de.debian.org/debian/pool/main/l/lsof
 PKG_MD5SUM:=23420509564a897b76055f9d84d19068
-
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)+dfsg.orig
+PKG_MAINTAINER:=Maxim Storchak <m.storchak@gmail.com>
 
 include $(INCLUDE_DIR)/package.mk
 

@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wavemon
-PKG_VERSION:=0.7.5
-PKG_RELEASE:=2
+PKG_VERSION:=0.7.6
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://eden-feed.erg.abdn.ac.uk/wavemon/stable-releases
-PKG_MD5SUM:=77d4a0f099ca98cf98a915adc70694ba
+PKG_MD5SUM:=c60e25feb8b1785cf14371556f0613f4
 
 PKG_INSTALL:=1
 
@@ -24,7 +24,7 @@ define Package/wavemon
   CATEGORY:=Network
   MAINTAINER:=Jonathan McCrohan <jmccrohan@gmail.com>
   TITLE:=N-curses based wireless network devices monitor
-  DEPENDS:=+libncurses
+  DEPENDS:=+libncurses +libpthread
   SUBMENU:=wireless
   URL:=http://eden-feed.erg.abdn.ac.uk/wavemon/
 endef
@@ -38,6 +38,8 @@ endef
 
 CONFIGURE_VARS += \
 	ac_cv_lib_cap_cap_get_flag=no
+
+TARGET_CFLAGS += -pthread
 
 MAKE_FLAGS += \
 	CFLAGS="$(TARGET_CFLAGS) -L$(STAGING_DIR)/usr/lib -I$(STAGING_DIR)/usr/include"

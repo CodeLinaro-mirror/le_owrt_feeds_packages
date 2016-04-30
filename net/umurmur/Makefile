@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2009-2012 OpenWrt.org
+# Copyright (C) 2009-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -7,12 +7,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=umurmur
-PKG_VERSION:=0.2.14
+PKG_VERSION:=0.2.15
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://umurmur.googlecode.com/files
-PKG_MD5SUM:=e22121b4b91f4c9de43f858f6defa0b0
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_URL:=git://github.com/fatbob313/umurmur.git
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_VERSION:=f66c0c3d630aaff1c4d589bc4d884067f00b6529
+
+PKG_INSTALL:=1
+
+PKG_MAINTAINER:=Martin Johansson <martin@fatbob.nu>
+PKG_LICENSE:=BSD-3-Clause
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(BUILD_VARIANT)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -61,6 +68,11 @@ define Build/Compile
 	CFLAGS="$(TARGET_CFLAGS)" \
 	LDFLAGS="$(TARGET_LDFLAGS)" \
 	$(MAKE) -C $(PKG_BUILD_DIR)/src all
+endef
+
+define Build/Configure
+	cd $(PKG_BUILD_DIR) && ./autogen.sh
+	$(call Build/Configure/Default)
 endef
 
 define Package/umurmur-openssl/conffiles

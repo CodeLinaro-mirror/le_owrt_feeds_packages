@@ -25,6 +25,7 @@ define Package/luasocket
   CATEGORY:=Languages
   TITLE:=LuaSocket
   URL:=http://luasocket.luaforge.net/
+  MAINTAINER:=W. Michael Petullo <mike@flyn.org>
   DEPENDS:=+lua
 endef
 

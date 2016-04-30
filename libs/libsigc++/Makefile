@@ -8,12 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libsigc++
-PKG_VERSION:=2.2.10
+PKG_VERSION:=2.3.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=@GNOME/libsigc++/2.2
-PKG_MD5SUM:=73419b477f3bb9ddb9905c88a92f4b4c
+PKG_SOURCE_URL:=@GNOME/libsigc++/2.3
+PKG_MD5SUM:=06a0569e8ba161d3428e7daa838682f8
+PKG_MAINTAINER:=Steven Barth <cyrus@openwrt.org>
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1

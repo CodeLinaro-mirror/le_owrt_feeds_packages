@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2012 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libmodbus
-PKG_VERSION:=3.0.3
+PKG_VERSION:=3.0.6
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://github.com/downloads/stephane/libmodbus/
-PKG_MD5SUM:=b5042d833c6c132e6fb2551af133a342
+PKG_SOURCE_URL:=http://libmodbus.org/releases
+PKG_MD5SUM:=c80f88b6ca19cabc4ceffc195ca07771
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -25,6 +25,7 @@ define Package/libmodbus
   CATEGORY:=Libraries
   URL:=http://www.libmodbus.org
   TITLE:=libmodbus
+  MAINTAINER:=Michael Heimpold <mhei@heimpold.de>
 endef
 
 define Package/libmodbus/description

@@ -8,16 +8,22 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=zip
-PKG_VERSION:=2.32
-PKG_RELEASE:=2
+PKG_REV:=30
+PKG_VERSION:=3.0
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)232.zip
+PKG_SOURCE:=$(PKG_NAME)$(PKG_REV).tar.gz
 PKG_SOURCE_URL:=@SF/infozip
-PKG_MD5SUM:=da947ed356e5fdb30ff4bc3dc7698f33
+PKG_MD5SUM:=7b74551e63f8ee6aab6fbc86676c0d37
+PKG_MAINTAINER:=Álvaro Fernández Rojas <noltari@gmail.com>
+
+PKG_LICENSE:=BSD-4-Clause
+PKG_LICENSE_FILES:=LICENSE
+
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)/zip$(PKG_REV)
+PKG_CHECK_FORMAT_SECURITY:=0
 
 include $(INCLUDE_DIR)/package.mk
-
-PKG_UNPACK=unzip -d $(PKG_BUILD_DIR)/ $(DL_DIR)/$(PKG_SOURCE)
 
 define Package/zip
   SECTION:=utils
@@ -25,7 +31,7 @@ define Package/zip
   DEPENDS:=
   TITLE:=Archiver for .zip files
   URL:=http://infozip.sourceforge.net/Zip.html
-  SUBMENU:=compression
+  SUBMENU:=Compression
 endef
 
 define Package/zip/description
@@ -44,6 +50,7 @@ define Build/Compile
 		CFLAGS="$(TARGET_CFLAGS)" \
 		CC="$(TARGET_CC) $(TARGET_CFLAGS) -O $(TARGET_CPPFLAGS) -I. -DUNIX" \
 		LD="$(TARGET_CC) $(TARGET_LDFLAGS)" \
+		IZ_BZIP2="no" \
 		install
 endef
 

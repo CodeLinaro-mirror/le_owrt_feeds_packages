@@ -17,15 +17,18 @@ PKG_MD5SUM:=7a60495208b9383225493c6dd6abb2f0
 
 PKG_FIXUP:=autoreconf
 PKG_REMOVE_FILES:=aclocal.m4 libltdl/aclocal.m4
+PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+PKG_USE_MIPS16:=0
 
 COLLECTD_PLUGINS_DISABLED:= \
 	apple_sensors \
 	battery \
 	cpufreq \
 	curl_json \
+	dbi \
 	entropy \
 	genericjmx \
 	gmond \
@@ -37,12 +40,14 @@ COLLECTD_PLUGINS_DISABLED:= \
 	mbmon \
 	memcachec \
 	memcached \
+	modbus \
 	monitorus \
 	multimeter \
 	netapp \
 	nfs \
 	notify_desktop \
 	notify_email \
+	nut \
 	openvz \
 	oracle \
 	perl \
@@ -69,7 +74,6 @@ COLLECTD_PLUGINS_SELECTED:= \
 	cpu \
 	csv \
 	curl \
-	dbi \
 	df \
 	disk \
 	dns \
@@ -85,13 +89,11 @@ COLLECTD_PLUGINS_SELECTED:= \
 	logfile \
 	madwifi \
 	memory \
-	modbus \
 	mysql \
 	netlink \
 	network \
 	nginx \
 	ntpd \
-	nut \
 	olsrd \
 	onewire \
 	openvpn \
@@ -192,11 +194,6 @@ ifneq ($(CONFIG_PACKAGE_collectd-mod-netlink),)
   CONFIGURE_ARGS+= --with-libnetlink="$(STAGING_DIR)/usr"
 endif
 
-# exception: mod-modbus needs libmodbus
-ifneq ($(CONFIG_PACKAGE_collectd-mod-modbus),)
-  CONFIGURE_ARGS+= --with-libmodbus="$(STAGING_DIR)/usr"
-endif
-
 # exception: mod-onewire needs libow-capi
 ifneq ($(CONFIG_PACKAGE_collectd-mod-onewire),)
   CONFIGURE_ARGS+= --with-libowcapi="$(STAGING_DIR)/usr"
@@ -261,7 +258,7 @@ $(eval $(call BuildPlugin,contextswitch,context switch input,contextswitch,))
 $(eval $(call BuildPlugin,cpu,CPU input,cpu,))
 $(eval $(call BuildPlugin,csv,CSV output,csv,))
 $(eval $(call BuildPlugin,curl,cURL input,curl,+PACKAGE_collectd-mod-curl:libcurl))
-$(eval $(call BuildPlugin,dbi,relational database input,dbi,+PACKAGE_collectd-mod-dbi:libdbi))
+#$(eval $(call BuildPlugin,dbi,relational database input,dbi,+PACKAGE_collectd-mod-dbi:libdbi))
 $(eval $(call BuildPlugin,df,disk space input,df,))
 $(eval $(call BuildPlugin,disk,disk usage/timing input,disk,))
 $(eval $(call BuildPlugin,dns,DNS traffic input,dns,+PACKAGE_collectd-mod-dns:libpcap))
@@ -276,14 +273,13 @@ $(eval $(call BuildPlugin,iwinfo,libiwinfo wireless statistics,iwinfo,+PACKAGE_c
 $(eval $(call BuildPlugin,load,system load input,load,))
 $(eval $(call BuildPlugin,logfile,log files output,logfile,))
 $(eval $(call BuildPlugin,madwifi,MadWifi status input,madwifi,))
-$(eval $(call BuildPlugin,mysql,MySQL status input,mysql,+PACKAGE_collectd-mod-mysql:libmysqlclient-r))
+#$(eval $(call BuildPlugin,mysql,MySQL status input,mysql,+PACKAGE_collectd-mod-mysql:libmysqlclient-r))
 $(eval $(call BuildPlugin,memory,physical memory usage input,memory,))
-$(eval $(call BuildPlugin,modbus,read variables through libmodbus,modbus,+PACKAGE_collectd-mod-modbus:libmodbus @BROKEN))
-$(eval $(call BuildPlugin,netlink,netlink input,netlink,+PACKAGE_collectd-mod-netlink:ip))
+$(eval $(call BuildPlugin,netlink,netlink input,netlink,+PACKAGE_collectd-mod-netlink:ip @BROKEN))
 $(eval $(call BuildPlugin,network,network input/output,network))
 $(eval $(call BuildPlugin,nginx,nginx status input,nginx,+PACKAGE_collectd-mod-nginx:libcurl))
 $(eval $(call BuildPlugin,ntpd,NTP daemon status input,ntpd,))
-$(eval $(call BuildPlugin,nut,UPS monitoring input,nut,+PACKAGE_collectd-mod-nut:nut))
+#$(eval $(call BuildPlugin,nut,UPS monitoring input,nut,+PACKAGE_collectd-mod-nut:nut))
 $(eval $(call BuildPlugin,olsrd,OLSRd status input,olsrd,))
 $(eval $(call BuildPlugin,onewire,onewire sensor input,onewire,+PACKAGE_collectd-mod-onewire:libow-capi @BROKEN))
 $(eval $(call BuildPlugin,openvpn,OpenVPN traffic/compression input,openvpn,))

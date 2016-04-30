@@ -4,12 +4,12 @@
  #
  #######################################################################
  %.lo: %.c
--	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(RLM_CFLAGS) -c $<
-+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) $(RLM_CFLAGS) -c $<
+-	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) $(RLM_CFLAGS) -c $<
++	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) $(CPPFLAGS) $(RLM_CFLAGS) -c $<
  
  %.lo: %.cpp
--	$(LIBTOOL) --mode=compile $(CXX) $(CFLAGS) $(RLM_CFLAGS) -c $<
-+	$(LIBTOOL) --mode=compile $(CXX) $(CFLAGS) $(CPPFLAGS) $(RLM_CFLAGS) -c $<
+-	$(LIBTOOL) --mode=compile --tag=CXX $(CXX) $(CFLAGS) $(RLM_CFLAGS) -c $<
++	$(LIBTOOL) --mode=compile --tag=CXX $(CXX) $(CFLAGS) $(CPPFLAGS) $(RLM_CFLAGS) -c $<
  
  ifneq ($(TARGET),)
  #######################################################################

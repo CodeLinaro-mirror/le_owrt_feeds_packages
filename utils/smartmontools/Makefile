@@ -9,12 +9,13 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/uclibc++.mk
 
 PKG_NAME:=smartmontools
-PKG_VERSION:=5.40
-PKG_RELEASE:=4
+PKG_VERSION:=6.2
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/smartmontools
-PKG_MD5SUM:=0f0be0239914ad87830a4fff594bda5b
+PKG_MD5SUM:=d44f84081a12cef79cd17f78044351fc
+PKG_MAINTAINER:=Maxim Storchak <m.storchak@gmail.com>
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -40,7 +41,6 @@ endef
 
 define Package/smartd
   $(call Package/smartmontools/Default)
-  DEPENDS+= +rsync
   TITLE+= Daemon
 endef
 

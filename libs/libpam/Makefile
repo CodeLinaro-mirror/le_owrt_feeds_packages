@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2009 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -9,13 +9,14 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libpam
 PKG_VERSION:=1.1.8
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 PKG_SOURCE:=Linux-PAM-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://www.linux-pam.org/library/
 PKG_MD5SUM:=35b6091af95981b1b2cd60d813b5e4ee
 PKG_INSTALL:=1
 PKG_FIXUP:=autoreconf
+PKG_MAINTAINER:=Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/Linux-PAM-$(PKG_VERSION)
 
@@ -24,12 +25,12 @@ include $(INCLUDE_DIR)/package.mk
 define Package/libpam
   SECTION:=libs
   CATEGORY:=Libraries
-  TITLE:=free implementation of the following DCE-RFC from Sunsoft.
+  TITLE:=the Linux-PAM libraries and modules.
   URL:=http://www.kernel.org/pub/linux/libs/pam
 endef
 
 define Package/libpam/description
-	Linux-PAM is a free implementation of the following DCE-RFC from Sunsoft.
+	The Linux-PAM Pluggable Authentication Modules.
 endef
 
 TARGET_CFLAGS += $(FPIC)

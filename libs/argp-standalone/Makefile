@@ -1,3 +1,10 @@
+#
+# Copyright (C) 2007-2014 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+#
+
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=argp-standalone
@@ -7,6 +14,9 @@ PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.lysator.liu.se/~nisse/misc/
 PKG_MD5SUM:=720704bac078d067111b32444e24ba69
+
+PKG_LICENSE:=LGPL-2.1
+PKG_LICENSE:=Makefile.am
 
 include $(INCLUDE_DIR)/package.mk
 

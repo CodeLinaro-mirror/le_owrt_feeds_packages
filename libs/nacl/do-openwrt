@@ -52,7 +52,7 @@ mkdir -p "$work"
 cp -pr randombytes/* "$work"
 (
   cd "$work"
-  
+
   cp devurandom.c randombytes-impl.c
   cp devurandom.h randombytes-impl.h
   $CC $CFLAGS -c randombytes-impl.c
@@ -99,12 +99,12 @@ do
     fi
 
     opi=`echo "$implementationdir" | tr ./- ___`
-    
+
     echo "=== `date` === $implementationdir"
 
     cfiles=`ls "$implementationdir" | grep '\.c$' || :`
     sfiles=`ls "$implementationdir" | grep '\.[sS]$' || :`
-    
+
     cp -p "$o"/*.c "$work"
 
     cp -pr "$implementationdir"/* "$work"
@@ -182,7 +182,7 @@ do
 	do
 	  echo "$version $startdate $o $p fromcompiler $implementationdir $f $err" >&5
 	done
-	
+
 	[ "$ok" = 1 ]
       done
 
@@ -191,7 +191,7 @@ do
 	mv "$f" "${opi}-$f"
       done
     )
-  
+
     echo "=== `date` === $implementationdir $CC $CFLAGS finishing"
 
     $AR cr "$lib/lib${project}.a" "$work"/*.o \

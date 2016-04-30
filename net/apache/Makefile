@@ -8,14 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=apache
-PKG_VERSION:=2.2.15
-PKG_RELEASE:=3
+PKG_VERSION:=2.2.27
+PKG_RELEASE:=1
 PKG_SOURCE_NAME:=httpd
+PKG_MAINTAINER:=Thomas Heil <heil@terminal-consulting.de>
+PKG_LICENSE:=Apache License
 
 PKG_SOURCE:=$(PKG_SOURCE_NAME)-$(PKG_VERSION).tar.bz2
-PKG_SOURCE_URL:=http://ftp.uni-erlangen.de/pub/mirrors/apache/httpd/ \
+PKG_SOURCE_URL:=http://mirrors.ibiblio.org/apache/httpd/ \
 		http://apache.imsam.info/httpd/
-PKG_MD5SUM:=016cec97337eccead2aad6a7c27f2e14
+PKG_MD5SUM:=8faef0decf3fa7e69b2568eb2105a3d8
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_NAME)-$(PKG_VERSION)
 

@@ -8,12 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=apr-util
-PKG_VERSION:=1.3.12
-PKG_RELEASE:=2
+PKG_VERSION:=1.5.3
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_SOURCE_URL:=http://www.ibiblio.org/pub/mirrors/apache/apr
-PKG_MD5SUM:=0f671b037ca62751a8a7005578085560
+PKG_SOURCE_URL:=https://archive.apache.org/dist/apr/
+PKG_MD5SUM:=6f3417691c7a27090f36e7cf4d94b36e
+PKG_MAINTAINER:=Thomas Heil <heil@terminal-consulting.de>
+PKG_LICENSE:=Apache License
 
 PKG_FIXUP:=autoreconf
 PKG_REMOVE_FILES:=aclocal.m4 build/ltmain.sh

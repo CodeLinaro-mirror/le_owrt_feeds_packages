@@ -8,12 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=softflowd
-PKG_VERSION:=0.9.8
-PKG_RELEASE:=3
+PKG_VERSION:=0.9.9
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://www.mindrot.org/files/softflowd/
-PKG_MD5SUM:=0054d1c80494396cc15edb0a1c7748b1
+PKG_SOURCE_URL:=http://softflowd.googlecode.com/files/
+PKG_MD5SUM:=ba83e2715e6250e6645ebcaa9ae1009d
+PKG_MAINTAINER:=Ross Vandegrift <ross@kallisti.us>
+PKG_LICENSE:=BSD-3-Clause
 
 PKG_FIXUP:=autoreconf
 
@@ -24,7 +26,7 @@ define Package/softflowd
   CATEGORY:=Network
   DEPENDS:=+libpcap
   TITLE:=softflowd
-  URL:=http://www.mindrot.org/projects/softflowd/
+  URL:=http://code.google.com/p/softflowd/
 endef
 
 define Package/softflowd/description

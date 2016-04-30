@@ -1,13 +1,23 @@
+#
+# Copyright (C) 2014 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+#
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=perl-www-curl
-PKG_VERSION:=4.00
+PKG_VERSION:=4.17
 PKG_RELEASE:=1
-PKG_MD5SUM:=f34eb29f59a811869a4f77bfc0df2f5d
 
-PKG_SOURCE_URL:=http://search.cpan.org/CPAN/authors/id/S/SZ/SZBALINT
+PKG_SOURCE_URL:=http://www.cpan.org/authors/id/S/SZ/SZBALINT/
 PKG_SOURCE:=WWW-Curl-$(PKG_VERSION).tar.gz
+PKG_MD5SUM:=997ac81cd6b03b30b36f7cd930474845
+
+PKG_LICENSE:=GPLv1+ ARTISTIC
+PKG_LICENSE_FILES:=LICENSE
+PKG_MAINTAINER:=Marcel Denia <naoir@gmx.net>
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/perl/WWW-Curl-$(PKG_VERSION)
 
@@ -15,12 +25,12 @@ include $(INCLUDE_DIR)/package.mk
 include ../perl/perlmod.mk
 
 define Package/perl-www-curl
-SUBMENU:=Perl
-SECTION:=lang
-CATEGORY:=Languages
-TITLE:=Perl bindings to libcurl
-URL:=http://search.cpan.org/dist/WWW-Curl/
-DEPENDS:=perl +libcurl
+  SUBMENU:=Perl
+  SECTION:=lang
+  CATEGORY:=Languages
+  TITLE:=Perl bindings to libcurl
+  URL:=http://search.cpan.org/dist/WWW-Curl/
+  DEPENDS:=perl +libcurl
 endef
 
 define Build/Configure

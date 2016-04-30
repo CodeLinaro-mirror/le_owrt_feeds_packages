@@ -8,12 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rsync
-PKG_VERSION:=3.1.0
+PKG_VERSION:=3.1.1
 PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://rsync.samba.org/ftp/rsync/src
-PKG_MD5SUM:=3be148772a33224771a8d4d2a028b132
+PKG_MD5SUM:=43bd6676f0b404326eee2d63be3cdcfe
+PKG_MAINTAINER:=Maxim Storchak <m.storchak@gmail.com>
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
@@ -25,9 +26,26 @@ define Package/rsync
   CATEGORY:=Network
   SUBMENU:=File Transfer
   TITLE:=Fast remote file copy program (like rcp)
-  DEPENDS:=+libpopt +zlib
+  DEPENDS:=+libpopt +zlib +RSYNC_xattr:libattr +RSYNC_acl:libacl
   URL:=http://rsync.samba.org/
+  MENU:=1
 endef
+
+define Package/rsync/config
+	source "$(SOURCE)/Config.in"
+endef
+
+ifeq ($(CONFIG_RSYNC_xattr),y)
+	CONFIGURE_ARGS+= --enable-xattr-support
+else
+	CONFIGURE_ARGS+= --disable-xattr-support
+endif
+
+ifeq ($(CONFIG_RSYNC_acl),y)
+	CONFIGURE_ARGS+= --enable-acl-support
+else
+	CONFIGURE_ARGS+= --disable-acl-support
+endif
 
 define Package/rsyncd
   SECTION:=net
@@ -53,8 +71,6 @@ CONFIGURE_ARGS += \
 	--with-included-zlib=no \
 	--disable-debug \
 	--disable-locale \
-	--disable-xattr-support \
-	--disable-acl-support \
 
 define Package/rsync/install
 	$(INSTALL_DIR) $(1)/usr/bin

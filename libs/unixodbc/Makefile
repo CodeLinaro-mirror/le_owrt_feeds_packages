@@ -8,13 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=unixodbc
-PKG_VERSION:=2.3.1
+PKG_VERSION:=2.3.2
 PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=ftp://ftp.unixodbc.org/pub/unixODBC/
 PKG_SOURCE:=unixODBC-$(PKG_VERSION).tar.gz
-PKG_MD5SUM:=86788d4006620fa1f171c13d07fdcaab
+PKG_MD5SUM:=5e4528851eda5d3d4aed249b669bd05b
 PKG_BUILD_DIR:=$(BUILD_DIR)/unixODBC-$(PKG_VERSION)
+PKG_MAINTAINER:=Thomas Heil <heil@terminal-consulting.de>
+PKG_LICENSE:=prog GPL libs LGPL
 
 include $(INCLUDE_DIR)/package.mk
 CONFIGURE_ARGS += \

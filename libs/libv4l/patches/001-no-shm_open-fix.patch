@@ -1,15 +1,15 @@
 --- a/lib/libv4lconvert/control/libv4lcontrol.c
 +++ b/lib/libv4lconvert/control/libv4lcontrol.c
-@@ -525,7 +525,7 @@ static void v4lcontrol_get_flags_from_db
- 
- struct v4lcontrol_data *v4lcontrol_create(int fd, int always_needs_conversion)
+@@ -570,7 +570,7 @@ static void v4lcontrol_get_flags_from_db
+ struct v4lcontrol_data *v4lcontrol_create(int fd, void *dev_ops_priv,
+ 	const struct libv4l_dev_ops *dev_ops, int always_needs_conversion)
  {
 -	int shm_fd;
 +	int shm_fd, fdflags;
  	int i, rc, got_usb_info, speed, init = 0;
  	char *s, shm_name[256], pwd_buf[1024];
  	struct v4l2_capability cap;
-@@ -638,33 +638,38 @@ struct v4lcontrol_data *v4lcontrol_creat
+@@ -695,33 +695,38 @@ struct v4lcontrol_data *v4lcontrol_creat
  
  	if (getpwuid_r(geteuid(), &pwd, pwd_buf, sizeof(pwd_buf), &pwd_p) == 0) {
  		if (got_usb_info)

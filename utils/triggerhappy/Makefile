@@ -1,4 +1,6 @@
 #
+# Copyright (C) 2014 OpenWrt.org
+#
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
 #
@@ -7,14 +9,18 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=triggerhappy
 PKG_VERSION:=0.3.4
-PKG_REV:=cb3ed9ba849ff5926fa47fd1ae042fa0083edaf5
-PKG_RELEASE:=1
+PKG_REV:=649bf670a012558393d7c41f3660d0a017edd982
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=git://github.com/wertarbyte/triggerhappy
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_REV)
+
+PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
+PKG_LICENSE:=GPL-3.0+
+PKG_LICENSE_FILE:=COPYING
 
 include $(INCLUDE_DIR)/package.mk
 

@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=fwknop
-PKG_VERSION:=2.0
+PKG_VERSION:=2.6.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://www.cipherdyne.org/fwknop/download
-PKG_MD5SUM:=96de4c5a4ae75a8618ef80269c6a70ad
-
+PKG_MD5SUM:=4c68128297f76ee536a446fcdd496435
+PKG_MAINTAINER:=Jonathan Bennett <JBennett@incomsystems.biz>
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
@@ -22,7 +22,6 @@ include $(INCLUDE_DIR)/package.mk
 define Package/fwknop/Default
   TITLE:=FireWall KNock OPerator
   URL:=http://www.cipherdyne.org/fwknop/
-  MAINTAINER:=Jonathan Bennett <jbscience87@gmail.com>
 endef
 
 define Package/fwknop/Default/description

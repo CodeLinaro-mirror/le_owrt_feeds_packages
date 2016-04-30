@@ -8,12 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libcap
-PKG_VERSION:=2.22
+PKG_VERSION:=2.24
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_SOURCE_URL:=http://distfiles.gentoo.org/distfiles/
-PKG_MD5SUM:=ce64058bdb3f086ddbfca8ce6c919845
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
+PKG_SOURCE_URL:=http://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/
+PKG_MD5SUM:=d43ab9f680435a7fff35b4ace8d45b80
+PKG_MAINTAINER:=Steven Barth <cyrus@openwrt.org>
 
 PKG_INSTALL:=1
 

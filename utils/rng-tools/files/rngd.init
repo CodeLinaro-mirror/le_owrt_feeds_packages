@@ -1,24 +1,16 @@
 #!/bin/sh /etc/rc.common
-# Copyright (C) 2011 OpenWrt.org
+# Copyright (C) 2011-2014 OpenWrt.org
 
 START=98
 
-RNGD_STEP=256
-RNGD_AMOUNT=2048
+RNGD_INTERVAL=30
+RNGD_AMOUNT=4000
 RNGD_DEVICE="/dev/urandom"
 
 start() {
-        if [ -e /dev/hwrng ]; then
-                RNGD_DEVICE="/dev/hwrng"
-        fi
-        service_start /sbin/rngd -r $RNGD_DEVICE -W $RNGD_AMOUNT -s $RNGD_STEP
+	service_start /sbin/rngd -r $RNGD_DEVICE -W $RNGD_AMOUNT
 }
 
 stop() {
 	service_stop /sbin/rngd
-}
-
-restart() {
-	stop
-	start
 }

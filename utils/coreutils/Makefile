@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2008-2012 OpenWrt.org
+# Copyright (C) 2008-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -15,6 +15,7 @@ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@GNU/coreutils
 PKG_MD5SUM:=89b06f91634208dceba7b36ad1f9e8b9
 PKG_BUILD_DEPENDS:=libpthread
+PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
 
 PKG_BUILD_PARALLEL:=1
 
@@ -33,7 +34,6 @@ COREUTILS_APPLETS := \
 
 DEPENDS_sort = +libpthread
 DEPENDS_timeout = +librt
-DEPENDS_uptime = +libelf1
 DEPENDS_expr = +libgmp
 DEPENDS_factor = +libgmp
 
@@ -82,6 +82,7 @@ ifneq ($(CONFIG_USE_UCLIBC),)
 endif
 
 CONFIGURE_ARGS += \
+	--disable-xattr \
 	--enable-install-program=su
 
 define Build/Compile

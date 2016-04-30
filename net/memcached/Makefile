@@ -1,6 +1,6 @@
 #
 # Copyright (C) 2009-2012 OpenWrt.org
-# Copyright (C) 2009-2012 Thomas Heil <heil@terminal-consulting.de>
+# Copyright (C) 2009-2014 Thomas Heil <heil@terminal-consulting.de>
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -9,14 +9,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=memcached
-PKG_VERSION:=1.4.12
+PKG_VERSION:=1.4.20
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://memcached.googlecode.com/files
-PKG_MD5SUM:=4194de21b58a92de684ce69b8e501c44
-
+PKG_SOURCE_URL:=http://memcached.org/files
+PKG_MD5SUM:=92f702bcb28d7bec8fdf9418360fc062
 PKG_INSTALL:=1
+PKG_MAINTAINER:=Thomas Heil <heil@terminal-consulting.de>
+PKG_LICENSE:=permissive free software license
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -25,7 +26,6 @@ define Package/memcached
   CATEGORY:=Network
   DEPENDS:=+libevent +libpthread
   TITLE:=The high-performance, distributed memory object caching system
-  MAINTAINER:=Thomas Heil <heil@terminal-consulting.de>
   URL:=http://memcached.org/
 endef
 

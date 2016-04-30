@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libffi
-PKG_VERSION:=3.0.11
+PKG_VERSION:=3.0.13
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ftp://sourceware.org/pub/libffi/
-PKG_MD5SUM:=f69b9693227d976835b4857b1ba7d0e3
+PKG_MD5SUM:=45f3b6dbc9ee7c7dfbbbc5feba571529
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
@@ -30,6 +30,7 @@ define Package/libffi
   CATEGORY:=Libraries
   TITLE:=Foreign Function Interface (FFI) library
   URL:=http://sourceware.org/libffi/
+  MAINTAINER:=Peter Wagner <tripolar@gmx.at>
 endef
 
 define Package/libffi/description
