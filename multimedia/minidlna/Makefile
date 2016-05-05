@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2010-2013 OpenWrt.org
+# Copyright (C) 2010-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,17 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=minidlna
-PKG_VERSION:=1.0.25
+PKG_VERSION:=1.1.3
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)_$(PKG_VERSION)_src.tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/minidlna
-PKG_MD5SUM:=d966256baf2f9b068b9de871ab5dade5
-
+PKG_MD5SUM:=879027192c89e5376cdd2ae2d1aa33b4
+PKG_MAINTAINER:=Knyazkov Dmitry <medavedik@gmail.com>
 PKG_BUILD_PARALLEL:=0
 PKG_BUILD_DEPENDS:=util-linux
 
-include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 
@@ -38,7 +37,7 @@ define Package/minidlna/description
 endef
 
 define Package/minidlna/conffiles
-/etc/minidlna.conf
+/etc/config/minidlna
 endef
 
 TARGET_CPPFLAGS += \
@@ -64,16 +63,14 @@ MAKE_FLAGS +=\
 	LDFLAGS="$(TARGET_LDFLAGS)" \
 	ICONV_LIBS="-liconv $(if $(INTL_FULL),-lintl)" \
 
-MAKE_VARS +=\
-	PREFIX="$(STAGING_DIR)/usr" \
-	ICONV_PREFIX="$(ICONV_PREFIX)" \
-	INTL_PREFIX="$(INTL_PREFIX)" \
-	OS_NAME="OpenWrt Linux" \
-	OS_VERSION="$(LINUX_VERSION)" \
-	OS_URL="http://openwrt.org/" \
-	DB_PATH="/var/run/minidlna" \
-	LOG_PATH="/var/log" \
-
+CONFIGURE_ARGS +=\
+	--with-libiconv-prefix="$(ICONV_PREFIX)" \
+	--with-libintl-prefix="$(INTL_PREFIX)" \
+	--with-os-name="OpenWrt Linux" \
+	--with-os-version="$(LINUX_VERSION)" \
+	--with-os-url="http://openwrt.org/" \
+	--with-db-path="/var/run/minidlna" \
+	--with-log-path="/var/log" \
 
 define Package/minidlna/install
 	$(INSTALL_DIR) $(1)/usr/bin
@@ -82,10 +79,6 @@ define Package/minidlna/install
 	$(INSTALL_BIN) ./files/minidlna.init $(1)/etc/init.d/minidlna
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/minidlna.config $(1)/etc/config/minidlna
-endef
-
-define Package/minidlna/conffiles
-/etc/config/minidlna
 endef
 
 $(eval $(call BuildPackage,minidlna))

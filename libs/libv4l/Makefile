@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2009-2012 OpenWrt.org
+# Copyright (C) 2009-2014 OpenWrt.org
 # Copyright (C) 2009 David Cooper <dave@kupesoft.com>
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -9,17 +9,23 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=v4l-utils
-PKG_VERSION:=0.8.6
+PKG_VERSION:=1.2.1
 PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://www.linuxtv.org/downloads/v4l-utils
-PKG_MD5SUM:=80062780ae90e5955473b09b31e9828a
+PKG_MD5SUM:=4cc0fb4ded302ea9e89e5e1b56a7252b
+
+PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
+
+PKG_LICENSE:=GPL-2.0 LGPL-2.1
+PKG_LICENSE_FILE:=COPYING COPYING.libv4l
 
 PKG_BUILD_DEPENDS:=argp-standalone
 
 include $(INCLUDE_DIR)/uclibc++.mk
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/nls.mk
 
 define Package/libv4l/Default
   TITLE:=Video 4 Linux
@@ -46,7 +52,7 @@ define Package/libv4l
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE+= wrapper libraries
-  DEPENDS := +libpthread +librt
+  DEPENDS := +libpthread +librt $(ICONV_DEPENDS)
 endef
 
 define Package/libv4l/description
@@ -58,7 +64,7 @@ define Package/v4l-utils
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE+= utilities
-  DEPENDS := +libv4l $(CXX_DEPENDS)
+  DEPENDS := +libv4l $(CXX_DEPENDS) $(ICONV_DEPENDS)
 endef
 
 define Package/v4l-utils/description
@@ -67,17 +73,19 @@ define Package/v4l-utils/description
 endef
 
 TARGET_CFLAGS += $(FPIC)
+TARGET_LDFLAGS += -largp
+
+CONFIGURE_ARGS+= \
+	--disable-libdvbv5 \
+	--disable-qv4l2 \
+	--without-jpeg \
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
-		DESTDIR="$(PKG_INSTALL_DIR)" PREFIX="/usr" \
-		DISABLE_LIBJPEG="1" \
-		$(CONFIGURE_VARS) \
+		DESTDIR="$(PKG_INSTALL_DIR)" \
 		all install
 	$(MAKE) -C $(PKG_BUILD_DIR) \
-		DESTDIR="$(PKG_INSTALL_DIR)" PREFIX="/usr" \
-		DISABLE_LIBJPEG="1" \
-		$(CONFIGURE_VARS) \
+		DESTDIR="$(PKG_INSTALL_DIR)" \
 		LINKTYPE="static" \
 		all install
 endef

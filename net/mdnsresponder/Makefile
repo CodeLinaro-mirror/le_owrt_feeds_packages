@@ -9,11 +9,12 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mDNSResponder
 PKG_VERSION:=544
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 PKG_SOURCE:=mDNSResponder-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://opensource.apple.com/tarballs/mDNSResponder/
 PKG_MD5SUM:=39142ab70bd82a096801ce346f86cbab
+PKG_MAINTAINER:=Steven Barth <cyrus@openwrt.org>
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/mDNSResponder-$(PKG_VERSION)
 
@@ -21,6 +22,9 @@ PKG_BUILD_PARALLEL:=0
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
+
+# sys/capability.h is not part of *libc*
+PKG_BUILD_DEPENDS:=libcap
 
 define Package/mDNSResponder/Default
   SECTION:=net
@@ -146,7 +150,6 @@ define Package/mdnsd/install
 	$(INSTALL_DIR) $(1)/usr/sbin/
 	$(CP) $(PKG_INSTALL_DIR)/usr/sbin/mdnsd $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
-	$(INSTALL_DATA) ./files/mdnsd.hotplug $(1)/etc/hotplug.d/iface
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/mdnsd.init $(1)/etc/init.d/mdnsd
 	$(INSTALL_DIR) $(1)/usr/lib/

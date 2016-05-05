@@ -26,6 +26,7 @@ define Package/libtheora
   CATEGORY:=Libraries
   TITLE:=libtheora
   URL:=http://xiph.org/theora/
+  MAINTAINER:=W. Michael Petullo <mike@flyn.org>
   DEPENDS:=+libogg
 endef
 

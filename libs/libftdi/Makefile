@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 OpenWrt.org
+# Copyright (C) 2011-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,14 +8,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libftdi
-PKG_VERSION:=0.19
+PKG_VERSION:=0.20
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.intra2net.com/en/developer/libftdi/download/
-PKG_MD5SUM:=e6e25f33b4327b1b7aa1156947da45f3
+PKG_MD5SUM:=355d4474e3faa81b485d6a604b06951f
+PKG_MAINTAINER:=Álvaro Fernández Rojas <noltari@gmail.com>
+
+PKG_LICENSE:=LGPL-2.0
+PKG_LICENSE_FILES:=COPYING.LIB
 
 PKG_INSTALL:=1
+PKG_USE_MIPS16:=0
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
@@ -24,7 +29,7 @@ define Package/libftdi
   SECTION:=libs
   CATEGORY:=Libraries
   DEPENDS:=+libusb-compat
-  TITLE:=library to talk to FTDI chips
+  TITLE:=Library to talk to FTDI chips
   URL:=http://www.intra2net.com/en/developer/libftdi/
 endef
 
@@ -36,7 +41,7 @@ endef
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include/
-	$(CP) $(PKG_INSTALL_DIR)/usr/include/libftdi/ftdi.h $(1)/usr/include/
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/ftdi.h $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libftdi.{a,so} $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libftdi.so* $(1)/usr/lib/

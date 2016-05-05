@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 OpenWrt.org
+# Copyright (C) 2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -25,6 +25,7 @@ define Package/libssh2
   TITLE:=SSH2 library
   URL:=http://www.libssh2.org/
   DEPENDS:=+libopenssl +zlib
+  MAINTAINER:=Jiri Slachta <slachta@cesnet.cz>
 endef
 
 define Package/libssh2/description

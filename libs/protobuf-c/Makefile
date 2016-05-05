@@ -7,15 +7,20 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=protobuf-c
-PKG_VERSION:=0.15
-PKG_RELEASE:=1
+PKG_NAME:=libprotobuf-c
+PKG_VERSION:=2014-06-30
+PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://protobuf-c.googlecode.com/files
-PKG_MD5SUM:=73ff0c8df50d2eee75269ad8f8c07dc8
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_URL:=git://github.com/protobuf-c/protobuf-c.git
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_VERSION:=6136f54b221ab8883731349d01f34b01812e391d
 
 PKG_INSTALL:=1
+PKG_FIXUP:=autoreconf
+
+PKG_MAINTAINER:=Jacob Siverskog <jacob@teenageengineering.com>
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -39,10 +44,8 @@ CONFIGURE_ARGS += \
 	--disable-protoc
 
 define Build/InstallDev
-	$(INSTALL_DIR) $(1)/usr/include/google/protobuf-c
-	$(CP) \
-		$(PKG_INSTALL_DIR)/usr/include/google/protobuf-c/* \
-		$(1)/usr/include/google/protobuf-c/
+	$(INSTALL_DIR) $(1)/usr/include/
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/* $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libprotobuf-c.{a,la,so*} $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig

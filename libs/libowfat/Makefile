@@ -16,6 +16,7 @@ PKG_RELEASE:=2
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://dl.fefe.de
 PKG_MD5SUM:=6bbee9a86506419657d87123b7a6f2c1
+PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
 
 include $(INCLUDE_DIR)/package.mk
 

@@ -8,13 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luaposix
-PKG_VERSION:=5.1.11
+PKG_VERSION:=v32
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://luaforge.net/frs/download.php/4813
-PKG_MD5SUM:=edb76911dbdabe98dec49e3d8a126227
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+PKG_SOURCE:=release-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://github.com/luaposix/luaposix/archive/
+PKG_MD5SUM:=2bfede7b7cee96c5d0f6c0354e17498c
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-release-$(PKG_VERSION)
+PKG_REMOVE_FILES:=aclocal.m4
+PKG_FIXUP:=autoreconf
+PKG_MAINTAINER:=Maxim Storchak <m.storchak@gmail.com>
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -23,16 +26,14 @@ define Package/luaposix
   SECTION:=lang
   CATEGORY:=Languages
   TITLE:=luaposix
-  URL:=http://luaposix.luaforge.net/
-  DEPENDS:=+lua +librt
+  URL:=http://luaforge.net/projects/luaposix/
+  DEPENDS:=+lua +librt +luabitop
+  PKG_BUILD_DEPENDS:=+lua/host
 endef
 
 define Package/luaposix/description
   luaposix is a general POSIX library for Lua providing access
   to various low level libc functions.
-endef
-
-define Build/Configure
 endef
 
 TARGET_CFLAGS += -DLUA_USE_LINUX $(FPIC) -std=gnu99
@@ -46,7 +47,8 @@ endif
 
 define Package/luaposix/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/posix.so $(1)/usr/lib/lua
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ext/posix/.libs/posix_c.so $(1)/usr/lib/lua
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/posix.lua $(1)/usr/lib/lua
 endef
 
 $(eval $(call BuildPackage,luaposix))

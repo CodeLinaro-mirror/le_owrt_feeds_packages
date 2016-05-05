@@ -1,5 +1,5 @@
-#
-# Copyright (C) 2010-2014 OpenWrt.org
+# 
+# Copyright (C) 2010 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=crtmpserver
-PKG_REV:=726
+PKG_REV:=811
 PKG_VERSION:=r$(PKG_REV)
-PKG_RELEASE:=2
+PKG_RELEASE:=1
+PKG_BUILD_PARALLEL:=2
+PKG_MAINTAINER:=Thomas Heil <heil@terminal-consulting.de>
+PKG_LICENSE:=GPL-3.0
+
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_SOURCE_URL:=--username=anonymous --password= https://svn.rtmpd.com/crtmpserver/trunk
+PKG_SOURCE_URL:=--username=anonymous --password= https://svn.rtmpd.com/crtmpserver/branches/1.0
 PKG_SOURCE_SUBDIR:=crtmpserver-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_PROTO:=svn
@@ -35,13 +39,17 @@ stream (live or recorded) in the following technologies:
  * To and from embedded devices: iPhone, Android
  * From surveillance cameras
  * IP-TV using MPEG-TS and RTSP/RTCP/RTP protocols
-
+                
 Also, crtmpserver can be used as a high performance rendes-vous
 server. For example, it enables you to do:
  * Audio/Video conferencing
  * Online gaming
  * Online collaboration
  * Simple/complex chat applications
+endef
+
+define Package/crtmpserver/conffiles
+/etc/crtmpserver.lua
 endef
 
 # XXX: this hack handles the usr/bin vs bin difference of backfire and trunk
@@ -62,8 +70,7 @@ endef
 
 define Build/Compile
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR)/builders/make \
-		CFLAGS="$(TARGET_CFLAGS)" \
-		PLATFORM=linux-openwrt-uclibc
+		PLATFORM=linux-openwrt-uclibc -Wno-error -j6
 endef
 
 define Package/crtmpserver/install
@@ -77,9 +84,12 @@ define Package/crtmpserver/install
 			$(1)/usr/lib/crtmpserver/$(app)/; \
 	)
 	$(INSTALL_DIR) $(1)/etc
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/builders/make/output/dynamic/crtmpserver.lua $(1)/etc/
+	$(INSTALL_CONF) $(PKG_BUILD_DIR)/builders/make/output/dynamic/crtmpserver.lua $(1)/etc/
 	$(INSTALL_DIR) $(1)/usr/share/crtmpserver/appselector
 	$(INSTALL_DIR) $(1)/usr/share/crtmpserver/media
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/crtmpserver.init $(1)/etc/init.d/crtmpserver
 endef
 
 $(eval $(call BuildPackage,crtmpserver))
+

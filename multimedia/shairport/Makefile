@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 OpenWrt.org
+# Copyright (C) 2013-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,21 +8,22 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=shairport
-PKG_VERSION:=2012-10-20
-PKG_RELEASE:=$(PKG_SOURCE_VERSION)
+PKG_VERSION:=2014-05-08
+PKG_RELEASE:=2
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=git://github.com/albertz/shairport.git
+PKG_SOURCE_URL:=git://github.com/abrasive/shairport.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=4746bb11395d171ee800f074f489c42020a84932
+PKG_SOURCE_VERSION:=078b21043cdcef6ffad7452db27f036770b23b0c
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
+PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/shairport
   SECTION:=multimedia
   CATEGORY:=Multimedia
-  DEPENDS:=+libpthread +avahi-utils +libopenssl +libao
+  DEPENDS:=+libpthread +avahi-utils +libopenssl +libavahi-client +alsa-utils
   TITLE:=ShairPort AirPort Express emulator
 endef
 
@@ -38,19 +39,19 @@ endef
 
 TARGET_CFLAGS += $(FPIC)
 
-LIBS:=-lao -lm -lcrypto -lpthread
+LIBS:=-lm -lcrypto -lpthread -lavahi-common -lavahi-client -lasound
 
 MAKE_FLAGS += \
 	CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS)" \
 	LDFLAGS="$(TARGET_LDFLAGS) $(LIBS)"
 
 define Package/shairport/install
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/shairport $(1)/usr/sbin/
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/shairport $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) files/shairport.init $(1)/etc/init.d/shairport
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_DATA) files/shairport.config $(1)/etc/config/shairport
+	$(INSTALL_CONF) files/shairport.config $(1)/etc/config/shairport
 endef
 
 $(eval $(call BuildPackage,shairport))

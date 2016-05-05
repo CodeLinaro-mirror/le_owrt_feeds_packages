@@ -25,6 +25,20 @@ start() {
 		chown prosody:prosody /var/log/prosody
 	}
 
+	[ -d /var/log/prosody ] && {
+		chown -R prosody:prosody /etc/prosody
+	}
+
+	[ -f /sbin/paxctl ] && {
+		paxctl  -v /usr/bin/ > /dev/null  2>&1	
+		[ $? -ne 0 ] && {
+			cp /usr/bin/lua /tmp
+			paxctl -c -m /tmp/lua
+			cp -f /tmp/lua /usr/bin/lua
+		}
+	}
+
+	
 	$BIN start
 }
 

@@ -8,13 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=znc
-PKG_VERSION:=1.2
+PKG_VERSION:=1.4
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://znc.in/releases \
 		http://znc.in/releases/archive
-PKG_MD5SUM:=ef18e5402a82cc3fcab5c2ac5c2e6f3b
+PKG_MD5SUM:=630cb74db34d2d5451ba30b47869f6bb
+
+PKG_MAINTAINER:=Jonas Gorski <jogo@openwrt.org>
+PKG_LICENSE:=Apache-2.0
+PKG_LICENSE_FILES:=LICENSE
 
 PKG_BUILD_PARALLEL:=1
 
@@ -25,7 +29,6 @@ define Package/znc/default
   CATEGORY:=Network
   TITLE:=ZNC
   URL:=http://en.znc.in/
-  MAINTAINER:=Jonas Gorski <jogo@openwrt.org>
 endef
 
 define Package/znc

@@ -1,16 +1,15 @@
 #
-# Copyright (C) 2006-2012 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
 #
-# blogic@openwrt.org
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tiff
 PKG_VERSION:=4.0.3
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://download.osgeo.org/libtiff
@@ -18,6 +17,9 @@ PKG_MD5SUM:=051c1068e6a0627f461948c365290410
 
 PKG_FIXUP:=autoreconf
 PKG_REMOVE_FILES:=autogen.sh aclocal.m4
+
+PKG_LICENSE:=BSD
+PKG_LICENSE_FILES:=COPYRIGHT
 
 PKG_INSTALL:=1
 
@@ -29,6 +31,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/tiff/Default
   TITLE:=TIFF
   URL:=http://www.remotesensing.org/libtiff/
+  MAINTAINER:=Jiri Slachta <slachta@cesnet.cz>
 endef
 
 define Package/libtiff

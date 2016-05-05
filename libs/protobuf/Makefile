@@ -8,14 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=protobuf
-PKG_VERSION:=2.4.1
+PKG_VERSION:=2.5.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://protobuf.googlecode.com/files
-PKG_MD5SUM:=ed436802019c9e1f40cc750eaf78f318
+PKG_MD5SUM:=a72001a9067a4c2c4e0e836d0f92ece4
 
 PKG_BUILD_DEPENDS:=protobuf/host
+PKG_USE_MIPS16:=0
 
 PKG_INSTALL:=1
 
@@ -37,7 +38,14 @@ define Package/protobuf/description
  of its internal RPC protocols and file formats.
 endef
 
-CONFIGURE_ARGS += --with-protoc=$(STAGING_DIR_HOST)/bin/protoc
+define Host/Compile
+	$(MAKE) -C $(HOST_BUILD_DIR)
+endef
+
+define Host/Install
+endef
+
+CONFIGURE_ARGS += --with-protoc=$(HOST_BUILD_DIR)/src/protoc
 
 define Build/InstallDev
 	$(INSTALL_DIR) \

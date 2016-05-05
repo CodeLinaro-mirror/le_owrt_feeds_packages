@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 OpenWrt.org
+# Copyright (C) 2013-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,15 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=xupnpd
-PKG_REV:=387
+PKG_REV:=399
 PKG_VERSION:=$(PKG_REV)
-PKG_RELEASE:=5
+PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=svn
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=xupnpd-$(PKG_VERSION)
 PKG_SOURCE_URL:=http://tsdemuxer.googlecode.com/svn/trunk/xupnpd/src/
 PKG_SOURCE:=$(PKG_SOURCE_SUBDIR).tar.gz
+PKG_MAINTAINER:=Álvaro Fernández Rojas <noltari@gmail.com>
 
 include $(INCLUDE_DIR)/package.mk
 

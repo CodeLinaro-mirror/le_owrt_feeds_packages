@@ -8,14 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libtorrent
-PKG_VERSION:=0.13.3-git
-
+PKG_VERSION:=0.13.4-git
 PKG_RELEASE=$(PKG_SOURCE_VERSION)-1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/rakshasa/libtorrent.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=6fb96e38f166a1189c1b9af2a6e95bf569a81d4b
+PKG_SOURCE_VERSION:=51cd5ea8913a5f5062813d9f5b6256c76d41ea11
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
 PKG_FIXUP:=autoreconf
@@ -30,6 +29,7 @@ define Package/libtorrent
   TITLE:=Rakshasa's BitTorrent library
   URL:=http://libtorrent.rakshasa.no/
   DEPENDS:=+libopenssl +libsigcxx
+  MAINTAINER:=Peter Wagner <tripolar@gmx.at>
 endef
 
 define Package/libtorrent/description
@@ -47,12 +47,8 @@ CONFIGURE_ARGS+= \
 	--enable-static \
 	--enable-aligned \
 	--disable-debug \
-	--enable-openssl
-
-define Build/Configure
-	( cd $(PKG_BUILD_DIR); ./autogen.sh );
-	$(call Build/Configure/Default)
-endef
+	--enable-openssl \
+	--disable-instrumentation
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include

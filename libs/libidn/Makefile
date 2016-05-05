@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2009-2010 OpenWrt.org
+# Copyright (C) 2009-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,16 +8,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libidn
-PKG_VERSION:=1.18
+PKG_VERSION:=1.28
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@GNU/libidn
-PKG_MD5SUM:=66f115347439f56386f37a3ad92c1da2
+PKG_MD5SUM:=43a6f14b16559e10a492acc65c4b0acc
+
+PKG_LICENSE:=GPLv2 GPLv3 LGPLv2.1 LGPLv3 APACHEv2
+PKG_LICENSE_FILES:=COPYING COPYINGv2 COPYINGv3 COPYING.LESSERv2 COPYING.LESSERv3 java/LICENSE-2.0.txt
+PKG_MAINTAINER:=Marcel Denia <naoir@gmx.net>
 
 PKG_FIXUP:=autoreconf
 PKG_REMOVE_FILES:=GNUmakefile aclocal.m4
-
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk

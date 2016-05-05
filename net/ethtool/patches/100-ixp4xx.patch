@@ -1,55 +1,27 @@
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -10,7 +10,7 @@ ethtool_SOURCES = ethtool.c ethtool-copy
+@@ -13,7 +13,7 @@ ethtool_SOURCES += \
  		  fec_8xx.c ibm_emac.c ixgb.c ixgbe.c natsemi.c	\
  		  pcnet32.c realtek.c tg3.c marvell.c vioc.c	\
  		  smsc911x.c at76c50x-usb.c sfc.c stmmac.c	\
--		  rxclass.c sfpid.c sfpdiag.c
-+		  rxclass.c sfpid.c sfpdiag.c ixp4xx.c
+-		  sfpid.c sfpdiag.c ixgbevf.c
++		  sfpid.c sfpdiag.c ixgbevf.c ixp4xx.c
+ endif
  
  TESTS = test-cmdline test-features
- check_PROGRAMS = test-cmdline test-features
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -78,7 +78,7 @@ am_ethtool_OBJECTS = ethtool.$(OBJEXT) a
- 	tg3.$(OBJEXT) marvell.$(OBJEXT) vioc.$(OBJEXT) \
- 	smsc911x.$(OBJEXT) at76c50x-usb.$(OBJEXT) sfc.$(OBJEXT) \
- 	stmmac.$(OBJEXT) rxclass.$(OBJEXT) sfpid.$(OBJEXT) \
--	sfpdiag.$(OBJEXT)
-+	sfpdiag.$(OBJEXT) ixp4xx.$(OBJEXT)
- ethtool_OBJECTS = $(am_ethtool_OBJECTS)
- ethtool_LDADD = $(LDADD)
- ethtool_DEPENDENCIES =
-@@ -286,7 +286,7 @@ ethtool_SOURCES = ethtool.c ethtool-copy
- 		  fec_8xx.c ibm_emac.c ixgb.c ixgbe.c natsemi.c	\
- 		  pcnet32.c realtek.c tg3.c marvell.c vioc.c	\
- 		  smsc911x.c at76c50x-usb.c sfc.c stmmac.c	\
--		  rxclass.c sfpid.c sfpdiag.c
-+		  rxclass.c sfpid.c sfpdiag.c ixp4xx.c
- 
- test_cmdline_SOURCES = test-cmdline.c test-common.c $(ethtool_SOURCES) 
- test_cmdline_CFLAGS = -DTEST_ETHTOOL
-@@ -431,6 +431,7 @@ distclean-compile:
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sfpid.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smsc911x.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stmmac.Po@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ixp4xx.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_cmdline-amd8111e.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_cmdline-at76c50x-usb.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_cmdline-de2104x.Po@am__quote@
 --- a/ethtool.c
 +++ b/ethtool.c
-@@ -873,6 +873,7 @@ static const struct {
- 	{ "igb", igb_dump_regs },
+@@ -894,6 +894,7 @@ static const struct {
  	{ "ixgb", ixgb_dump_regs },
  	{ "ixgbe", ixgbe_dump_regs },
+ 	{ "ixgbevf", ixgbevf_dump_regs },
 +	{ "ixp4xx", ixp4xx_dump_regs },
  	{ "natsemi", natsemi_dump_regs },
  	{ "e100", e100_dump_regs },
  	{ "amd8111e", amd8111e_dump_regs },
 --- a/internal.h
 +++ b/internal.h
-@@ -241,6 +241,9 @@ int st_gmac_dump_regs(struct ethtool_drv
+@@ -243,6 +243,9 @@ int st_gmac_dump_regs(struct ethtool_drv
  /* Et131x ethernet controller */
  int et131x_dump_regs(struct ethtool_drvinfo *info, struct ethtool_regs *regs);
  

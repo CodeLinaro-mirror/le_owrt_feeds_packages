@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2013 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,13 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ethtool
-PKG_VERSION:=3.7
+PKG_VERSION:=3.14
 PKG_RELEASE:=1
 
+PKG_MAINTAINER:=Matthias Schiffer <mschiffer@universe-factory.net>
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@KERNEL/software/network/ethtool
-PKG_MD5SUM:=f16c8416e6ec917e5753918dc23a60bd
+PKG_MD5SUM:=d46b809ddd672b51d7e23787ae9122e0
 
+PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
 

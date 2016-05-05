@@ -8,12 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=miniupnpc
-PKG_VERSION:=1.8
+PKG_VERSION:=1.9
 PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=http://miniupnp.free.fr/files
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_MD5SUM:=065bf20a20ebe605c675b7a5aaef340a
+PKG_MD5SUM:=5ef3ba321e6df72d6519b728b292073e
+PKG_MAINTAINER:=Steven Barth <cyrus@openwrt.org>
 
 PKG_INSTALL:=1
 
@@ -44,7 +45,6 @@ TARGET_CFLAGS += $(FPIC)
 
 MAKE_FLAGS += \
 	OS="Linux" \
-	PREFIX="$(PKG_INSTALL_DIR)"
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include/miniupnpc

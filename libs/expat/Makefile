@@ -14,6 +14,7 @@ PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_MD5SUM:=dd7dab7a5fea97d2a6a43f511449b7cd
 PKG_SOURCE_URL:=@SF/expat
+PKG_MAINTAINER:=Steven Barth <cyrus@openwrt.org>
 
 PKG_LICENSE:=MIT
 PACKAGE_LICENSE_FILES:=COPYING
@@ -57,8 +58,6 @@ define Build/InstallDev
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/expat{,_external}.h $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libexpat.{a,so*} $(1)/usr/lib/
-	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig/
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/expat.pc $(1)/usr/lib/pkgconfig/
 endef
 
 define Package/libexpat/install

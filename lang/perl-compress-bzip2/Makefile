@@ -1,13 +1,22 @@
+#
+# Copyright (C) 2014 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+#
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=perl-compress-bzip2
-PKG_VERSION:=2.09
-PKG_RELEASE:=3
-PKG_MD5SUM:=1699fde3e86f2a036f135ae606d456bf
+PKG_VERSION:=2.18
+PKG_RELEASE:=1
 
-PKG_SOURCE_URL:=http://search.cpan.org/CPAN/authors/id/A/AR/ARJAY
+PKG_SOURCE_URL:=http://www.cpan.org/authors/id/R/RU/RURBAN/
 PKG_SOURCE:=Compress-Bzip2-$(PKG_VERSION).tar.gz
+PKG_MD5SUM:=c4a1995df9443cb97c28593cbbb23304
+
+PKG_LICENSE:=GPLv1+ ARTISTIC
+PKG_MAINTAINER:=Marcel Denia <naoir@gmx.net>
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/perl/Compress-Bzip2-$(PKG_VERSION)
 

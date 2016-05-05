@@ -17,6 +17,8 @@ PKG_MD5SUM:=d15060a813b91383a9f3c66faf84867e
 
 PKG_FIXUP:=libtool-ucxx
 
+PKG_MAINTAINER:=Jacob Siverskog <jacob@teenageengineering.com>
+
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/uclibc++.mk

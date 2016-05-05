@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2009-2012 OpenWrt.org
+# Copyright (C) 2009-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=sslh
-PKG_VERSION:=1.14
-PKG_RELEASE:=1
+PKG_VERSION:=v1.16
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://rutschle.net/tech/
-PKG_MD5SUM:=36e64bd6c7d0a299d5acd1109988099b
+PKG_MD5SUM:=c6e7d1cb0adb15f6efe480e36d98c560
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -23,7 +23,7 @@ define Package/sslh
   SUBMENU:=Routing and Redirection
   TITLE:=SSL/SSH multiplexer
   URL:=http://rutschle.net/tech/sslh.shtml
-  MAINTAINER:=Matthias Buecher <mail@maddes.net>
+  MAINTAINER:=Jonathan McCrohan <jmccrohan@gmail.com>
 endef
 
 define Package/sslh/conffiles

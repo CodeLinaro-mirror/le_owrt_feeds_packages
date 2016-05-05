@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libgcrypt
-PKG_VERSION:=1.5.3
+PKG_VERSION:=1.6.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=ftp://ftp.gnupg.org/gcrypt/libgcrypt
-PKG_MD5SUM:=993159b2924ae7b0e4eaff0743c2db35
+PKG_MD5SUM:=a5a5060dc2f80bcac700ab0236ea47dc
 
 PKG_FIXUP:=patch-libtool
 PKG_INSTALL:=1
@@ -27,6 +27,7 @@ define Package/libgcrypt
   DEPENDS:=+libgpg-error
   TITLE:=GNU crypto library
   URL:=http://directory.fsf.org/security/libgcrypt.html
+  MAINTAINER:=W. Michael Petullo <mike@flyn.org>
 endef
 
 define Package/libgcrypt/description
@@ -44,10 +45,7 @@ CONFIGURE_ARGS += \
 	--enable-shared \
 	--enable-static \
 	--disable-asm \
-	--with-gpg-error-prefix="$(STAGING_DIR)/usr" \
-	--enable-digests="md5 rmd160 sha1 sha256 sha512" \
-	--enable-ciphers="arcfour des aes cast5" \
-	--enable-pubkey-ciphers="rsa dsa"
+	--with-gpg-error-prefix="$(STAGING_DIR)/usr"
 
 TARGET_CFLAGS += $(FPIC)
 

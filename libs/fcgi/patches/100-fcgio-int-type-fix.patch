@@ -23,7 +23,7 @@ diff -urN fcgi-2.4.0/libfcgi/fcgio.cpp fcgi-2.4.0.new/libfcgi/fcgio.cpp
  
  // uflow() removes the char, underflow() doesn't
 -int fcgi_streambuf::uflow() 
-+short int fcgi_streambuf::uflow() 
++std::basic_streambuf<char>::int_type fcgi_streambuf::uflow()
  {
      int rv = underflow();
      if (this->bufsize) gbump(1);
@@ -32,7 +32,7 @@ diff -urN fcgi-2.4.0/libfcgi/fcgio.cpp fcgi-2.4.0.new/libfcgi/fcgio.cpp
  				
  // Note that the expected behaviour when there is no buffer varies
 -int fcgi_streambuf::underflow()
-+short int fcgi_streambuf::underflow()
++std::basic_streambuf<char>::int_type fcgi_streambuf::underflow()
  {
      if (this->bufsize)
      {

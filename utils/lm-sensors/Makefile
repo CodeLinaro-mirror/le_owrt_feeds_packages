@@ -8,12 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lm-sensors
-PKG_VERSION:=3.3.2
-PKG_RELEASE:=2
+PKG_VERSION:=3.3.5
+PKG_RELEASE:=1
 
 PKG_SOURCE:=lm_sensors-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://dl.lm-sensors.org/lm-sensors/releases
-PKG_MD5SUM:=f357ba00b080ab102a170f7bf8bb2578
+PKG_MD5SUM:=da506dedceb41822e64865f6ba34828a
+PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
+PKG_LICENSE:=GPL-2.0+ LGPL-2.1+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/lm_sensors-$(PKG_VERSION)
 PKG_BUILD_PARALLEL:=1

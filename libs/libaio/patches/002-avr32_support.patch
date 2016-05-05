@@ -1,8 +1,10 @@
---- a/src/libaio.h
-+++ b/src/libaio.h
-@@ -107,6 +107,10 @@ typedef enum io_iocb_cmd {
- #  else
- #    error "neither mipseb nor mipsel?"
+Index: libaio-0.3.109/src/libaio.h
+===================================================================
+--- libaio-0.3.109.orig/src/libaio.h	2014-06-11 10:41:12.537824814 +0200
++++ libaio-0.3.109/src/libaio.h	2014-06-11 10:41:12.537824814 +0200
+@@ -134,6 +134,10 @@
+ #define PADDEDptr(x, y) x
+ #define PADDEDul(x, y)  unsigned long x
  #  endif
 +#elif defined(__avr32__) /* big endian, 32 bits */
 +#define PADDED(x, y)	unsigned y; x
@@ -11,8 +13,10 @@
  #else
  #error	endian?
  #endif
---- /dev/null
-+++ b/src/syscall-avr32.h
+Index: libaio-0.3.109/src/syscall-avr32.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libaio-0.3.109/src/syscall-avr32.h	2014-06-11 10:41:12.537824814 +0200
 @@ -0,0 +1,91 @@
 +/*
 + * Copyright (C) 2007 Atmel Corporation
@@ -105,12 +109,14 @@
 +			     : "memory");				\
 +	return (type) __res_r12;					\
 +}
---- a/src/syscall.h
-+++ b/src/syscall.h
-@@ -32,6 +32,8 @@
- #include "syscall-parisc.h"
- #elif defined(__mips__)
- #include "syscall-mips.h"
+Index: libaio-0.3.109/src/syscall.h
+===================================================================
+--- libaio-0.3.109.orig/src/syscall.h	2014-06-11 10:41:12.537824814 +0200
++++ libaio-0.3.109/src/syscall.h	2014-06-11 10:41:12.537824814 +0200
+@@ -38,6 +38,8 @@
+ #include "syscall-sh.h"
+ #elif defined(__aarch64__)
+ #include "syscall-arm64.h"
 +#elif defined(__avr32__)
 +#include "syscall-avr32.h"
  #else

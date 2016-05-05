@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2011 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -14,6 +14,10 @@ PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@GNU/zile
 PKG_MD5SUM:=fe77d801ba69e0fb9b4914a04b9ff506
+PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
+
+PKG_LICENSE:=GPL-3.0+
+PKG_LICENSE_FILE:=COPYING
 
 PKG_INSTALL:=1
 

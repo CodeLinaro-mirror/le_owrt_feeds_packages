@@ -1,4 +1,4 @@
-#
+# 
 # Copyright (C) 2009 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luaexpat
-PKG_VERSION:=1.1
-PKG_RELEASE:=2
+PKG_VERSION:=1.2.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://luaforge.net/frs/download.php/2469
-PKG_MD5SUM:=6ecb895ccf5cff1e7f2facd438b1f8d0
+PKG_SOURCE_URL:=http://matthewwild.co.uk/projects/luaexpat
+PKG_MD5SUM:=03efe50c7f30a34580701e6527d7bfee
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -21,8 +21,9 @@ define Package/luaexpat
   SUBMENU:=Lua
   SECTION:=lang
   CATEGORY:=Languages
-  TITLE:=LuaExpat
+  TITLE:=LuaExpat 
   URL:=http://www.keplerproject.org/luaexpat/
+  MAINTAINER:=W. Michael Petullo <mike@flyn.org>
   DEPENDS:=+lua +libexpat
 endef
 
@@ -42,12 +43,12 @@ define Build/Compile
 	COMPAT_DIR="$(PKG_BUILD_DIR)/compat-5.1r5" \
 	LIB_OPTION="-shared $(TARGET_LDFLAGS)" \
 	CC="$(TARGET_CC) $(TARGET_CFLAGS) $(FPIC) -std=c99" \
-	LD="$(TARGET_CROSS)ld -shared"
+	LD="$(TARGET_CROSS)ld -shared" 
 endef
 
 define Package/luaexpat/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/src/lxp.so.1.1.0 $(1)/usr/lib/lua/lxp.so
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/src/lxp.so.1.2.0 $(1)/usr/lib/lua/lxp.so
 	$(INSTALL_DIR) $(1)/usr/lib/lua/lxp
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/src/lxp/lom.lua $(1)/usr/lib/lua/lxp
 endef

@@ -7,9 +7,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=nfs-kernel-server
-PKG_VERSION:=1.2.9
+PKG_VERSION:=1.3.0
 PKG_RELEASE:=1
-PKG_MD5SUM:=18869d16db3f49c053f8c68eba3fe2e0
+PKG_MD5SUM:=3ac3726eda563946d1f44ac3e5b61d56
 
 PKG_SOURCE_URL:=@SF/nfs
 PKG_SOURCE:=nfs-utils-$(PKG_VERSION).tar.bz2
@@ -29,6 +29,7 @@ define Package/nfs-kernel-server/Default
   SUBMENU:=Filesystem
   DEPENDS:=+libwrap +libblkid +libuuid $(LIBRPC_DEPENDS)
   URL:=http://nfs.sourceforge.net/
+  MAINTAINER:=Peter Wagner <tripolar@gmx.at>
 endef
 
 define Package/nfs-kernel-server

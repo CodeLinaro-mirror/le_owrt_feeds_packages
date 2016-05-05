@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2010 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -22,6 +22,7 @@ PKG_LICENSE_FILE:=COPYING aserver/COPYING
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_USE_MIPS16:=0
+PKG_CHECK_FORMAT_SECURITY:=0
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -30,6 +31,7 @@ define Package/alsa-lib
   CATEGORY:=Libraries
   TITLE:=ALSA (Advanced Linux Sound Architecture) library
   URL:=http://www.alsa-project.org/
+  MAINTAINER:=Peter Wagner <tripolar@gmx.at>
   DEPENDS:=@AUDIO_SUPPORT +kmod-sound-core +libpthread +librt
 endef
 

@@ -1,13 +1,22 @@
+#
+# Copyright (C) 2014 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+#
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=perl-lockfile-simple
-PKG_VERSION:=0.206
+PKG_VERSION:=0.208
 PKG_RELEASE:=1
-PKG_MD5SUM:=d8966c3fb799aefcaaf80f845057a1fa
 
-PKG_SOURCE_URL:=http://search.cpan.org/CPAN/authors/id/J/JV/JV
+PKG_SOURCE_URL:=http://www.cpan.org/authors/id/S/SC/SCHWIGON/lockfile-simple/
 PKG_SOURCE:=LockFile-Simple-$(PKG_VERSION).tar.gz
+PKG_MD5SUM:=4421283b4f32549e5299963734170044
+
+PKG_LICENSE:=GPLv2+ ARTISTIC
+PKG_MAINTAINER:=Marcel Denia <naoir@gmx.net>
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/perl/LockFile-Simple-$(PKG_VERSION)
 
@@ -15,12 +24,12 @@ include $(INCLUDE_DIR)/package.mk
 include ../perl/perlmod.mk
 
 define Package/perl-lockfile-simple
-SUBMENU:=Perl
-SECTION:=lang
-CATEGORY:=Languages
-TITLE:=Simple advisory file locking
-URL:=http://search.cpan.org/dist/LockFile-Simple/
-DEPENDS:=perl
+  SUBMENU:=Perl
+  SECTION:=lang
+  CATEGORY:=Languages
+  TITLE:=Simple advisory file locking
+  URL:=http://search.cpan.org/dist/LockFile-Simple/
+  DEPENDS:=perl
 endef
 
 define Build/Configure

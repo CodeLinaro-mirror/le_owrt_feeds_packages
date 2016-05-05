@@ -1,5 +1,14 @@
 --- a/builders/cmake/crtmpserver/crtmpserver.lua
 +++ b/builders/cmake/crtmpserver/crtmpserver.lua
+@@ -4,7 +4,7 @@ configuration=
+ {
+ 	-- if true, the server will run as a daemon.
+ 	-- NOTE: all console appenders will be ignored if this is a daemon
+-	daemon=false,
++	daemon=true,
+ 	-- the OS's path separator. Used in composing paths
+ 	pathSeparator="/",
+ 
 @@ -44,7 +44,7 @@ configuration=
  	{
  		-- this is the root directory of all applications
