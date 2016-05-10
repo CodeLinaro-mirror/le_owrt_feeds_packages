@@ -23,7 +23,7 @@ define Package/mplayer
   CATEGORY:=Sound
   TITLE:=MPlayer
   URL:=http://www.mplayerhq.hu/
-  DEPENDS:=+libbz2 +libpthread +libncurses +libmad +libmpg123 +libltdl +alsa-lib +liblzo +libSDL +libogg +libtheora +zlib +opencore-amr +libffmpeg-full
+  DEPENDS:=+libbz2 +libpthread +libncurses +libmad +libmpg123 +libltdl +alsa-lib +liblzo +libSDL +libogg +libtheora +zlib +opencore-amr +libffmpeg-full +libspeex
 
 endef
 
@@ -65,7 +65,6 @@ CONFIGURE_ARGS = \
 	--disable-png \
 	--disable-jpeg \
 	--disable-faad \
-	--disable-ffmpeg_a \
 	--enable-libopencore_amrnb \
 	--enable-libopencore_amrwb
 
