@@ -94,6 +94,8 @@ $pppd_options
 EOF
 
 	xl2tpd-control add l2tp-${interface} pppoptfile=${optfile} lns=${server} || {
+		/etc/init.d/xl2tpd restart
+		sleep 1
 		echo "xl2tpd-control: Add l2tp-$interface failed" >&2
 		proto_setup_failed "$interface"
 		exit 1
