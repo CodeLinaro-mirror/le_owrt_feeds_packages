@@ -12,7 +12,7 @@ PKG_VERSION:=1.2.56
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=http://mirror.internode.on.net/pub/slackware/slackware-13.1/patches/source/libpng
+PKG_SOURCE_URL:=@SF/libpng
 PKG_MD5SUM:=868562bd1c58b76ed8703f135a2e439a
 PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
 
