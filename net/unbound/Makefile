@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=unbound
 PKG_VERSION:=1.5.9
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSE
@@ -38,6 +38,7 @@ define Package/unbound
   SUBMENU:=IP Addresses and Names
   TITLE+= (daemon)
   DEPENDS+= +libunbound
+  USERID:=unbound:unbound
 endef
 
 define Package/unbound/description
@@ -113,6 +114,7 @@ CONFIGURE_ARGS += \
 	--with-libexpat="$(STAGING_DIR)/usr" \
 	--with-ssl="$(STAGING_DIR)/usr" \
 	--with-pidfile=/var/run/unbound.pid \
+	--with-user=unbound \
 	--without-pthreads
 
 define Package/unbound/conffiles
