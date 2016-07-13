@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libevent
-PKG_VERSION:=1.4.15
-PKG_RELEASE:=1
+PKG_VERSION:=2.1.5-beta
+PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-release-$(PKG_VERSION)-stable
-PKG_SOURCE:=release-$(PKG_VERSION)-stable.tar.gz
-PKG_SOURCE_URL:=https://github.com/libevent/libevent/archive/
-PKG_MD5SUM:=6dce6fe39f133c09ffe63de895805f7f
-PKG_MAINTAINER:=Steven Barth <cyrus@openwrt.org>
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/libevent/libevent.git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=0b49ae34594533daa82c06a506078de9e336a013
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -26,9 +26,9 @@ include $(INCLUDE_DIR)/package.mk
 define Package/libevent
   SECTION:=libs
   CATEGORY:=Libraries
-  TITLE:=Event notification library (legacy)
-  DEPENDS:=+librt
-  URL:=http://www.libevent.org
+  TITLE:=Event notification library
+  DEPENDS:=+librt +libopenssl
+  URL:=http://www.monkey.org/~provos/libevent/
 endef
 
 define Package/libevent/description
