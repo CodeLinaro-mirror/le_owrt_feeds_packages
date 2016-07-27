@@ -241,9 +241,6 @@ fi
 
 # let's check if there is already an IP registered on the web
 get_registered_ip REGISTERED_IP "NO_RETRY"
-ERR_LAST=$?
-#     No error    or     No IP set	 otherwise retry
-[ $ERR_LAST -eq 0 -o $ERR_LAST -eq 127 ] || get_registered_ip REGISTERED_IP
 
 # loop endlessly, checking ip every check_interval and forcing an updating once every force_interval
 write_log 6 "Starting main loop at $(eval $DATE_PROG)"
