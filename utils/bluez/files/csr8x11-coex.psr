@@ -31,3 +31,6 @@
 &2489 = 0096 0011
 
 
+//Disable clock request on PIO2
+&0246 = 0000
+
