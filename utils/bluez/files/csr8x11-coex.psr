@@ -2,8 +2,8 @@
 &01fe = 6590
 
 // PSKEY_COEX_SCHEME
-// 3 = Use Unity-3.
-&2480 = 0003
+// 7 = Use Unity-e.
+&2480 = 0007
 
 // Signal Configuration
 // --------------------
@@ -24,11 +24,13 @@
 // PSKEY_coex_transaction_priority_table
 &2488 = 0001 0001 0001 0001 0001 0001 0001 0001 0001 0001 0001 0000 0001 0000 0000 0000 0001
 
-// PSKEY_COEX_UNITY_3_TIMINGS
-// Default values are:
-//   T1 - 150 us
-//   T2 -  17 us
-&2489 = 0096 0011
+// PSKEY_COEX_BLE_TRANSACTION_PRIORITY_TABLE
+&2493 = 0000 0000 0000 0001 0001 0000 0001 0001 0001 0001 0001 0001 0001 0000 0000 0001
+
+// PSKEY_COEX_UNITY_EXPRESS_TIMINGS
+//   BT_ACTIVE lead time - 20 us
+//   BT_STATUS lead time - 12 us
+&248a = 0014 000c
 
 
 //Disable clock request on PIO2
