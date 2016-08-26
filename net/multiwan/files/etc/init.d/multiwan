@@ -1,5 +1,5 @@
 #!/bin/sh /etc/rc.common
-START=99
+START=98
 EXTRA_COMMANDS="single"
 
 start () {
