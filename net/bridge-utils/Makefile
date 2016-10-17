@@ -13,7 +13,7 @@ PKG_VERSION:=1.5
 PKG_RELEASE:=3
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://kernel.googlesource.com/pub/scm/linux/kernel/git/shemminger/bridge-utils.git
+PKG_SOURCE_URL:=https://source.codeaurora.org/quic/qsdk/bridge-utils
 PKG_SOURCE_VERSION:=v${PKG_VERSION}
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
