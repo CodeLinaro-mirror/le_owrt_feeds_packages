@@ -47,6 +47,7 @@ $(call package/file/Default)
 endef
 
 CONFIGURE_ARGS += \
+	ac_cv_func_strndup=yes \
 	--enable-shared \
 	--enable-static \
 
