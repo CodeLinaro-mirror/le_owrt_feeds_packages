@@ -21,10 +21,33 @@ bt_up(){
   fi
 }
 
+set_bt_address() {
+  art=$(grep -i "art" /proc/mtd | cut -d ":" -f 1)
+  bt_addr=$(hexdump /dev/$art -n 6 -s 64 | cut -d " " -f2-4 | sed 's/ //g'| head -n 1)
+  Byte01=${bt_addr:0:2}
+  Byte02=${bt_addr:2:2}
+  Byte03=${bt_addr:4:2}
+  Byte04=${bt_addr:6:2}
+  Byte05=${bt_addr:8:2}
+  Byte06=${bt_addr:10:2}
+
+  bccmd -t hci -d hci0 psset 0x01 0x00 0x00 0x$Byte06 0x$Byte05 0x$Byte04 0x$Byte03 0x$Byte02  0x$Byte01
+}
+
+set_xtal_trim_value() {
+  art=$(grep -i "art" /proc/mtd | cut -d ":" -f 1)
+  trim=$(hexdump /dev/$art -n 7 -s 64 | cut -d " " -f5 | head -n 1)
+  Byte01=${trim:0:2}
+
+  bccmd -t hci -d hci0 psset 0x01f6 0x$Byte01
+}
+
 bccmd_init_csr8x11() {
   bt_up
   bccmd -t hci -d hci0 psload /etc/bluetooth/csr8x11-a12-bt4.2-patch.psr
   bccmd -t hci -d hci0 psload /etc/bluetooth/csr8x11-coex.psr
+  set_bt_address
+  set_xtal_trim_value
   bccmd -t hci -d hci0 warmreset
   bt_up
 }
