@@ -42,6 +42,11 @@ set_xtal_trim_value() {
   bccmd -t hci -d hci0 psset 0x01f6 0x$Byte01
 }
 
+adjust_ble_conn_interval(){
+  echo 16 > /sys/kernel/debug/bluetooth/hci0/conn_min_interval
+  echo 16 > /sys/kernel/debug/bluetooth/hci0/conn_max_interval
+}
+
 bccmd_init_csr8x11() {
   bt_up
   bccmd -t hci -d hci0 psload /etc/bluetooth/csr8x11-a12-bt4.2-patch.psr
@@ -50,6 +55,8 @@ bccmd_init_csr8x11() {
   set_xtal_trim_value
   bccmd -t hci -d hci0 warmreset
   bt_up
+
+  adjust_ble_conn_interval
 }
 
 start() {
