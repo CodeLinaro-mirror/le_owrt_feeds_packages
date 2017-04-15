@@ -19,7 +19,7 @@ PKG_MAINTAINER:=Hannu Nyman <hannu.nyman@iki.fi>
 
 PKG_FIXUP:=autoreconf
 
-PKG_BUILD_DEPENDS:=USE_UCLIBC:argp-standalone
+PKG_BUILD_DEPENDS:=argp-standalone
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -30,10 +30,8 @@ define Package/rng-tools
   URL:=http://sourceforge.net/projects/gkernel/
 endef
 
-ifdef CONFIG_USE_UCLIBC
 CONFIGURE_VARS += \
     LIBS="-largp"
-endif
 
 CONFIGURE_ARGS += \
 	--without-libgcrypt
