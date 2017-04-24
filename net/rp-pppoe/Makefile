@@ -84,11 +84,17 @@ $(call Package/rp-pppoe/Default/description)
  This package contains pppoe-sniff.
 endef
 
-TARGET_CFLAGS += -I$(PKG_BUILD_DIR)/src/libevent
+TARGET_CFLAGS += -I$(PKG_BUILD_DIR)/src/libevent -isystem $(PKG_BUILD_DIR)/missing-headers
 CONFIGURE_PATH := ./src
 CONFIGURE_ARGS += ac_cv_path_PPPD=/usr/sbin/pppd --enable-plugin=$(STAGING_DIR)/usr/include/
 MAKE_FLAGS := DESTDIR="$(PKG_INSTALL_DIR)" install
 MAKE_PATH := ./src
+
+define Build/Prepare
+	mkdir -p $(PKG_BUILD_DIR)/missing-headers/net
+	$(CP) ./files/ppp_defs.h $(PKG_BUILD_DIR)/missing-headers/net/
+	$(call Build/Prepare/Default,$(1),$(2),$(3))
+endef
 
 define Package/rp-pppoe-client/install
 	$(INSTALL_DIR) $(1)/etc/init.d
