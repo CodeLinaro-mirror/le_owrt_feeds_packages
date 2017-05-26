@@ -1,0 +1,26 @@
+--- a/common/lpf.c
++++ b/common/lpf.c
+@@ -36,7 +36,11 @@
+ #include <linux/filter.h>
+ #include <linux/if_ether.h>
+ #include <netinet/in_systm.h>
++#if defined(__GLIBC__) || defined(__UCLIBC__)
+ #include <net/if_packet.h>
++#else
++#include <linux/if_packet.h>
++#endif
+ #include "includes/netinet/ip.h"
+ #include "includes/netinet/udp.h"
+ #include "includes/netinet/if_ether.h"
+--- a/includes/arpa/nameser.h
++++ b/includes/arpa/nameser.h
+@@ -61,6 +61,9 @@
+ #ifndef _ARPA_NAMESER_H_
+ #define _ARPA_NAMESER_H_
+ 
++#if !defined(__GLIBC__) && !defined(__UCLIBC__)
++#include <sys/types.h>
++#endif
+ /*
+  * Revision information.  This is the release date in YYYYMMDD format.
+  * It can change every day so the right thing to do with it is use it
