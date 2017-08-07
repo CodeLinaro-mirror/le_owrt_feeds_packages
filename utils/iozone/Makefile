@@ -19,7 +19,11 @@ PKG_MD5SUM:=5205cd571c6e68440772f7e0af0712d6
 include $(INCLUDE_DIR)/package.mk
 
 MAKE_PATH:=src/current
+ifeq ($(ARCH),aarch64)
+MAKE_FLAGS += linux-arm
+else
 MAKE_FLAGS += linux-$(ARCH)
+endif
 
 PKG_BUILD_BIN:=$(PKG_BUILD_DIR)/$(MAKE_PATH)
 
