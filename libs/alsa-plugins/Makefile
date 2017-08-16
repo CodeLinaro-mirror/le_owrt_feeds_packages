@@ -15,7 +15,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/alsa-plugins/Default
   SECTION:=sound
   CATEGORY:=Sound
-  DEPENDS:=+alsa-lib +libncursesw +libpthread +mm-audio
+  DEPENDS:=+alsa-lib +libncursesw +libpthread
   TITLE:=ALSA (Advanced Linux Sound Architecture) Plugins
 endef
 
@@ -31,7 +31,7 @@ endef
 
 define Package/alsa-plugins-gcs
  $(call Package/alsa-plugins/Default)
- DEPENDS:=+ffmpeg +libspeexdsp
+ DEPENDS:=+ffmpeg +libspeexdsp graphite-client
  TITLE+= gcs
 endef
 
