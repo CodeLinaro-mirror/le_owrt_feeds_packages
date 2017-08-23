@@ -689,7 +689,7 @@ Signed-off-by: Ram Chandra Jangir <rjangir@codeaurora.org>
 +.NOEXPORT:
 --- /dev/null
 +++ b/gcs/gcs_plugin.c
-@@ -0,0 +1,912 @@
+@@ -0,0 +1,906 @@
 +/*
 + * Copyright (c) 2017, The Linux Foundation. All rights reserved.
 + *
@@ -725,12 +725,6 @@ Signed-off-by: Ram Chandra Jangir <rjangir@codeaurora.org>
 +
 +#define GPLUGIN_DBG(fmt, ...)	\
 +	fprintf(stderr, "%s: " fmt "\n", __func__, ##__VA_ARGS__)
-+
-+#define PRINT_FOR_BU(fmt, ...)	\
-+	fprintf(stderr, "%s: " fmt "\n", __func__, ##__VA_ARGS__)
-+
-+#define SLEEP_FOR_BU(x) \
-+	sleep(x)
 +
 +#define GCS_DLSYM(gcs_d, name)	\
 +	do {	\
@@ -950,8 +944,10 @@ Signed-off-by: Ram Chandra Jangir <rjangir@codeaurora.org>
 +	pthread_mutex_lock(&gcs_d->buf_mutex);
 +
 +	filled_bytes = GCS_BUF_FILLED_BYTES(gcs_d);
-+	GPLUGIN_DBG("size %u offset %u size_bytes %u filled_bytes %u buf %p appl_ptr %u hw_ptr %u",
-+		    size, offset, size_bytes, filled_bytes, buf, io->appl_ptr, io->hw_ptr);
++	/*
++	* GPLUGIN_DBG("size %u offset %u size_bytes %u filled_bytes %u buf %p appl_ptr %u hw_ptr %u",
++	*	    size, offset, size_bytes, filled_bytes, buf, io->appl_ptr, io->hw_ptr);
++	*/
 +
 +	if (((size_bytes % gcs_d->period_bytes) != 0) ||
 +		((filled_bytes % gcs_d->period_bytes) != 0) ||
@@ -1261,8 +1257,6 @@ Signed-off-by: Ram Chandra Jangir <rjangir@codeaurora.org>
 +	struct gcs_io_pdata *gcs_d = io->private_data;
 +	pthread_attr_t attr;
 +	int ret = 0;
-+
-+	GPLUGIN_DBG("enter");
 +
 +	ret = gcs_d->ops.gcs_register_data_cmd_handler_fn(gcs_d->graph_hdl,
 +					(data_cmd_cb_ptr) gcs_data_rsp_cb, gcs_d);
