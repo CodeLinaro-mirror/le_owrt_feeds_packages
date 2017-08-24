@@ -14,9 +14,11 @@ PKG_RELEASE:=1
 PKG_LICENSE:=LGPL-2.1+ BSD-2-Clause GPL-2.0
 PKG_MAINTAINER:=Luka Perkov <luka@openwrt.org>
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://linuxcontainers.org/downloads/lxc/
-PKG_MD5SUM:=197abb5a28ab0b689c737eb1951023fb
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=git://codeaurora.org/quic/qsdk/lxc
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=b7a1093e1ed790360bd122c6e8d38509de906196
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
 PKG_BUILD_DEPENDS:=lua
 PKG_BUILD_PARALLEL:=1
@@ -169,6 +171,11 @@ define Package/lxc-common/install
 		./files/lxc.conf \
 		$(1)/etc/lxc/lxc.conf
 
+	$(INSTALL_DIR) $(1)/etc/init.d/
+	$(CP) \
+		./files/lxc \
+		$(1)/etc/init.d/lxc
+
 	$(INSTALL_DIR) $(1)/lxc/
 endef
 
@@ -184,6 +191,12 @@ define Package/lxc-templates/install
 	$(CP) \
 		$(PKG_INSTALL_DIR)/usr/share/lxc/templates/lxc-* \
 		$(1)/usr/share/lxc/templates/
+
+	 $(INSTALL_DIR) $(1)/usr/share/lxc/templates/
+	$(CP) \
+		./files/lxc-qsdk \
+		$(1)/usr/share/lxc/templates/lxc-qsdk
+
 endef
 
 define Package/lxc-configs/install
