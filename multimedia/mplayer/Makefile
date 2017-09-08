@@ -23,7 +23,7 @@ define Package/mplayer
   CATEGORY:=Sound
   TITLE:=MPlayer
   URL:=http://www.mplayerhq.hu/
-  DEPENDS:=+libbz2 +libpthread +libncurses +libmad +libmpg123 +libltdl +alsa-lib +liblzo +libSDL +libogg +libtheora +zlib +opencore-amr +libffmpeg-full +libspeex
+  DEPENDS:=@!TARGET_ipq_ipq807x_64 +libbz2 +libpthread +libncurses +libmad +libmpg123 +libltdl +alsa-lib +liblzo +libSDL +libogg +libtheora +zlib +opencore-amr +libffmpeg-full +libspeex
 
 endef
 
