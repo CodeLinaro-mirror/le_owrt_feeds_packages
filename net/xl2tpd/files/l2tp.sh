@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
 #!/bin/sh
 
 [ -x /usr/sbin/xl2tpd ] || exit 0
@@ -17,6 +33,7 @@ proto_l2tp_init_config() {
 	proto_config_add_int "mtu"
 	proto_config_add_int "checkup_interval"
 	proto_config_add_string "server"
+	proto_config_add_string "l2tpoipsec"
 	available=1
 	no_device=1
 	no_proto_task=1
@@ -26,10 +43,13 @@ proto_l2tp_setup() {
 	local interface="$1"
 	local optfile="/tmp/l2tp/options.${interface}"
 
-	local ip serv_addr server
+	local ip serv_addr server l2tpoipsec_en
 	json_get_var server server && {
 		for ip in $(resolveip -t 5 "$server"); do
-			( proto_add_host_dependency "$interface" "$ip" )
+			json_get_var l2tpoipsec_en l2tpoipsec
+			if [ "$l2tpoipsec_en" != "yes" ]; then
+				( proto_add_host_dependency "$interface" "$ip" )
+			fi
 			echo "$ip" >> /tmp/server.l2tp-${interface}
 			serv_addr=1
 		done
