@@ -1,0 +1,13 @@
+Index: avs-device-sdk-1.3.0/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.3.0.orig/CMakeLists.txt	2017-12-22 15:39:01.156714618 +0530
++++ avs-device-sdk-1.3.0/CMakeLists.txt	2017-12-22 15:39:37.304577694 +0530
+@@ -3,6 +3,8 @@
+ # Set project information
+ project(AlexaClientSDK VERSION 1.3.0 LANGUAGES CXX)
+ set(PROJECT_BRIEF "A cross-platform, modular SDK for interacting with the Alexa Voice Service")
++set(CMAKE_BINARY_DIR ${CMAKE_BINARY_DIR}/../build)
++add_definitions(-D_GLIBCXX_USE_C99=1)
+ 
+ include(build/BuildDefaults.cmake)
+ include(tools/Testing.cmake)
