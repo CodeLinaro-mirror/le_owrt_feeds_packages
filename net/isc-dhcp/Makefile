@@ -12,6 +12,10 @@ UPSTREAM_NAME:=dhcp
 PKG_VERSION:=4.3.3
 PKG_RELEASE:=1
 
+PKG_LICENSE:=BSD-3-Clause
+PKG_LICENSE_FILES:=LICENSE
+PKG_MAINTAINER:=Antony Antony <antony@phenome.org>
+
 PKG_SOURCE:=$(UPSTREAM_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ftp://ftp.isc.org/isc/dhcp/$(PKG_VERSION)
 PKG_MD5SUM:=c5577b09c9017cdd319a11ff6364268e
@@ -193,7 +197,8 @@ endif
 endef
 
 define Package/isc-dhcp-server-$(BUILD_VARIANT)/install
-	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/dhcpd $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/dhcpd.init $(1)/etc/init.d/dhcpd
 	$(INSTALL_BIN) ./files/dhcpd.conf $(1)/etc
@@ -203,15 +208,29 @@ ifeq ($(BUILD_VARIANT),ipv6)
 endif
 endef
 
+define Package/isc-dhcp-server-ipv4/conffiles
+/etc/dhcpd.conf
+endef
+
+define Package/isc-dhcp-server-ipv6/conffiles
+/etc/dhcpd6.conf
+endef
+
 define Package/isc-dhcp-client-$(BUILD_VARIANT)/install
-	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/dhclient $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/dhclient-script $(1)/usr/sbin/
-	$(INSTALL_BIN) ./files/dhclient.init $(1)/etc/init.d/dhclient
 ifeq ($(BUILD_VARIANT),ipv6)
-	$(INSTALL_BIN) ./files/dhclient6.init $(1)/etc/init.d/dhclient6
 	$(INSTALL_BIN) ./files/dhclient6.conf $(1)/etc
 endif
+endef
+
+define Package/isc-dhcp-client-ipv4/conffiles
+/etc/dhclient.conf
+endef
+
+define Package/isc-dhcp-client-ipv6/conffiles
+/etc/dhclient6.conf
 endef
 
 define Package/isc-dhcp-omshell-$(BUILD_VARIANT)/install
