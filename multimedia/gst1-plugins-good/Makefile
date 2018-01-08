@@ -110,6 +110,7 @@ CONFIGURE_ARGS += \
 	--disable-osx_video \
 	--disable-pulse \
 	--disable-qtdemux \
+	--disable-rtp \
 	--disable-rtspmanager \
 	--disable-shout2 \
 	--disable-sunaudio \
