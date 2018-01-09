@@ -35,7 +35,7 @@ define Package/gstreamer1/Default
   SECTION:=multimedia
   TITLE:=GStreamer
   URL:=http://gstreamer.freedesktop.org/
-  DEPENDS:= $(ICONV_DEPENDS) $(INTL_DEPENDS)
+  DEPENDS:= $(ICONV_DEPENDS) $(INTL_DEPENDS) +librt
 endef
 
 define Package/gstreamer1/description/Default
