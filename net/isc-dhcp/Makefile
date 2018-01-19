@@ -9,16 +9,18 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=isc-dhcp
 UPSTREAM_NAME:=dhcp
-PKG_VERSION:=4.3.3
+PKG_VERSION:=4.3.6
 PKG_RELEASE:=1
 
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Antony Antony <antony@phenome.org>
+PKG_MAINTAINER:=Philip Prindeville <philipp@redfish-solutions.com>
 
 PKG_SOURCE:=$(UPSTREAM_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=ftp://ftp.isc.org/isc/dhcp/$(PKG_VERSION)
-PKG_MD5SUM:=c5577b09c9017cdd319a11ff6364268e
+PKG_SOURCE_URL:=ftp://ftp.isc.org/isc/dhcp/$(PKG_VERSION) \
+		http://ftp.funet.fi/pub/mirrors/ftp.isc.org/isc/dhcp/$(PKG_VERSION) \
+		http://ftp.iij.ad.jp/pub/network/isc/dhcp/$(PKG_VERSION)
+PKG_HASH:=a41eaf6364f1377fe065d35671d9cf82bbbc8f21207819b2b9f33f652aec6f1b
 
 PKG_FIXUP:=autoreconf
 PKG_BUILD_PARALLEL:=1
@@ -174,6 +176,14 @@ endif
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR)			\
+		BUILD_CC="$(HOSTCC_NOCACHE)"		\
+		CROSS_CC="$(TARGET_CC)"			\
+		host_alias="$(GNU_TARGET_NAME)"		\
+		target_alias="$(GNU_TARGET_NAME)"	\
+		build_alias="$(GNU_HOST_NAME)"		\
+		ac_cv_file__dev_random=yes		\
+		all
+	$(MAKE) -C $(PKG_BUILD_DIR)			\
 		DESTDIR="$(PKG_INSTALL_DIR)"		\
 		BUILD_CC="$(HOSTCC_NOCACHE)"		\
 		CROSS_CC="$(TARGET_CC)"			\
@@ -181,7 +191,7 @@ define Build/Compile
 		target_alias="$(GNU_TARGET_NAME)"	\
 		build_alias="$(GNU_HOST_NAME)"		\
 		ac_cv_file__dev_random=yes		\
-		all install-exec
+		install-exec
 endef
 
 define Package/isc-dhcp-relay-$(BUILD_VARIANT)/install
@@ -197,11 +207,10 @@ endif
 endef
 
 define Package/isc-dhcp-server-$(BUILD_VARIANT)/install
-	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc
-	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/init.d $(1)/etc/uci-defaults
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/dhcpd $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/dhcpd.init $(1)/etc/init.d/dhcpd
-	$(INSTALL_BIN) ./files/dhcpd.conf $(1)/etc
+	$(INSTALL_BIN) ./files/dhcpd.defaults $(1)/etc/uci-defaults
 ifeq ($(BUILD_VARIANT),ipv6)
 	$(INSTALL_BIN) ./files/dhcpd6.init $(1)/etc/init.d/dhcpd6
 	$(INSTALL_BIN) ./files/dhcpd6.conf $(1)/etc
