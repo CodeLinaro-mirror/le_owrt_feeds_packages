@@ -283,8 +283,8 @@ $(eval $(call GstBuildPlugin,typefindfunctions,'typefind' functions,audio pbutil
 $(eval $(call GstBuildPlugin,videoconvert,video format conversion,video,,))
 $(eval $(call GstBuildPlugin,videorate,Adjusts video frames,video,,))
 $(eval $(call GstBuildPlugin,videoscale,Resizes video,video,,))
-$(eval $(call GstBuildPlugin,videotestsrc,video test,video,,+liboil))
-$(eval $(call GstBuildPlugin,volume,volume,audio controller,,+liboil))
+#$(eval $(call GstBuildPlugin,videotestsrc,video test,video,,+liboil))
+$(eval $(call GstBuildPlugin,volume,volume,audio controller,,))
 $(eval $(call GstBuildPlugin,vorbis,Vorbis,audio tag,ogg,+libvorbis))
 
 $(eval $(call BuildPackage,gstreamer1-plugins-base))
