@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2015 OpenWrt.org
+# Copyright (C) 2011-2016 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,10 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gst1-plugins-bad
-PKG_VERSION:=1.4.5
-PKG_RELEASE:=2
+PKG_VERSION:=1.10.5
+PKG_RELEASE:=1
 
-PKG_MAINTAINER:=W. Michael Petullo <mike@flyn.org>
+PKG_MAINTAINER:=W. Michael Petullo <mike@flyn.org> \
+		Ted Hess <thess@kitschensync.net>
 
 PKG_LICENSE:=LGPLv2 GPLv2
 PKG_LICENSE_FILES:=COPYING.LIB COPYING
@@ -19,9 +20,9 @@ PKG_LICENSE_FILES:=COPYING.LIB COPYING
 PKG_BUILD_DIR:=$(BUILD_DIR)/gst-plugins-bad-$(PKG_VERSION)
 PKG_SOURCE:=gst-plugins-bad-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=http://gstreamer.freedesktop.org/src/gst-plugins-bad/
-PKG_MD5SUM:=e0bb39412cf4a48fe0397bcf3a7cd451
+PKG_HASH:=c5806040bb83b43be86ce592e6a19c5d83d7776f7d9f434eb4b911c4efff3573
 
-PKG_BUILD_DEPENDS:= libgstreamer1 gstreamer1-plugins-base
+PKG_BUILD_DEPENDS:= libgstreamer1 gst1-plugins-base libgst1basecamerabinsrc libgst1photography libgst1adaptivedemux libgst1uridownloader libgst1badbase
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -37,7 +38,7 @@ define Package/gstreamer1-bad/Default
   SECTION:=multimedia
   TITLE:=GStreamer
   URL:=http://gstreamer.freedesktop.org/
-  DEPENDS:= +libgstreamer1 $(ICONV_DEPENDS)
+  DEPENDS:= +gst1-plugins-base +libgstreamer1 +libgst1pbutils $(ICONV_DEPENDS)
 endef
 
 define Package/gstreamer1-bad/description/Default
@@ -115,7 +116,6 @@ CONFIGURE_ARGS += \
 	--disable-resindvd \
 	--disable-faac \
 	--disable-faad \
-	--disable-fbdev \
 	--disable-flite \
 	--disable-gsm \
 	--disable-kate \
@@ -148,7 +148,6 @@ CONFIGURE_ARGS += \
 	--disable-schro \
 	--disable-zbar \
 	--disable-srtp \
-	--disable-hls \
 	\
 	--without-libiconv-prefix \
 	--without-libintl-prefix \
@@ -199,8 +198,11 @@ define GstBuildLibrary
   $$(eval $$(call BuildPackage,libgst1$(1)))
 endef
 
+$(eval $(call GstBuildLibrary,adaptivedemux,adaptivedemux,app uridownloader,))
 $(eval $(call GstBuildLibrary,photography,photography,,))
 $(eval $(call GstBuildLibrary,basecamerabinsrc,basecamerabinsrc,app,))
+$(eval $(call GstBuildLibrary,uridownloader,uridownloader,,))
+$(eval $(call GstBuildLibrary,badbase,badbase,,))
 
 # 1: short name
 # 2: description
@@ -243,21 +245,22 @@ $(eval $(call GstBuildPlugin,aiff,aiff support,audio tag,,))
 $(eval $(call GstBuildPlugin,asfmux,asf muxing support,rtp,,))
 $(eval $(call GstBuildPlugin,autoconvert,autoconvert support,,,))
 $(eval $(call GstBuildPlugin,bayer,bayer support,video,,))
-$(eval $(call GstBuildPlugin,camerabin2,camerabin support,basecamerabinsrc photography tag pbutils app,,))
+$(eval $(call GstBuildPlugin,camerabin2,camerabin support,basecamerabinsrc photography pbutils app,,))
 $(eval $(call GstBuildPlugin,dataurisrc,dataurisrc support,,,))
 $(eval $(call GstBuildPlugin,debugutilsbad,debugutils support,video,,))
 $(eval $(call GstBuildPlugin,dvdspu,dvdspu support,video,,))
+$(eval $(call GstBuildPlugin,fbdevsink,fbdev support,video,,))
 $(eval $(call GstBuildPlugin,festival,festival support,audio,,))
+$(eval $(call GstBuildPlugin,hls,HLS support,pbutils adaptivedemux,multifile,+libnettle))
 $(eval $(call GstBuildPlugin,frei0r,frei0r support,controller video,,))
 $(eval $(call GstBuildPlugin,id3tag,id3tag support,tag,,))
 $(eval $(call GstBuildPlugin,jpegformat,jpegformat support,tag,,))
-$(eval $(call GstBuildPlugin,liveadder,liveadder support,audio,,))
-$(eval $(call GstBuildPlugin,mpegpsdemux,mpegpsdemux support,pbutils tag,,))
+$(eval $(call GstBuildPlugin,mpegpsdemux,mpegpsdemux support,pbutils,,))
 $(eval $(call GstBuildPlugin,mpegpsmux,mpegpsmux support,,,))
-#$(eval $(call GstBuildPlugin,mpegtsdemux,mpegtsdemux support,mpegts pbutils tag,,))
+#$(eval $(call GstBuildPlugin,mpegtsdemux,mpegtsdemux support,mpegts pbutils,,))
 #$(eval $(call GstBuildPlugin,mpegtsmux,mpegtsmux support,video,,))
-$(eval $(call GstBuildPlugin,mxf,mxf support,audio video,,))
-$(eval $(call GstBuildPlugin,opus,OPUS plugin library,audio tag rtp,,+libopus))
+$(eval $(call GstBuildPlugin,mxf,mxf support,badbase audio video,,))
+$(eval $(call GstBuildPlugin,opusparse,OPUS streams library,pbutils,,+libopus))
 $(eval $(call GstBuildPlugin,pcapparse,pcapparse support,,,))
 $(eval $(call GstBuildPlugin,pnm,pnm support,video,,))
 $(eval $(call GstBuildPlugin,rawparse,rawparse support,audio video,,))
