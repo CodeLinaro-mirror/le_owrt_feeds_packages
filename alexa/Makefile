@@ -1,14 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=avs-device-sdk
-PKG_VERSION:=1.4
+PKG_VERSION:=1.5
 PKG_RELEASE:=0
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE).tar.bz2
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE)
 PKG_SOURCE_URL:=https://github.com/alexa/avs-device-sdk.git
 PKG_SOURCE_BRANCH:=github/master
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_VERSION:=56c26e85888992f2a78f685d26295c14d9c87718
+PKG_SOURCE_VERSION:=add1956688ea777e3632d3006fc2171efe7b5620
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 CMAKE_INSTALL:=1
 
@@ -48,6 +48,7 @@ define Package/avs-device-sdk/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/AIP/src/libAIP.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/Alerts/src/libAlerts.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/AudioPlayer/src/libAudioPlayer.so $(1)/usr/lib
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/ExternalMediaPlayer/src/libExternalMediaPlayer.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/Notifications/src/libNotifications.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/PlaybackController/src/libPlaybackController.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/Settings/src/libSettings.so $(1)/usr/lib
