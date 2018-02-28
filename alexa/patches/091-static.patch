@@ -1,0 +1,446 @@
+Index: avs-device-sdk-1.6.0/ACL/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/ACL/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/ACL/src/CMakeLists.txt	2018-03-19 15:02:04.967281868 +0530
+@@ -4,7 +4,7 @@
+ file(GLOB_RECURSE ACL_SRC "${ACL_SOURCE_DIR}/src/*.cpp")
+ add_definitions("-DACSDK_LOG_MODULE=acl")
+ add_definitions("-DACSDK_OPENSSL_MIN_VER_REQUIRED=${OPENSSL_MIN_VERSION}")
+-add_library(ACL SHARED ${ACL_SRC})
++add_library(ACL STATIC ${ACL_SRC})
+ target_include_directories(ACL PUBLIC "${MultipartParser_SOURCE_DIR}")
+ target_include_directories(ACL PUBLIC ${CURL_INCLUDE_DIRS})
+ target_include_directories(ACL PUBLIC "${ACL_SOURCE_DIR}/include")
+@@ -12,4 +12,4 @@
+ target_link_libraries(ACL ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} AVSCommon)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/ADSL/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/ADSL/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/ADSL/src/CMakeLists.txt	2018-03-19 15:02:30.063309606 +0530
+@@ -2,7 +2,7 @@
+ 
+ find_package(Threads ${THREADS_PACKAGE_CONFIG})
+ add_definitions("-DACSDK_LOG_MODULE=adsl")
+-add_library(ADSL SHARED
++add_library(ADSL STATIC
+     DirectiveProcessor.cpp
+     DirectiveRouter.cpp
+     DirectiveSequencer.cpp
+@@ -15,4 +15,4 @@
+     AVSCommon)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/AFML/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/AFML/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/AFML/src/CMakeLists.txt	2018-03-19 15:01:24.063236512 +0530
+@@ -1,4 +1,4 @@
+-add_library(AFML SHARED
++add_library(AFML STATIC
+     AudioActivityTracker.cpp
+     Channel.cpp
+     FocusManager.cpp
+Index: avs-device-sdk-1.6.0/AVSCommon/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/AVSCommon/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/AVSCommon/CMakeLists.txt	2018-03-19 15:00:06.055149500 +0530
+@@ -7,7 +7,7 @@
+ add_subdirectory("AVS")
+ add_subdirectory("Utils")
+ 
+-add_library(AVSCommon SHARED
++add_library(AVSCommon STATIC
+     AVS/src/AVSDirective.cpp
+     AVS/src/AVSMessage.cpp
+     AVS/src/AVSMessageHeader.cpp
+Index: avs-device-sdk-1.6.0/ApplicationUtilities/DefaultClient/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/ApplicationUtilities/DefaultClient/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/ApplicationUtilities/DefaultClient/src/CMakeLists.txt	2018-03-19 15:02:13.951291806 +0530
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+ 
+ add_definitions("-DACSDK_LOG_MODULE=defaultClient")
+-add_library(DefaultClient SHARED
++add_library(DefaultClient STATIC
+     DefaultClient.cpp)
+ target_include_directories(DefaultClient PUBLIC
+     "${DefaultClient_SOURCE_DIR}/include")
+Index: avs-device-sdk-1.6.0/ApplicationUtilities/Resources/Audio/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/ApplicationUtilities/Resources/Audio/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/ApplicationUtilities/Resources/Audio/src/CMakeLists.txt	2018-03-19 15:02:09.835287254 +0530
+@@ -1,6 +1,6 @@
+ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+ 
+-add_library(AudioResources SHARED
++add_library(AudioResources STATIC
+         AlertsAudioFactory.cpp
+         AudioFactory.cpp
+         NotificationsAudioFactory.cpp)
+Index: avs-device-sdk-1.6.0/AuthDelegate/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/AuthDelegate/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/AuthDelegate/src/CMakeLists.txt	2018-03-19 15:01:28.347241271 +0530
+@@ -2,7 +2,7 @@
+ find_package(Threads ${THREADS_PACKAGE_CONFIG})
+ 
+ add_definitions("-DACSDK_LOG_MODULE=authDelegate")
+-add_library(AuthDelegate SHARED
++add_library(AuthDelegate STATIC
+     AuthDelegate.cpp)
+ target_include_directories(AuthDelegate PUBLIC
+     ${AuthDelegate_SOURCE_DIR}/include)
+Index: avs-device-sdk-1.6.0/CapabilityAgents/AIP/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/AIP/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/AIP/src/CMakeLists.txt	2018-03-19 15:00:45.587193679 +0530
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+ 
+ add_definitions("-DACSDK_LOG_MODULE=aip")
+-add_library(AIP SHARED
++add_library(AIP STATIC
+     AudioInputProcessor.cpp
+     ESPData.cpp)
+ target_include_directories(AIP PUBLIC
+Index: avs-device-sdk-1.6.0/CapabilityAgents/Alerts/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/Alerts/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/Alerts/src/CMakeLists.txt	2018-03-19 15:00:40.919188471 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=alerts")
+ 
+-add_library(Alerts SHARED
++add_library(Alerts STATIC
+         Renderer/Renderer.cpp
+         Storage/SQLiteAlertStorage.cpp
+         Alarm.cpp
+Index: avs-device-sdk-1.6.0/CapabilityAgents/AudioPlayer/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/AudioPlayer/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/AudioPlayer/src/CMakeLists.txt	2018-03-19 15:01:01.811211760 +0530
+@@ -1,5 +1,5 @@
+ add_definitions("-DACSDK_LOG_MODULE=audioplayer")
+-add_library(AudioPlayer SHARED
++add_library(AudioPlayer STATIC
+     AudioPlayer.cpp
+     IntervalCalculator.cpp)
+ target_include_directories(AudioPlayer PUBLIC
+Index: avs-device-sdk-1.6.0/CapabilityAgents/ExternalMediaPlayer/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/ExternalMediaPlayer/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/ExternalMediaPlayer/src/CMakeLists.txt	2018-03-19 15:00:35.551182480 +0530
+@@ -6,7 +6,7 @@
+     add_subdirectory("ExternalMediaPlayerAdapters")
+ endif()
+ 
+-add_library(ExternalMediaPlayer SHARED
++add_library(ExternalMediaPlayer STATIC
+         ${ExternalMediaPlayer_SOURCES})
+ 
+ target_include_directories(ExternalMediaPlayer PUBLIC
+Index: avs-device-sdk-1.6.0/CapabilityAgents/GadgetManager/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/GadgetManager/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/GadgetManager/src/CMakeLists.txt	2018-03-19 15:01:05.863216271 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=gadgetManager")
+ 
+-add_library(GadgetManager SHARED
++add_library(GadgetManager STATIC
+ 	BinaryRepresentation.cpp
+ 	FinalizeGadgetEvent.cpp
+ 	FrameParser.cpp
+Index: avs-device-sdk-1.6.0/CapabilityAgents/Notifications/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/Notifications/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/Notifications/src/CMakeLists.txt	2018-03-19 15:00:30.667177025 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=Notifications")
+ 
+-add_library(Notifications SHARED
++add_library(Notifications STATIC
+ 		NotificationIndicator.cpp
+ 		NotificationRenderer.cpp
+ 		NotificationsCapabilityAgent.cpp
+@@ -15,4 +15,4 @@
+ target_link_libraries(Notifications AudioResources AVSCommon SQLiteStorage RegistrationManager)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/CapabilityAgents/PlaybackController/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/PlaybackController/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/PlaybackController/src/CMakeLists.txt	2018-03-19 15:00:56.879206267 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=playbackcontroller")
+ 
+-add_library(PlaybackController SHARED
++add_library(PlaybackController STATIC
+     "${CMAKE_CURRENT_LIST_DIR}/PlaybackController.cpp"
+     "${CMAKE_CURRENT_LIST_DIR}/PlaybackRouter.cpp"
+     "${CMAKE_CURRENT_LIST_DIR}/PlaybackMessageRequest.cpp")
+@@ -11,4 +11,4 @@
+ target_link_libraries(PlaybackController AVSCommon ContextManager)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/CapabilityAgents/Settings/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/Settings/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/Settings/src/CMakeLists.txt	2018-03-19 15:00:19.331164356 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=Settings")
+ 
+-add_library(Settings SHARED
++add_library(Settings STATIC
+         Settings.cpp
+         SettingsUpdatedEventSender.cpp
+         SQLiteSettingStorage.cpp)
+@@ -14,4 +14,4 @@
+ target_link_libraries(Settings AVSCommon SQLiteStorage RegistrationManager)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/CapabilityAgents/SpeakerManager/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/SpeakerManager/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/SpeakerManager/src/CMakeLists.txt	2018-03-19 15:01:10.471221399 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=speakerManager")
+ 
+-add_library(SpeakerManager SHARED SpeakerManager.cpp)
++add_library(SpeakerManager STATIC SpeakerManager.cpp)
+ 
+ target_include_directories(SpeakerManager PUBLIC
+         "${ContextManager_INCLUDE_DIRS}"
+Index: avs-device-sdk-1.6.0/CapabilityAgents/SpeechSynthesizer/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/SpeechSynthesizer/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/SpeechSynthesizer/src/CMakeLists.txt	2018-03-19 15:00:50.095198706 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=speechSynthesizer")
+ 
+-add_library(SpeechSynthesizer SHARED
++add_library(SpeechSynthesizer STATIC
+         SpeechSynthesizer.cpp)
+ 
+ target_include_directories(SpeechSynthesizer PUBLIC
+Index: avs-device-sdk-1.6.0/CapabilityAgents/System/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/System/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/System/src/CMakeLists.txt	2018-03-19 15:01:14.991226427 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=system")
+ 
+-add_library(AVSSystem SHARED
++add_library(AVSSystem STATIC
+     "${CMAKE_CURRENT_LIST_DIR}/EndpointHandler.cpp"
+     "${CMAKE_CURRENT_LIST_DIR}/SoftwareInfoSender.cpp"
+     "${CMAKE_CURRENT_LIST_DIR}/SoftwareInfoSendRequest.cpp"
+Index: avs-device-sdk-1.6.0/CapabilityAgents/TemplateRuntime/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CapabilityAgents/TemplateRuntime/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CapabilityAgents/TemplateRuntime/src/CMakeLists.txt	2018-03-19 15:00:25.915171716 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=templateRuntime")
+ 
+-add_library(TemplateRuntime SHARED
++add_library(TemplateRuntime STATIC
+     "${CMAKE_CURRENT_LIST_DIR}/TemplateRuntime.cpp")
+ 
+ target_include_directories(TemplateRuntime
+@@ -9,4 +9,4 @@
+ target_link_libraries(TemplateRuntime AVSCommon)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/CertifiedSender/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/CertifiedSender/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/CertifiedSender/src/CMakeLists.txt	2018-03-19 15:02:17.827296091 +0530
+@@ -1,5 +1,5 @@
+ add_definitions("-DACSDK_LOG_MODULE=certifiedSender")
+-add_library(CertifiedSender SHARED
++add_library(CertifiedSender STATIC
+         CertifiedSender.cpp
+         SQLiteMessageStorage.cpp)
+ 
+@@ -12,4 +12,4 @@
+ target_link_libraries(CertifiedSender AVSCommon RegistrationManager SQLiteStorage)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/ContextManager/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/ContextManager/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/ContextManager/src/CMakeLists.txt	2018-03-19 15:02:25.903305013 +0530
+@@ -1,5 +1,5 @@
+ add_definitions("-DACSDK_LOG_MODULE=contextManager")
+-add_library(ContextManager SHARED
++add_library(ContextManager STATIC
+     ContextManager.cpp)
+ 
+ target_include_directories(ContextManager PUBLIC
+@@ -10,4 +10,4 @@
+     AVSCommon)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/ESP/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/ESP/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/ESP/src/CMakeLists.txt	2018-03-19 15:03:08.131351552 +0530
+@@ -1,11 +1,11 @@
+ add_definitions("-DACSDK_LOG_MODULE=esp")
+ 
+ if (ESP_PROVIDER)
+-    add_library(ESP SHARED ESPDataProvider.cpp)
++    add_library(ESP STATIC ESPDataProvider.cpp)
+     target_link_libraries(ESP "${ESP_LIB_PATH}")
+     target_include_directories(ESP PUBLIC "${ESP_INCLUDE_DIR}")
+ else()
+-    add_library(ESP SHARED DummyESPDataProvider.cpp)
++    add_library(ESP STATIC DummyESPDataProvider.cpp)
+ endif()
+ 
+ target_include_directories(ESP PUBLIC
+Index: avs-device-sdk-1.6.0/Integration/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/Integration/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/Integration/src/CMakeLists.txt	2018-03-19 15:01:19.471231408 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=integration")
+ file(GLOB_RECURSE INTEGRATION_SRC "*.cpp")
+-add_library(Integration SHARED "${INTEGRATION_SRC}")
++add_library(Integration STATIC "${INTEGRATION_SRC}")
+ target_include_directories(Integration PUBLIC "${ACL_SOURCE_DIR}/include")
+ target_include_directories(Integration PUBLIC "${AuthDelegate_SOURCE_DIR}/include")
+ target_include_directories(Integration PUBLIC "${Integration_SOURCE_DIR}/include")
+Index: avs-device-sdk-1.6.0/KWD/KittAi/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/KWD/KittAi/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/KWD/KittAi/src/CMakeLists.txt	2018-03-19 15:02:33.927313871 +0530
+@@ -1,5 +1,5 @@
+ add_definitions("-DACSDK_LOG_MODULE=kittAiKeyWordDetector")
+-add_library(KITTAI SHARED
++add_library(KITTAI STATIC
+     KittAiKeyWordDetector.cpp)
+ 
+ target_include_directories(KITTAI PUBLIC
+@@ -10,4 +10,4 @@
+ target_link_libraries(KITTAI KWD AVSCommon "${KITTAI_KEY_WORD_DETECTOR_LIB_PATH}" blas)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/KWD/Sensory/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/KWD/Sensory/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/KWD/Sensory/src/CMakeLists.txt	2018-03-19 15:02:39.187319674 +0530
+@@ -1,5 +1,5 @@
+ add_definitions("-DACSDK_LOG_MODULE=sensoryKeywordDetector")
+-add_library(SENSORY SHARED
++add_library(SENSORY STATIC
+     SensoryKeywordDetector.cpp)
+ 
+ target_include_directories(SENSORY PUBLIC
+@@ -10,4 +10,4 @@
+ target_link_libraries(SENSORY KWD AVSCommon "${SENSORY_KEY_WORD_DETECTOR_LIB_PATH}")
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/KWD/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/KWD/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/KWD/src/CMakeLists.txt	2018-03-19 15:02:43.679324627 +0530
+@@ -1,9 +1,9 @@
+ add_definitions("-DACSDK_LOG_MODULE=abstractKeywordDetector")
+-add_library(KWD SHARED
++add_library(KWD STATIC
+     AbstractKeywordDetector.cpp)
+ 
+ include_directories(KWD "${KWD_SOURCE_DIR}/include")
+ target_link_libraries(KWD AVSCommon)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/MediaPlayer/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/MediaPlayer/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/MediaPlayer/src/CMakeLists.txt	2018-03-19 15:02:48.123329526 +0530
+@@ -1,5 +1,5 @@
+ add_definitions("-DACSDK_LOG_MODULE=mediaPlayer")
+-add_library(MediaPlayer SHARED
++add_library(MediaPlayer STATIC
+     AttachmentReaderSource.cpp
+     BaseStreamSource.cpp
+     ErrorTypeConversion.cpp
+Index: avs-device-sdk-1.6.0/PlaylistParser/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/PlaylistParser/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/PlaylistParser/src/CMakeLists.txt	2018-03-19 15:00:13.067157349 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=PlaylistParser")
+ 
+-add_library(PlaylistParser SHARED PlaylistParser.cpp UrlContentToAttachmentConverter.cpp)
++add_library(PlaylistParser STATIC PlaylistParser.cpp UrlContentToAttachmentConverter.cpp)
+ 
+ target_include_directories(PlaylistParser PUBLIC
+     "${PlaylistParser_SOURCE_DIR}/include" 
+@@ -9,4 +9,4 @@
+ target_link_libraries(PlaylistParser AVSCommon)
+ 
+ # install target
+-asdk_install()
+\ No newline at end of file
++asdk_install()
+Index: avs-device-sdk-1.6.0/RegistrationManager/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/RegistrationManager/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/RegistrationManager/src/CMakeLists.txt	2018-03-19 14:59:28.099106916 +0530
+@@ -1,6 +1,6 @@
+ add_definitions("-DACSDK_LOG_MODULE=registrationManager")
+ 
+-add_library(RegistrationManager SHARED RegistrationManager.cpp CustomerDataManager.cpp CustomerDataHandler.cpp)
++add_library(RegistrationManager STATIC RegistrationManager.cpp CustomerDataManager.cpp CustomerDataHandler.cpp)
+ 
+ target_include_directories(RegistrationManager PUBLIC
+     "${RegistrationManager_SOURCE_DIR}/include"
+Index: avs-device-sdk-1.6.0/Storage/SQLiteStorage/src/CMakeLists.txt
+===================================================================
+--- avs-device-sdk-1.6.0.orig/Storage/SQLiteStorage/src/CMakeLists.txt	2018-03-19 13:48:36.000000000 +0530
++++ avs-device-sdk-1.6.0/Storage/SQLiteStorage/src/CMakeLists.txt	2018-03-19 15:02:21.827300511 +0530
+@@ -1,5 +1,5 @@
+ add_definitions("-DACSDK_LOG_MODULE=sqliteStorage")
+-add_library(SQLiteStorage SHARED
++add_library(SQLiteStorage STATIC
+         SQLiteDatabase.cpp
+         SQLiteStatement.cpp
+         SQLiteUtils.cpp)
