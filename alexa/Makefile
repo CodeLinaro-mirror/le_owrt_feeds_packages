@@ -29,39 +29,44 @@ CMAKE_OPTIONS += \
 	-DACSDK_EXCLUDE_TEST_FROM_ALL=ON \
 	-DSENSORY_KEY_WORD_DETECTOR=OFF \
 	-DGSTREAMER_MEDIA_PLAYER=ON \
-	-DCURL_LIBRARY=${STAGING_DIR}/usr/lib/ \
+	-DCURL_LIBRARY=${STAGING_DIR}/usr/lib/libcurl.a \
 	-DCURL_INCLUDE_DIR=${STAGING_DIR}/usr/include/
 
 define Package/avs-device-sdk/description
  Alexa voice assistance for AVS.
 endef
 
+define Build/InstallDev
+	$(INSTALL_DIR) $(1)/usr $(1)/usr/lib $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/ACL/src/libACL.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/ADSL/src/libADSL.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/AFML/src/libAFML.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/ApplicationUtilities/DefaultClient/src/libDefaultClient.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/ApplicationUtilities/Resources/Audio/src/libAudioResources.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/AuthDelegate/src/libAuthDelegate.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/AVSCommon/libAVSCommon.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/AIP/src/libAIP.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/Alerts/src/libAlerts.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/AudioPlayer/src/libAudioPlayer.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/ExternalMediaPlayer/src/libExternalMediaPlayer.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/Notifications/src/libNotifications.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/PlaybackController/src/libPlaybackController.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/Settings/src/libSettings.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/SpeakerManager/src/libSpeakerManager.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/SpeechSynthesizer/src/libSpeechSynthesizer.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/System/src/libAVSSystem.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CapabilityAgents/TemplateRuntime/src/libTemplateRuntime.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/CertifiedSender/src/libCertifiedSender.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/ContextManager/src/libContextManager.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/ESP/src/libESP.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/KWD/src/libKWD.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/MediaPlayer/src/libMediaPlayer.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/PlaylistParser/src/libPlaylistParser.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/RegistrationManager/src/libRegistrationManager.a $(1)/usr/lib/avs
+	$(CP) $(PKG_BUILD_DIR)/Storage/SQLiteStorage/src/libSQLiteStorage.a $(1)/usr/lib/avs
+endef
 define Package/avs-device-sdk/install
-	$(INSTALL_DIR) $(1)/alexa $(1)/usr/lib $(1)/usr/bin $(1)/etc/ssl $(1)/etc/ssl/certs $(1)/etc/init.d
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ACL/src/libACL.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ADSL/src/libADSL.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/AFML/src/libAFML.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ApplicationUtilities/DefaultClient/src/libDefaultClient.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ApplicationUtilities/Resources/Audio/src/libAudioResources.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/AuthDelegate/src/libAuthDelegate.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/AVSCommon/libAVSCommon.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/AIP/src/libAIP.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/Alerts/src/libAlerts.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/AudioPlayer/src/libAudioPlayer.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/ExternalMediaPlayer/src/libExternalMediaPlayer.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/Notifications/src/libNotifications.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/PlaybackController/src/libPlaybackController.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/Settings/src/libSettings.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/SpeakerManager/src/libSpeakerManager.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/SpeechSynthesizer/src/libSpeechSynthesizer.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/System/src/libAVSSystem.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CapabilityAgents/TemplateRuntime/src/libTemplateRuntime.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/CertifiedSender/src/libCertifiedSender.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ContextManager/src/libContextManager.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/MediaPlayer/src/libMediaPlayer.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/PlaylistParser/src/libPlaylistParser.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/RegistrationManager/src/libRegistrationManager.so $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/Storage/SQLiteStorage/src/libSQLiteStorage.so $(1)/usr/lib
+	true
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
