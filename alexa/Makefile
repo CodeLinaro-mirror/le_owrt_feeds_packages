@@ -1,14 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=avs-device-sdk
-PKG_VERSION:=1.5
+PKG_VERSION:=1.6
 PKG_RELEASE:=0
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE).tar.bz2
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE)
 PKG_SOURCE_URL:=https://github.com/alexa/avs-device-sdk.git
 PKG_SOURCE_BRANCH:=github/master
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_VERSION:=add1956688ea777e3632d3006fc2171efe7b5620
+PKG_SOURCE_VERSION:=46fd5482bcc481e2fb7445d434d21ab7e5685529
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 CMAKE_INSTALL:=1
 
@@ -60,6 +60,7 @@ define Package/avs-device-sdk/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ContextManager/src/libContextManager.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/MediaPlayer/src/libMediaPlayer.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/PlaylistParser/src/libPlaylistParser.so $(1)/usr/lib
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/RegistrationManager/src/libRegistrationManager.so $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/Storage/SQLiteStorage/src/libSQLiteStorage.so $(1)/usr/lib
 endef
 
