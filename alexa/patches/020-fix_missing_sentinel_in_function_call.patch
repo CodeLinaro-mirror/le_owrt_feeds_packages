@@ -1,8 +1,8 @@
-Index: avs-device-sdk-1.3.0/MediaPlayer/src/MediaPlayer.cpp
+Index: avs-device-sdk-1.6.0/MediaPlayer/src/MediaPlayer.cpp
 ===================================================================
---- avs-device-sdk-1.3.0.orig/MediaPlayer/src/MediaPlayer.cpp	2017-12-22 15:40:44.756322005 +0530
-+++ avs-device-sdk-1.3.0/MediaPlayer/src/MediaPlayer.cpp	2017-12-22 15:41:32.260141777 +0530
-@@ -502,7 +502,7 @@
+--- avs-device-sdk-1.6.0.orig/MediaPlayer/src/MediaPlayer.cpp	2018-03-09 10:53:49.000000000 +0530
++++ avs-device-sdk-1.6.0/MediaPlayer/src/MediaPlayer.cpp	2018-03-09 12:40:58.067908173 +0530
+@@ -498,7 +498,7 @@
      }
  
      // AVS Volume will be between 0 and 100.
