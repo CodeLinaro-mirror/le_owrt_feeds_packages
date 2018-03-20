@@ -8,3 +8,11 @@
  	$(top_builddir)/glib/libglib-2.0.la 		\
  	$(NULL)
  
+--- a/gobject/glib-mkenums.in
++++ b/gobject/glib-mkenums.in
+@@ -1,4 +1,4 @@
+-#! @PERL_PATH@
++#! /usr/bin/perl
+ 
+ use warnings;
+ use File::Basename;
