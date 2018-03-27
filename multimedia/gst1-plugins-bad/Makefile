@@ -232,6 +232,8 @@ define GstBuildPlugin
 	$(INSTALL_DIR) $$(1)/usr/lib/gstreamer-$(GST_VERSION)
 	( cd $(PKG_INSTALL_DIR); $(CP) \
 		./usr/lib/gstreamer-$(GST_VERSION)/libgst$(1).so* \
+		./usr/lib/libgstmpegts-1.0.so* \
+		./usr/lib/libgstcodecparsers-1.0.so* \
 		$$(1)/usr/lib/gstreamer-$(GST_VERSION)/ \
 	)
   endef
@@ -257,8 +259,8 @@ $(eval $(call GstBuildPlugin,id3tag,id3tag support,tag,,))
 $(eval $(call GstBuildPlugin,jpegformat,jpegformat support,tag,,))
 $(eval $(call GstBuildPlugin,mpegpsdemux,mpegpsdemux support,pbutils,,))
 $(eval $(call GstBuildPlugin,mpegpsmux,mpegpsmux support,,,))
-#$(eval $(call GstBuildPlugin,mpegtsdemux,mpegtsdemux support,mpegts pbutils,,))
-#$(eval $(call GstBuildPlugin,mpegtsmux,mpegtsmux support,video,,))
+$(eval $(call GstBuildPlugin,mpegtsdemux,mpegtsdemux support,mpegts pbutils,,))
+$(eval $(call GstBuildPlugin,mpegtsmux,mpegtsmux support,video,,))
 $(eval $(call GstBuildPlugin,mxf,mxf support,badbase audio video,,))
 $(eval $(call GstBuildPlugin,opusparse,OPUS streams library,pbutils,,+libopus))
 $(eval $(call GstBuildPlugin,pcapparse,pcapparse support,,,))
