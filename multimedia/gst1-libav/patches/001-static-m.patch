@@ -1,0 +1,13 @@
+Index: gst-libav-1.10.5/configure.ac
+===================================================================
+--- gst-libav-1.10.5.orig/configure.ac	2017-06-15 13:52:32.000000000 +0530
++++ gst-libav-1.10.5/configure.ac	2018-04-17 12:09:41.817273582 +0530
+@@ -96,7 +96,7 @@
+ 
+ dnl check for libm, for sin()
+ LT_LIB_M
+-AC_SUBST(LIBM)
++AC_SUBST(LIBM, "")
+ 
+ dnl check for pthreads
+ AX_PTHREAD
