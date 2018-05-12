@@ -185,7 +185,9 @@ CONFIGURE_ARGS += \
 
 TARGET_CFLAGS += -D_GNU_SOURCE
 
-TARGET_LDFLAGS += $(FPIC) $(TOOLCHAIN_DIR)/lib/libm.a
+TARGET_LDFLAGS += \
+		  $(TOOLCHAIN_DIR)/lib/libm.a \
+		  $(FPIC)
 
 define Package/gst1-libav/install
 	$(INSTALL_DIR) $(1)/usr/lib/gstreamer-$(GST_VERSION)
