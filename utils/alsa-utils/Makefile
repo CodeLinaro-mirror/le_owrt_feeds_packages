@@ -19,6 +19,8 @@ PKG_INSTALL:=1
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 
 include $(INCLUDE_DIR)/package.mk
+TARGET_CFLAGS += -fpie
+TARGET_LDFLAGS += -pie
 
 define Package/alsa-utils
   SECTION:=utils
