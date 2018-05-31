@@ -72,8 +72,8 @@ define Build/Compile
 		LINUX="$(LINUX_DIR)" \
 		CC="$(TARGET_CC)" \
 		STAGING_DIR="$(STAGING_DIR)" \
-		LDFLAGS="$(TARGET_LDFLAGS)" \
-		CFLAGS="$(TARGET_CFLAGS)"
+		LDFLAGS="$(TARGET_LDFLAGS) -pie" \
+		CFLAGS="$(TARGET_CFLAGS) -fpie"
 	$(Build/Compile/python-smbus)
 endef
 
