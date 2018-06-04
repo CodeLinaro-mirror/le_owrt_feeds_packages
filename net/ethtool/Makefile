@@ -37,6 +37,9 @@ define Package/ethtool/description
  network interface
 endef
 
+TARGET_CFLAGS += -fpie
+TARGET_LDFLAGS += -pie
+
 define Package/ethtool/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ethtool $(1)/usr/sbin
