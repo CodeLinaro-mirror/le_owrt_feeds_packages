@@ -84,7 +84,7 @@ $(call Package/rp-pppoe/Default/description)
  This package contains pppoe-sniff.
 endef
 
-TARGET_CFLAGS += -I$(PKG_BUILD_DIR)/src/libevent -isystem $(PKG_BUILD_DIR)/missing-headers
+TARGET_CFLAGS += -fpie -I$(PKG_BUILD_DIR)/src/libevent -isystem $(PKG_BUILD_DIR)/missing-headers
 CONFIGURE_PATH := ./src
 CONFIGURE_ARGS += ac_cv_path_PPPD=/usr/sbin/pppd --enable-plugin=$(STAGING_DIR)/usr/include/
 MAKE_FLAGS := DESTDIR="$(PKG_INSTALL_DIR)" install
