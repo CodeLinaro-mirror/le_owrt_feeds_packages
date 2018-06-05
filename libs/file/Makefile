@@ -53,7 +53,8 @@ CONFIGURE_ARGS += \
 
 MAKE_PATH := src
 
-TARGET_CFLAGS += $(FPIC)
+TARGET_CFLAGS += $(FPIC) -fpie
+TARGET_LDFLAGS += -pie
 
 define Build/Compile/magic
 	( cd $(PKG_BUILD_DIR)/magic/Magdir; \
