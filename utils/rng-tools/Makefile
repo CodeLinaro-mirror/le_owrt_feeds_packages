@@ -37,6 +37,8 @@ CONFIGURE_ARGS += \
 	--without-libgcrypt
 
 EXTRA_CFLAGS := -DRNG_TEST_PRIV
+TARGET_CFLAGS += -fpie
+TARGET_LDFLAGS += -pie
 
 ifneq ($(CONFIG_TARGET_ar71xx),)
 EXTRA_CFLAGS += -DENTROPY_FACTOR=5
