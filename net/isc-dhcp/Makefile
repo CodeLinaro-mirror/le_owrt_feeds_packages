@@ -65,6 +65,9 @@ define Package/isc-dhcp-relay-ipv4/conffiles
 /etc/config/dhcrelay
 endef
 
+TARGET_CFLAGS += -fpie
+TARGET_LDFLAGS += -pie
+
 define Package/isc-dhcp-relay-ipv6/description
 $(call Package/isc-dhcp-relay/description)
  This package is compiled with IPv4 and IPv6 support.
