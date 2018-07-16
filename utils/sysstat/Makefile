@@ -50,6 +50,9 @@ CONFIGURE_ARGS+= \
 	--disable-sensors \
 	--disable-nls
 
+TARGET_CFLAGS+= -fpie
+TARGET_LDFLAGS+= -pie
+
 define Package/sysstat/install
 	$(INSTALL_DIR) $(1)/usr/lib/sysstat
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/sysstat/{sadc,sa1,sa2} $(1)/usr/lib/sysstat/
