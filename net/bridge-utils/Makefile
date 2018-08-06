@@ -40,7 +40,8 @@ define Package/bridge/description
  form a larger network.
 endef
 
-TARGET_CFLAGS += -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+TARGET_CFLAGS += -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -fpie
+TARGET_LDFLAGS += -pie
 
 CONFIGURE_ARGS += \
 	--with-linux-headers="$(LINUX_DIR)" \

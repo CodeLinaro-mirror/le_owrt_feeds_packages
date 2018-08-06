@@ -15,6 +15,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)_$(PKG_VERSION)
 PKG_SOURCE_URL:=http://www.iozone.org/src/current
 PKG_SOURCE:=$(PKG_NAME)_$(PKG_VERSION).tar
 PKG_MD5SUM:=5205cd571c6e68440772f7e0af0712d6
+PKG_ASLR_PIE:=0
 
 include $(INCLUDE_DIR)/package.mk
 
