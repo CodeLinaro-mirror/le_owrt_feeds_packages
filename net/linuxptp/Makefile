@@ -37,10 +37,8 @@ define Package/linuxptp/description
  computers.
 endef
 
-EXTRA_CFLAGS += -DHAVE_CLOCK_ADJTIME -DHAVE_POSIX_SPAWN -DHAVE_ONESTEP_SYNC
-
-MAKE_VARS += \
-	EXTRA_CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS) $(EXTRA_CFLAGS)"
+MAKE_VARS += KBUILD_OUTPUT="$(TOOLCHAIN_DIR)" \
+	EXTRA_CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS)"
 
 define Package/linuxptp/install
 	$(INSTALL_DIR) $(1)/usr/sbin
