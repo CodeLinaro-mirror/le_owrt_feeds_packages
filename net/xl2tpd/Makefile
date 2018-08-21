@@ -25,6 +25,9 @@ PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
+TARGET_CFLAGS += -fpie
+TARGET_LDFLAGS += -pie
+
 define Package/xl2tpd
   SECTION:=net
   CATEGORY:=Network
