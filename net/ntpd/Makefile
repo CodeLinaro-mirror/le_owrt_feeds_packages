@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ntp
-PKG_VERSION:=4.2.8p9
-PKG_RELEASE:=2
+PKG_VERSION:=4.2.8p11
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/
-PKG_HASH:=b724287778e1bac625b447327c9851eedef020517a3545625e9f652a90f30b72
+PKG_HASH:=f14a39f753688252d683ff907035ffff106ba8d3db21309b742e09b5c3cd278e
 
 PKG_LICENSE:=Unique
 PKG_LICENSE_FILES:=COPYRIGHT html/copyright.html
@@ -42,6 +42,7 @@ endef
 
 define Package/ntpd
 $(call Package/ntpd/Default)
+  DEPENDS+= +ntp-utils
   TITLE+= server
   USERID:=ntp=123:ntp=123
 endef
@@ -86,10 +87,6 @@ $(call Package/ntpd/Default/description)
  This package contains the ntp-keygen.
 endef
 
-define Package/ntpd/conffiles
-/etc/ntp.conf
-endef
-
 CONFIGURE_VARS += \
 	ac_cv_header_md5_h=no \
 	ac_cv_lib_rt_sched_setscheduler=no \
@@ -116,10 +113,7 @@ define Package/ntpd/install
 	$(INSTALL_DIR) $(1)/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ntpd/ntpd $(1)/sbin/
 	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ntpq/ntpq $(1)/usr/sbin/
 	$(INSTALL_BIN) ./files/ntpd.hotplug-helper $(1)/usr/sbin/
-	$(INSTALL_DIR) $(1)/etc
-	$(INSTALL_CONF) ./files/ntp.conf $(1)/etc/
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/ntpd.init $(1)/etc/init.d/ntpd
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
@@ -148,6 +142,7 @@ endef
 define Package/ntp-utils/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ntpdc/ntpdc $(1)/usr/sbin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ntpq/ntpq $(1)/usr/sbin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/util/ntptime $(1)/usr/sbin/
 endef
 
