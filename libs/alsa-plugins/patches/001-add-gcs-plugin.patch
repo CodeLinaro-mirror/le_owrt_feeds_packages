@@ -703,7 +703,7 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
 +++ alsa-plugins-1.0.28/gcs/gcs_plugin.c	2018-09-18 18:58:42.858712052 -0700
-@@ -0,0 +1,951 @@
+@@ -0,0 +1,937 @@
 +/*
 + * Copyright (c) 2017, The Linux Foundation. All rights reserved.
 + *
@@ -809,7 +809,6 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +	unsigned int period_bytes;
 +	unsigned int period_cnt;
 +	unsigned int buf_size;
-+	bool setup_controls;
 +
 +	uint8_t rd_cnt;
 +	uint8_t wr_cnt;
@@ -841,7 +840,7 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +};
 +
 +static void gcs_deinitialize(struct gcs_io_pdata *gcs_d);
-+static void gcs_do_mixer_controls(struct gcs_io_pdata *gcs_d, bool enable);
++static void gcs_do_mixer_controls(bool enable);
 +
 +static uint32_t gcs_get_filled_period_cnt(struct gcs_io_pdata *gcs_d)
 +{
@@ -1033,7 +1032,7 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +	if (gcs_d->is_started)
 +		gcs_stop(gcs_d);
 +
-+	gcs_do_mixer_controls(gcs_d, false);
++	gcs_do_mixer_controls(false);
 +
 +	ret = gcs_d->ops.gcs_close_fn(gcs_d->graph_hdl);
 +	if (ret < 0 )
@@ -1247,13 +1246,9 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +	return NULL;
 +}
 +
-+static void gcs_do_mixer_controls(struct gcs_io_pdata *gcs_d, bool enable)
++static void gcs_do_mixer_controls(bool enable)
 +{
-+	if (!gcs_d->setup_controls)
-+		return;
-+
-+	GPLUGIN_DBG("executing the mixer controls for %s",
-+		    enable ? "enable" : "disable");
++	GPLUGIN_ERR("executing the mixer controls");
 +
 +	if(enable) {
 +		system("amixer sset 'ADC MUX0' 'DMIC'");
@@ -1275,6 +1270,8 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +		system("amixer sset 'WDMA1 CH4 MUX' 'PORT_4'");
 +		system("amixer sset 'WDMA1 CH5 MUX' 'PORT_5'");
 +		system("amixer sset 'WDMA1_ON_OFF' 'on'");
++
++		GPLUGIN_ERR("done enable mixer controls");
 +	} else {
 +		system("amixer sset 'ADC MUX0' 'AMIC'");
 +		system("amixer sset 'DMIC MUX0' 'ZERO'");
@@ -1295,6 +1292,8 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +		system("amixer sset 'WDMA1 CH4 MUX' 'PORT_0'");
 +		system("amixer sset 'WDMA1 CH5 MUX' 'PORT_0'");
 +		system("amixer sset 'WDMA1_ON_OFF' 'off'");
++
++		GPLUGIN_ERR("done enable mixer controls");
 +	}
 +}
 +
@@ -1509,7 +1508,6 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +	struct gcs_io_pdata *gcs_d;
 +	unsigned int rate = 0, channels = 0;
 +	int ret = 0;
-+	bool setup_controls = false;
 +
 +	if (stream != SND_PCM_STREAM_CAPTURE) {
 +		GPLUGIN_ERR("GCS-to-ALSA plugin is only for capture");
@@ -1543,17 +1541,6 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +			GPLUGIN_ERR("channels = %u", channels);
 +			continue;
 +		}
-+		if (strcmp(id, "setup_controls") == 0) {
-+			long val = 0;
-+			if (snd_config_get_integer(n, &val) < 0) {
-+				GPLUGIN_ERR("invalid type for %s", id);
-+				return -EINVAL;
-+			}
-+			if (val != 0)
-+				setup_controls = true;
-+			else
-+				setup_controls = false;
-+		}
 +
 +		GPLUGIN_ERR("unknown field %s", id);
 +	}
@@ -1577,7 +1564,6 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +	gcs_d->stop_buff = false;
 +	gcs_d->buff_active = false;
 +	gcs_d->num_buf_to_q = 2;
-+	gcs_d->setup_controls = setup_controls;
 +
 +	ret = snd_pcm_ioplug_create(&gcs_d->io, name, stream, mode);
 +	if (ret < 0) {
@@ -1629,7 +1615,7 @@ Index: alsa-plugins-1.0.28/gcs/gcs_plugin.c
 +		goto err_gcs_open;
 +	}
 +
-+	gcs_do_mixer_controls(gcs_d, true);
++	gcs_do_mixer_controls(true);
 +	return 0;
 +
 +
