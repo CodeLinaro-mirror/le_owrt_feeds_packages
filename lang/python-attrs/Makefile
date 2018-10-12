@@ -21,6 +21,7 @@ PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Jeffery To <jeffery.to@gmail.com>
 
+include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
 $(call include_mk, python-package.mk)
 
@@ -43,5 +44,16 @@ define Build/Compile
 	$(call Build/Compile/PyMod,,install --prefix="/usr" --root="$(PKG_INSTALL_DIR)")
 endef
 
+define Host/Install
+	$(INSTALL_DIR) $(HOST_PYTHON_LIB_DIR)
+	$(call Build/Compile/PyMod,,install --prefix="host" --root="$(STAGING_DIR)")
+endef
+
+define Build/InstallDev
+	$(INSTALL_DIR) $(HOST_PYTHON_LIB_DIR)
+	$(CP) $(PKG_INSTALL_DIR)/usr/* $(STAGING_DIR_HOST)/
+endef
+
+$(eval $(call HostBuild))
 $(eval $(call PyPackage,python-attrs))
 $(eval $(call BuildPackage,python-attrs))
