@@ -32,6 +32,24 @@ start_shairport_service() {
 	local stuffing
         local device
 
+	#set mixer cmds
+	echo "0x60e 0x10" > /sys/kernel/debug/regmap/0-000d/registers
+	echo "0x60f 0x10" > /sys/kernel/debug/regmap/0-000d/registers
+	amixer sset 'I2S RX2 MUX' 'AIF1_PB'
+	amixer sset 'I2S RX3 MUX' 'AIF1_PB'
+	amixer sset 'CDC_IF RX2 MUX' 'I2S_0 RX2'
+	amixer sset 'CDC_IF RX3 MUX' 'I2S_0 RX3'
+	amixer sset 'RX INT8_1 MIX1 INP0' 'RX2' ;
+	amixer sset 'RX INT7_1 MIX1 INP0' 'RX3' ;
+	amixer sset 'COMP8' 'on' ;
+	amixer sset 'COMP7' 'on' ;
+	amixer sset 'SpkrRight COMP' 'on' ;
+	amixer sset 'SpkrRight BOOST' 'on' ;
+	amixer sset 'SpkrRight SWR DAC_Port' 'on'
+	amixer sset 'SpkrLeft COMP' 'on' ;
+	amixer sset 'SpkrLeft BOOST' 'on' ;
+	amixer sset 'SpkrLeft SWR DAC_Port' 'on'
+
 	procd_open_instance
 
 	procd_set_param command /usr/bin/$NAME
