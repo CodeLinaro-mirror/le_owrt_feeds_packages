@@ -32,11 +32,15 @@ endef
 
 TARGET_CFLAGS += $(FPIC)
 
-define Build/Compile	
+ifeq ($(CONFIG_USE_MUSL),)
+EXTRA_LIBS=-lnsl
+endif
+
+define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
 		OPT_CFLAGS="$(TARGET_CFLAGS)" \
-		LIBS=-lnsl \
+		LIBS="$(EXTRA_LIBS)" \
 		NETGROUP= \
 		VSYSLOG= \
 		BUGS= \
