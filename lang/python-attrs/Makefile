@@ -15,8 +15,6 @@ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://pypi.python.org/packages/source/a/attrs
 PKG_MD5SUM:=b3c460eb6482f6e557c0e4025475c007
 
-PKG_BUILD_DEPENDS:=python python-setuptools
-
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Jeffery To <jeffery.to@gmail.com>

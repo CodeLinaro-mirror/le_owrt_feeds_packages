@@ -23,7 +23,6 @@ PKG_MD5SUM:=887f869bcc757957067b9198f707f32f
 PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
 PKG_LICENSE:=GPL-2.0
 
-PKG_BUILD_DEPENDS:=libncurses libreadline
 PKG_BUILD_PARALLEL:=1
 PKG_USE_MIPS16:=0
 
@@ -42,7 +41,7 @@ endef
 define Package/mysql-server
   SECTION:=utils
   CATEGORY:=Utilities
-  DEPENDS:=+libmysqlclient +libpthread +libncursesw +libreadline
+  DEPENDS:=+libmysqlclient +libpthread +libncurses +libreadline
   TITLE:=MySQL Server
   URL:=http://dev.mysql.com/
   SUBMENU:=database
