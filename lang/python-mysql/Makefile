@@ -16,8 +16,6 @@ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).zip
 PKG_SOURCE_URL:=https://pypi.python.org/packages/source/M/MySQL-python/
 PKG_MD5SUM:=654f75b302db6ed8dc5a898c625e030c
 
-PKG_BUILD_DEPENDS:=python python-setuptools libmysqlclient
-
 include $(INCLUDE_DIR)/package.mk
 $(call include_mk, python-package.mk)
 

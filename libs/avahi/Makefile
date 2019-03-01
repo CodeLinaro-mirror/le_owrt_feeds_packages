@@ -16,7 +16,7 @@ PKG_SOURCE_URL:=http://avahi.org/download/
 PKG_MD5SUM:=2f22745b8f7368ad5a0a3fddac343f2d
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 
-PKG_BUILD_DEPENDS:=libexpat libdaemon libgdbm intltool/host libpthread dbus
+PKG_BUILD_DEPENDS:=intltool/host
 
 PKG_FIXUP:=autoreconf
 PKG_REMOVE_FILES:=autogen.sh

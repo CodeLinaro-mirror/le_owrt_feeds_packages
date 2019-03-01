@@ -19,7 +19,7 @@ PKG_SOURCE_VERSION:=v$(PKG_VERSION)
 
 PKG_MAINTAINER:=Amr Hassan <amr.hassan@gmail.com>
 PKG_INSTALL=1
-PKG_BUILD_DEPENDS:=lua/host luac/host
+PKG_BUILD_DEPENDS:=lua/host
 PKG_LICENSE=GPL
 
 include $(INCLUDE_DIR)/package.mk

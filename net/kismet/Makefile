@@ -17,8 +17,6 @@ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.kismetwireless.net/code
 PKG_MD5SUM:=6cdcd78baf2e15edbe8a9de3c5493f02
 
-PKG_BUILD_DEPENDS:=libpcap libncurses libpcre
-
 include $(INCLUDE_DIR)/uclibc++.mk
 include $(INCLUDE_DIR)/package.mk
 

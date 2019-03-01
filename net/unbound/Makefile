@@ -19,7 +19,6 @@ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.unbound.net/downloads
 PKG_MD5SUM:=1e95fdcbaaf5dc87432d898006a5eb13
 
-PKG_BUILD_DEPENDS:=libexpat
 PKG_BUILD_PARALLEL:=1
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
