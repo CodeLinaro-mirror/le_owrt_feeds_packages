@@ -100,6 +100,7 @@ CONFIGURE_ARGS += \
 	--with-dbus-daemondir="/usr/sbin" \
 	--with-system-socket="/var/run/dbus/system_bus_socket" \
 	--with-system-pid-file="/var/run/dbus.pid" \
+	--with-session-socket-dir="/tmp" \
 	--without-x \
 	--libexecdir=/usr/lib/dbus-1
 
