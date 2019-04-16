@@ -46,7 +46,6 @@ endef
 
 HOST_CONFIGURE_ARGS += \
 	--disable-selinux \
-	--with-libiconv=gnu
 
 CONFIGURE_ARGS += \
 	--enable-shared \
@@ -54,7 +53,6 @@ CONFIGURE_ARGS += \
 	--enable-debug=no \
 	--disable-selinux \
 	--disable-fam \
-	--with-libiconv=gnu
 
 CONFIGURE_VARS += \
 	glib_cv_stack_grows=no \
