@@ -68,6 +68,10 @@ define Package/boost-libs/install
   true
 endef
 
+define Package/boost/install
+  true
+endef
+
 define Package/boost
   $(call Package/boost/Default)
   TITLE+= packages
@@ -228,10 +232,8 @@ define Build/InstallDev
 		$(CP) \
 			$(PKG_INSTALL_DIR)/lib/*.a \
 			$(1)/usr/lib/; \
-		$(CP) \
-			$(PKG_INSTALL_DIR)/lib/*.so* \
-			$(1)/usr/lib/; \
 	fi
+	-$(CP) $(PKG_INSTALL_DIR)/lib/*.so* $(1)/usr/lib/
 endef
 
 define Host/Install
