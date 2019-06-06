@@ -40,7 +40,7 @@ endef
 define Package/xmlrpc-c-common
   $(call Package/xmlrpc-c/Default)
   TITLE+= - common
-  DEPENDS+= +libpthread
+  DEPENDS+= +libpthread +libstdcpp
   HIDDEN:=1
 endef
 
@@ -82,7 +82,7 @@ endef
 define Package/xmlrpc-c-abyss
   $(call Package/xmlrpc-c/Default)
   TITLE+= - abyss
-  DEPENDS:=+xmlrpc-c-common @BROKEN
+  DEPENDS:=+xmlrpc-c-common
 endef
 
 define Package/xmlrpc-c-server-abyss
@@ -107,9 +107,10 @@ Package/xmlrpc-c-internal/description += Uses internal expat variant (stripped d
 CONFIGURE_ARGS+= \
 	--disable-wininet-client \
 	--disable-libwww-client \
-	--disable-abyss-server \
-	--disable-cplusplus \
-	--disable-abyss-threads \
+	--enable-abyss-server \
+	--enable-cplusplus \
+	--enable-abyss-threads \
+	--enable-curl-client \
 	--disable-cgi-server
 
 ifeq ($(BUILD_VARIANT),libxml2)
@@ -165,6 +166,13 @@ define Package/xmlrpc-c-internal/install
 		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc.so* \
 		$(1)/usr/lib/
 	$(CP) \
+		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc++.so* \
+		$(1)/usr/lib/
+	$(CP) \
+		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc_packetsocket.so* \
+		$(1)/usr/lib/
+
+	$(CP) \
 		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc_xmltok.so* \
 		$(1)/usr/lib/
 	$(CP) \
@@ -178,6 +186,13 @@ define Package/xmlrpc-c-server/install
 	$(CP) \
 		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc_server.so* \
 		$(1)/usr/lib/
+	$(CP) \
+		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc_server++.so* \
+		$(1)/usr/lib/
+	$(CP) \
+		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc_server_cgi++.so* \
+		$(1)/usr/lib/
+
 endef
 
 define Package/xmlrpc-c-abyss/install
@@ -193,6 +208,9 @@ define Package/xmlrpc-c-server-abyss/install
 		$(1)/usr/lib
 	$(CP) \
 		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc_server_abyss.so* \
+		$(1)/usr/lib/
+	$(CP) \
+		$(PKG_INSTALL_DIR)/usr/lib/libxmlrpc_server_abyss++.so* \
 		$(1)/usr/lib/
 endef
 
@@ -221,6 +239,6 @@ $(eval $(call BuildPackage,xmlrpc-c-common))
 #$(eval $(call BuildPackage,xmlrpc-c-libxml2))
 $(eval $(call BuildPackage,xmlrpc-c-internal))
 $(eval $(call BuildPackage,xmlrpc-c-server))
-#$(eval $(call BuildPackage,xmlrpc-c-abyss))
-#$(eval $(call BuildPackage,xmlrpc-c-server-abyss))
+$(eval $(call BuildPackage,xmlrpc-c-abyss))
+$(eval $(call BuildPackage,xmlrpc-c-server-abyss))
 $(eval $(call BuildPackage,xmlrpc-c-client))
