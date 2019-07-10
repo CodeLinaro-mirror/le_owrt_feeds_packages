@@ -1,0 +1,68 @@
+diff --git a/include/coap2/coap_io.h b/include/coap2/coap_io.h
+index 2fefb7d..dff72db 100644
+--- a/include/coap2/coap_io.h
++++ b/include/coap2/coap_io.h
+@@ -185,9 +185,6 @@ void coap_packet_get_memmapped(struct coap_packet_t *packet,
+                                unsigned char **address,
+                                size_t *length);
+ 
+-void coap_packet_set_addr( struct coap_packet_t *packet, const coap_address_t *src,
+-                           const coap_address_t *dst );
+-
+ #ifdef WITH_LWIP
+ /**
+  * Get the pbuf of a packet. The caller takes over responsibility for freeing
+diff --git a/libcoap-2.map b/libcoap-2.map
+index a4e62f8..f059912 100644
+--- a/libcoap-2.map
++++ b/libcoap-2.map
+@@ -112,7 +112,6 @@ global:
+   coap_package_name;
+   coap_package_version;
+   coap_packet_get_memmapped;
+-  coap_packet_set_addr;
+   coap_pdu_clear;
+   coap_pdu_encode_header;
+   coap_pdu_init;
+diff --git a/libcoap-2.sym b/libcoap-2.sym
+index ec379bf..6bd91e1 100644
+--- a/libcoap-2.sym
++++ b/libcoap-2.sym
+@@ -110,7 +110,6 @@ coap_opt_value
+ coap_package_name
+ coap_package_version
+ coap_packet_get_memmapped
+-coap_packet_set_addr
+ coap_pdu_clear
+ coap_pdu_encode_header
+ coap_pdu_init
+diff --git a/src/coap_io.c b/src/coap_io.c
+index 093c3d1..51d8896 100644
+--- a/src/coap_io.c
++++ b/src/coap_io.c
+@@ -993,11 +993,6 @@ coap_packet_get_memmapped(coap_packet_t *packet, unsigned char **address, size_t
+   *length = packet->length;
+ }
+ 
+-void coap_packet_set_addr(coap_packet_t *packet, const coap_address_t *src, const coap_address_t *dst) {
+-  coap_address_copy(&packet->src, src);
+-  coap_address_copy(&packet->dst, dst);
+-}
+-
+ ssize_t
+ coap_network_read(coap_socket_t *sock, coap_packet_t *packet) {
+   ssize_t len = -1;
+diff --git a/src/net.c b/src/net.c
+index 2ea144d..3c64690 100644
+--- a/src/net.c
++++ b/src/net.c
+@@ -1250,7 +1250,8 @@ coap_read_session(coap_context_t *ctx, coap_session_t *session, coap_tick_t now)
+       coap_log(LOG_DEBUG, "*  %s: received %zd bytes\n",
+                coap_session_str(session), bytes_read);
+       session->last_rx_tx = now;
+-      coap_packet_set_addr(packet, &session->remote_addr, &session->local_addr);
++      coap_address_copy(&session->remote_addr, &packet->src);
++      coap_address_copy(&session->local_addr, &packet->dst);
+       coap_handle_dgram_for_proto(ctx, session, packet);
+     }
+   } else {

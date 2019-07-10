@@ -1,0 +1,1364 @@
+From d0d1fc87baafa67ae9d5dbb943e43524f6b429ec Mon Sep 17 00:00:00 2001
+From: Jon Shallow <supjps-libcoap@jpshallow.com>
+Date: Sat, 4 May 2019 20:47:59 +0100
+Subject: [PATCH 1/8] Add in internal epoll support to expose a monitor-able
+ file descriptor
+
+If epoll is available, use it within libcoap to speed things up, as well as
+present to applications a file descriptor that can be used in a select() or
+returned as an event in a epoll_wait() call.
+
+Whenever coap_new_context() is called. set up a new epoll infrastructure with
+epoll_create() and destroy it with coap_free_context().
+
+For each new endpoint or session, add the socket fd to epoll.  When the socket
+is closed, remove the socket fd from epoll.
+
+Whenever a socket wants a write, the appropriate epoll event gets EPOLLOUT
+added and when the write happens reset the event back to just EPOLLIN.
+
+As there may be a packet retry event sometime in the future, a timerfd is
+created and added to the epoll structure (done in coap_new_context) which gets
+freed off in coap_free_context. If coap_run_once() determines that there is
+a future retry, timerfd is informed of when the event is to occur.  When
+timerfd times out, the application file descriptor will indicate a read is
+available.
+
+A new function coap_context_get_coap_fd(ctx) returns the application file
+descriptor.  The only other API change is that if wait_ms is set to 1 for
+coap_run_once(ctx, wait_ms), there is no waiting for a new packet to arrive.
+
+coap_run_once() is called, whether epoll support is available or not, to
+process all the underlying required i/o.
+
+If there is no epoll support, coap_one_once() continues to use the old
+select() method, otherwise it will use epoll_wait(). If there is epoll
+support, a modified version of coap_read() (coap_io_do_events()) is
+used instead.
+
+Makefile.am:
+
+Do not expose coap_epoll_ctl_mod() and coap_io_do_events() to applications.
+
+configure.ac:
+
+Test for the presence of sys/epoll.h and sys/timerfd.h and so setup
+HAVE_SYS_EPOLL_H and HAVE_SYS_TIMERFD_H appropriately in coap_config.h.
+Include new man page coap_io.txt.
+
+examples/coap-server.c:
+
+Include support for using this new exposed file descriptor.
+
+include/coap2/coap_io.h:
+
+Define COAP_MAX_EPOLL_EVENTS (to limit the number of events processed at once)
+and include coap_endpoint_t and coap_session_t in coap_socket_t.
+Include (internal) definition for coap_epoll_ctl_mod()
+
+include/coap2/net.h:
+
+Add epfd and eptimerfd to coap_context_t.
+Define coap_context_get_coap_fd() for applications to use.
+Include (internal) definition for coap_io_do_events().
+
+libcoap-2.map:
+libcoap-2.sym:
+
+Include coap_context_get_coap_fd.
+
+configure.ac:
+man/Makefile.am:
+man/coap.txt.in:
+man/coap_io.txt.in: (New)
+
+Include the new coap_in(3) man page that documents coap_run_once() and
+coap_context_get_coap_fd().
+
+src/coap_io.c:
+src/coap_openssl.c:
+src/coap_session.c:
+src/net.c:
+
+Add in the epoll support.
+
+src/net.c:
+
+Add in coap_context_get_coap_fd() function.
+---
+ Makefile.am             |   2 +
+ configure.ac            |   3 +-
+ examples/coap-server.c  |  38 ++++++-
+ include/coap2/coap_io.h |  21 ++++
+ include/coap2/net.h     |  39 ++++++-
+ libcoap-2.map           |   1 +
+ libcoap-2.sym           |   1 +
+ man/Makefile.am         |   1 +
+ man/coap.txt.in         |   5 +-
+ man/coap_io.txt.in      | 270 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/coap_io.c           | 163 ++++++++++++++++++++++++++++-
+ src/coap_openssl.c      |  44 +++++++-
+ src/coap_session.c      |  61 +++++++++++
+ src/net.c               | 197 ++++++++++++++++++++++++++++++++++-
+ 14 files changed, 831 insertions(+), 15 deletions(-)
+ create mode 100644 man/coap_io.txt.in
+
+diff --git a/Makefile.am b/Makefile.am
+index 165e5bd..8e59d25 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -157,6 +157,8 @@ coap_dtls_send \
+ coap_dtls_session_update_mtu \
+ coap_dtls_startup \
+ coap_endpoint_new_dtls_session \
++coap_epoll_ctl_mod \
++coap_io_do_events \
+ coap_mfree_endpoint \
+ coap_packet_extract_pbuf \
+ coap_pdu_from_pbuf \
+diff --git a/configure.ac b/configure.ac
+index ea7e027..a6e2298 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -565,7 +565,7 @@ fi
+ # Checks for header files.
+ AC_CHECK_HEADERS([assert.h arpa/inet.h limits.h netdb.h netinet/in.h \
+                   stdlib.h string.h strings.h sys/socket.h sys/time.h \
+-                  time.h unistd.h sys/unistd.h syslog.h sys/ioctl.h])
++                  time.h unistd.h sys/unistd.h syslog.h sys/ioctl.h sys/epoll.h sys/timerfd.h])
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_TYPE_SIZE_T
+@@ -655,6 +655,7 @@ man/coap_attribute.txt
+ man/coap_context.txt
+ man/coap_encryption.txt
+ man/coap_handler.txt
++man/coap_io.txt
+ man/coap_observe.txt
+ man/coap_logging.txt
+ man/coap_pdu_setup.txt
+diff --git a/examples/coap-server.c b/examples/coap-server.c
+index 6ee4b45..cee0507 100644
+--- a/examples/coap-server.c
++++ b/examples/coap-server.c
+@@ -951,6 +951,9 @@ main(int argc, char **argv) {
+   coap_log_t log_level = LOG_WARNING;
+   unsigned wait_ms;
+   time_t t_last = 0;
++  int coap_fd;
++  fd_set m_readfds;
++  int nfds = 0;
+   struct sigaction sa;
+ 
+   clock_offset = time(NULL);
+@@ -1030,6 +1033,14 @@ main(int argc, char **argv) {
+   if (group)
+     join(ctx, group);
+ 
++  coap_fd = coap_context_get_coap_fd(ctx);
++  if (coap_fd != -1) {
++    /* if coap_fd is -1, then epoll is not supported within libcoap */
++    FD_ZERO(&m_readfds);
++    FD_SET(coap_fd, &m_readfds);
++    nfds = coap_fd + 1;
++  }
++
+   memset (&sa, 0, sizeof(sa));
+   sigemptyset(&sa.sa_mask);
+   sa.sa_handler = handle_sigint;
+@@ -1040,7 +1051,32 @@ main(int argc, char **argv) {
+   wait_ms = COAP_RESOURCE_CHECK_TIME * 1000;
+ 
+   while ( !quit ) {
+-    int result = coap_run_once( ctx, wait_ms );
++    int result;
++
++    if (coap_fd != -1) {
++      fd_set readfds = m_readfds;
++      struct timeval tv;
++
++      tv.tv_sec = wait_ms / 1000;
++      tv.tv_usec = (wait_ms % 1000) * 1000;
++      /* Wait until any i/o takes place */
++      result = select (nfds, &readfds, NULL, NULL, &tv);
++      if (result == -1) {
++        if (errno != EAGAIN) {
++          coap_log(LOG_DEBUG, "select: %s (%d)\n", coap_socket_strerror(), errno);
++          break;
++        }
++      }
++      if (result > 0) {
++        if (FD_ISSET(coap_fd, &readfds)) {
++          result = coap_run_once( ctx, 1 );
++        }
++      }
++    }
++    else {
++      /* epoll is not supported within libcoap */
++      result = coap_run_once( ctx, wait_ms );
++    }
+     if ( result < 0 ) {
+       break;
+     } else if ( result && (unsigned)result < wait_ms ) {
+diff --git a/include/coap2/coap_io.h b/include/coap2/coap_io.h
+index cf6453c..1cf1b9e 100644
+--- a/include/coap2/coap_io.h
++++ b/include/coap2/coap_io.h
+@@ -19,6 +19,15 @@
+ #define COAP_RXBUFFER_SIZE 1472
+ #endif /* COAP_RXBUFFER_SIZE */
+ 
++/*
++ * It may may make sense to define this larger on busy systems
++ * (lots of sessions, large number of which are active), by using
++ * -DCOAP_MAX_EPOLL_EVENTS=nn at compile time.
++ */
++#ifndef COAP_MAX_EPOLL_EVENTS
++#define COAP_MAX_EPOLL_EVENTS 10
++#endif /* COAP_MAX_EPOLL_EVENTS */
++
+ #ifdef _WIN32
+ typedef SOCKET coap_fd_t;
+ #define coap_closesocket closesocket
+@@ -33,6 +42,7 @@ typedef int coap_fd_t;
+ 
+ struct coap_packet_t;
+ struct coap_session_t;
++struct coap_context_t;
+ struct coap_pdu_t;
+ 
+ typedef uint16_t coap_socket_flags_t;
+@@ -46,6 +56,14 @@ typedef struct coap_socket_t {
+   coap_fd_t fd;
+ #endif /* WITH_LWIP */
+   coap_socket_flags_t flags;
++  struct coap_session_t *session; /* Used for the epoll logic if a session.
++                                     Note: It must mot be wrapped with HAVE_SYS_EPOLL_H as
++                                     coap_socket_t is seen in applications embedded in
++                                     coap_session_t etc. */
++  struct coap_endpoint_t *endpoint; /* Used for the epoll logic if an endpoint.
++                                       Note: It must mot be wrapped with HAVE_SYS_EPOLL_H as
++                                       coap_socket_t is seen in applications embedded in
++                                       coap_session_t etc. */
+ } coap_socket_t;
+ 
+ /**
+@@ -117,6 +135,9 @@ coap_socket_write(coap_socket_t *sock, const uint8_t *data, size_t data_len);
+ ssize_t
+ coap_socket_read(coap_socket_t *sock, uint8_t *data, size_t data_len);
+ 
++void
++coap_epoll_ctl_mod(coap_socket_t *sock, uint32_t events, const char *func);
++
+ #ifdef WITH_LWIP
+ ssize_t
+ coap_socket_send_pdu( coap_socket_t *sock, struct coap_session_t *session,
+diff --git a/include/coap2/net.h b/include/coap2/net.h
+index a630a27..c4a3386 100644
+--- a/include/coap2/net.h
++++ b/include/coap2/net.h
+@@ -217,6 +217,13 @@ typedef struct coap_context_t {
+   unsigned int csm_timeout;           /**< Timeout for waiting for a CSM from the remote side. 0 means disabled. */
+ 
+   void *app;                       /**< application-specific data */
++#ifdef HAVE_SYS_EPOLL_H
++  int epfd;                        /**< External FD for epoll */
++#ifdef HAVE_SYS_TIMERFD_H
++  int eptimerfd;                   /**< Internal FD for timeout */
++  coap_tick_t next_timeout;        /**< When the next timeout is to occur */
++#endif /* HAVE_SYS_TIMERFD_H */
++#endif /* HAVE_SYS_EPOLL_H */
+ } coap_context_t;
+ 
+ /**
+@@ -367,6 +374,16 @@ coap_context_set_pki_root_cas(coap_context_t *context,
+ void coap_context_set_keepalive(coap_context_t *context, unsigned int seconds);
+ 
+ /**
++ * Get the libcoap internal file descriptor for using in an application's
++ * select() or returned as an event in an application's epoll_wait() call.
++ *
++ * @param context        The coap_context_t object.
++ *
++ * @return The libcoap file descriptor or @c -1 if epoll is not available.
++ */
++int coap_context_get_coap_fd(coap_context_t *context);
++
++/**
+  * Returns a new message id and updates @p session->tx_mid accordingly. The
+  * message id is returned in network byte order to make it easier to read in
+  * tracing tools.
+@@ -560,13 +577,31 @@ void coap_read(coap_context_t *ctx, coap_tick_t now);
+  * The main message processing loop.
+  *
+  * @param ctx The CoAP context
+- * @param timeout_ms Minimum number of milliseconds to wait for new messages before returning. If zero the call will block until at least one packet is sent or received.
++ * @param timeout_ms Minimum number of milliseconds to wait for new messages
++ *                   before returning. If zero the call will block until at
++ *                   least one packet is sent or received. If one, the function
++ *                   will return immediately following without waiting for any
++ *                   new input not already available.
+  *
+- * @return number of milliseconds spent or @c -1 if there was an error
++ * @return Number of milliseconds spent in coap_run_once, or @c -1 if there
++ *         was an error
+  */
+ 
+ int coap_run_once( coap_context_t *ctx, unsigned int timeout_ms );
+ 
++struct epoll_event;
++/**
++ * Process all the epoll events
++ *
++ * Internal function
++ *
++ * @param events The list of events returned from an apoll_wait() call.
++ * @param nevents The number of events.
++ *
++ * @return 1 if timeout event, else 0
++ */
++int coap_io_do_events(coap_context_t *ctx, struct epoll_event* events, int nevents);
++
+ /**
+  * Parses and interprets a CoAP datagram with context @p ctx. This function
+  * returns @c 0 if the datagram was handled, or a value less than zero on
+diff --git a/libcoap-2.map b/libcoap-2.map
+index 584d914..a4e62f8 100644
+--- a/libcoap-2.map
++++ b/libcoap-2.map
+@@ -23,6 +23,7 @@ global:
+   coap_clear_event_handler;
+   coap_clock_init;
+   coap_clone_uri;
++  coap_context_get_coap_fd;
+   coap_context_set_keepalive;
+   coap_context_set_pki;
+   coap_context_set_pki_root_cas;
+diff --git a/libcoap-2.sym b/libcoap-2.sym
+index b52ce21..ec379bf 100644
+--- a/libcoap-2.sym
++++ b/libcoap-2.sym
+@@ -21,6 +21,7 @@ coap_cleanup
+ coap_clear_event_handler
+ coap_clock_init
+ coap_clone_uri
++coap_context_get_coap_fd
+ coap_context_set_keepalive
+ coap_context_set_pki
+ coap_context_set_pki_root_cas
+diff --git a/man/Makefile.am b/man/Makefile.am
+index f469543..b3b1480 100644
+--- a/man/Makefile.am
++++ b/man/Makefile.am
+@@ -14,6 +14,7 @@ TXT3 = coap_attribute.txt \
+ 	coap_context.txt \
+ 	coap_encryption.txt \
+ 	coap_handler.txt \
++	coap_io.txt \
+ 	coap_logging.txt \
+ 	coap_observe.txt \
+ 	coap_pdu_setup.txt \
+diff --git a/man/coap.txt.in b/man/coap.txt.in
+index 17b69ff..ac2b172 100644
+--- a/man/coap.txt.in
++++ b/man/coap.txt.in
+@@ -39,8 +39,9 @@ examples directory.
+ SEE ALSO
+ --------
+ *coap_attribute*(3), *coap_context*(3), *coap_encryption*(3), *coap_handler*(3),
+-*coap_logging*(3), *coap_observe*(3), *coap_pdu_setup*(3), *coap_recovery*(3),
+-*coap_resource*(3), *coap_session*(3) and *coap_tls_library*(3)
++*coap_io*(3), *coap_logging*(3), *coap_observe*(3), *coap_pdu_setup*(3),
++*coap_recovery*(3), *coap_resource*(3), *coap_session*(3) and
++*coap_tls_library*(3)
+ 
+ For example executables, see *coap-client*(5), *coap-rd*(5) and *coap-server*(5)
+ 
+diff --git a/man/coap_io.txt.in b/man/coap_io.txt.in
+new file mode 100644
+index 0000000..a11b625
+--- /dev/null
++++ b/man/coap_io.txt.in
+@@ -0,0 +1,270 @@
++// -*- mode:doc; -*-
++// vim: set syntax=asciidoc,tw=0:
++
++coap_io(3)
++==========
++:doctype: manpage
++:man source:   coap_io
++:man version:  @PACKAGE_VERSION@
++:man manual:   libcoap Manual
++
++NAME
++----
++coap_io, coap_run_once, coap_context_get_coap_fd
++- Work with CoAP I/O to do the packet send and receives
++
++SYNOPSIS
++--------
++*#include <coap@LIBCOAP_API_VERSION@/coap.h>*
++
++*int coap_run_once(coap_context_t *_context_, unsigned int _timeout_ms_)*;
++
++*int coap_context_get_coap_fd(coap_context_t *_context_)*;
++
++Link with *-lcoap-@LIBCOAP_API_VERSION@*, *-lcoap-@LIBCOAP_API_VERSION@-gnutls*,
++*-lcoap-@LIBCOAP_API_VERSION@-openssl* or
++*-lcoap-@LIBCOAP_API_VERSION@-tinydtls* depending on your (D)TLS library
++type.
++
++DESCRIPTION
++-----------
++After setting up all the contexts, resources, endpoints sessions etc., the
++underlying CoAP and (D)TLS need to send (and possible re-send) created packets
++as well as receive packets for processing.
++
++The *coap_run_once*() function will process any outstanding packets to sent
++for the specified _context_ and wait for processing any input packets for up to
++_timeout_ms_ milli-seconds before returning. Once any outstanding input packets
++have been processed, the function will return. If _timeout_ms_ is set to zero,
++then *coap_run_once*() will wait indefinitely for the first input packet to
++come in. If _timeout_ms_ is set to one, then there is no wait if there is no
++input packets.
++
++There are two methods of how to call *coap_run_once*().
++
++1. Have *coap_run_once*() called from within a while() loop.  Under idle
++conditions (no input traffic) *coap_run_once*() will then get called every
++_timeout_ms_, but more frequently if there is input traffic.
++
++2. Wait on the file descriptor returned by *coap_context_get_coap_fd*()
++using select() or an event returned by epoll_wait(). If 'read' is available on
++the file descriptor, call *coap_run_once*() with _timeout_ms_ set to 1.
++See EXAMPLES below.
++
++NOTE: This method is only available for environments that support epoll
++(mostly Linux) as libcoap will then be using epoll internally to process all
++the file descriptors of the different sessions.
++
++The *coap_context_get_coap_fd*() function obtains from the specified
++_context_ a single file descriptor that can be monitored by a select() or
++as an event returned from a epoll_wait() call.  This file descriptor will get
++updated with information (read, write etc. available) whenever any of the
++internal to libcoap file descriptors (sockets) change state.
++
++RETURN VALUES
++-------------
++*coap_run_once*() returns the time, in milli-seconds, that was spent in the
++function. If -1 is returned, there was an unexpected error.
++
++*coap_context_get_coap_fd*() returns a non-negative number as the file
++descriptor to monitor, or -1 if epoll is not supported by the host
++environment.
++
++EXAMPLES
++--------
++*Method One*
++
++[source, c]
++----
++#include <coap@LIBCOAP_API_VERSION@/coap.h>
++
++int main(int argc, char *argv[]){
++
++  coap_context_t *ctx = NULL;
++  unsigned wait_ms;
++
++  /* Create the libcoap context */
++  ctx = coap_new_context(NULL);
++  if (!ctx) {
++    exit(1);
++  }
++
++  /* Other Set up Code */
++
++  wait_ms = COAP_RESOURCE_CHECK_TIME * 1000;
++
++  while (1) {
++    int result = coap_run_once(ctx, wait_ms);
++    if (result < 0) {
++      /* There is an internal issue */
++      break;
++    }
++    /* Do any other housekeeping */
++  }
++  coap_free_context(ctx);
++
++  /* Do any other cleanup */
++
++  exit(0);
++
++}
++----
++
++*Method Two - select*
++
++[source, c]
++----
++#include <coap@LIBCOAP_API_VERSION@/coap.h>
++
++#include <errno.h>
++
++int main(int argc, char *argv[]){
++
++  coap_context_t *ctx = NULL;
++  int coap_fd;
++  fd_set m_readfds;
++  int nfds;
++
++  /* Create the libcoap context */
++  ctx = coap_new_context(NULL);
++  if (!ctx) {
++    exit(1);
++  }
++  coap_fd = coap_context_get_coap_fd(ctx);
++  if (coap_fd == -1) {
++    exit(1);
++  }
++  FD_ZERO(&m_readfds);
++  FD_SET(coap_fd, &m_readfds);
++  nfds = coap_fd + 1;
++
++  /* Other Set up Code */
++
++  while (1) {
++    fd_set readfds = m_readfds;
++    int result;
++    /* Wait until any i/o takes place */
++    result = select (nfds, &readfds, NULL, NULL, NULL);
++    if (result == -1) {
++      if (errno != EAGAIN) {
++        coap_log(LOG_DEBUG, "select: %s (%d)\n", coap_socket_strerror(), errno);
++        break;
++      }
++    }
++    if (result > 0) {
++      if (FD_ISSET(coap_fd, &readfds)) {
++        result = coap_run_once(ctx, 1);
++        if (result < 0) {
++          /* There is an internal issue */
++          break;
++        }
++      }
++    }
++    /* Do any other housekeeping */
++  }
++  coap_free_context(ctx);
++
++  /* Do any other cleanup */
++
++  exit(0);
++
++}
++----
++
++*Method Two - epoll*
++
++[source, c]
++----
++#include <coap@LIBCOAP_API_VERSION@/coap.h>
++
++#include <sys/epoll.h>
++
++#include <errno.h>
++
++#define MAX_EVENTS 10
++
++int main(int argc, char *argv[]){
++
++  coap_context_t *ctx = NULL;
++  int coap_fd;
++  int epoll_fd;
++  struct epoll_event ev;
++  struct epoll_event events[MAX_EVENTS];
++  int nevents;
++  int i;
++
++  /* Create the libcoap context */
++  ctx = coap_new_context(NULL);
++  if (!ctx) {
++    exit(1);
++  }
++  coap_fd = coap_context_get_coap_fd(ctx);
++  if (coap_fd == -1) {
++    exit(1);
++  }
++  epoll_fd = epoll_create1(0);
++  if (epoll_fd == -1) {
++    exit(2);
++  }
++  ev.events = EPOLLIN;
++  ev.data.fd = coap_fd;
++  if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, coap_fd, &ev) == -1) {
++    exit(3);
++  }
++
++  /* Other Set up Code */
++
++  while (1) {
++    int result;
++    /* Wait until any i/o takes place */
++    nevents = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
++    if (nevents == -1) {
++      if (errno != EAGAIN) {
++        coap_log(LOG_DEBUG, "epoll_wait: %s (%d)\n", coap_socket_strerror(), errno);
++        break;
++      }
++    }
++    for (i = 0; i < nevents; i++) {
++      if (events[i].data.fd == coap_fd) {
++        result = coap_run_once(ctx, 1);
++        if (result < 0) {
++          /* There is an internal issue */
++          break;
++        }
++      }
++      else {
++        /* Process other events */
++      }
++    }
++    /* Do any other housekeeping */
++  }
++
++  if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, coap_fd, &ev) == -1) {
++    coap_log(LOG_DEBUG, "epoll_ctl: %s (%d)\n", coap_socket_strerror(), errno);
++  }
++  coap_free_context(ctx);
++
++  /* Do any other cleanup */
++
++  exit(0);
++
++}
++----
++
++SEE ALSO
++--------
++*coap_context*(3)
++
++FURTHER INFORMATION
++-------------------
++See "RFC7252: The Constrained Application Protocol (CoAP)" for further
++information.
++
++BUGS
++----
++Please report bugs on the mailing list for libcoap:
++libcoap-developers@lists.sourceforge.net
++
++AUTHORS
++-------
++The libcoap project <libcoap-developers@lists.sourceforge.net>
+diff --git a/src/coap_io.c b/src/coap_io.c
+index bfcb7ea..871ee64 100644
+--- a/src/coap_io.c
++++ b/src/coap_io.c
+@@ -40,6 +40,11 @@
+ # include <unistd.h>
+ #endif
+ #include <errno.h>
++#if defined(HAVE_SYS_EPOLL_H) && defined(HAVE_SYS_TIMERFD_H)
++#include <sys/epoll.h>
++#include <sys/timerfd.h>
++#define HAVE_EPOLL_SUPPORT
++#endif /* HAVE_SYS_EPOLL_H && HAVE_SYS_TIMERFD_H */
+ 
+ #ifdef WITH_CONTIKI
+ # include "uip.h"
+@@ -625,12 +630,62 @@ error:
+ 
+ void coap_socket_close(coap_socket_t *sock) {
+   if (sock->fd != COAP_INVALID_SOCKET) {
++#ifdef HAVE_EPOLL_SUPPORT
++    coap_context_t *context = sock->session ? sock->session->context :
++                              sock->endpoint ? sock->endpoint->context : NULL;
++    if (context != NULL) {
++      int ret;
++      struct epoll_event event;
++
++      /* Kernels prior to 2.6.9 expect non NULL event parameter */
++      ret = epoll_ctl(context->epfd, EPOLL_CTL_DEL, sock->fd, &event);
++      if (ret == -1) {
++         coap_log(LOG_ERR,
++                  "%s: epoll_ctl DEL failed: %s (%d)\n",
++                  "coap_socket_close",
++                  coap_socket_strerror(), errno);
++      }
++    }
++#endif /* HAVE_EPOLL_SUPPORT */
++    sock->endpoint = NULL;
++    sock->session = NULL;
+     coap_closesocket(sock->fd);
+     sock->fd = COAP_INVALID_SOCKET;
+   }
+   sock->flags = COAP_SOCKET_EMPTY;
+ }
+ 
++#ifdef HAVE_EPOLL_SUPPORT
++void
++coap_epoll_ctl_mod(coap_socket_t *sock,
++                   uint32_t events,
++                   const char *func
++) {
++  int ret;
++  struct epoll_event event;
++  coap_context_t *context;
++
++  if (sock == NULL)
++    return;
++
++  context = sock->session ? sock->session->context :
++                            sock->endpoint ? sock->endpoint->context : NULL;
++  if (context == NULL)
++    return;
++
++  event.events = events;
++  event.data.ptr = sock;
++
++  ret = epoll_ctl(context->epfd, EPOLL_CTL_MOD, sock->fd, &event);
++  if (ret == -1) {
++     coap_log(LOG_ERR,
++              "%s: epoll_ctl MOD failed: %s (%d)\n",
++              func,
++              coap_socket_strerror(), errno);
++  }
++}
++#endif /* HAVE_EPOLL_SUPPORT */
++
+ ssize_t
+ coap_socket_write(coap_socket_t *sock, const uint8_t *data, size_t data_len) {
+   ssize_t r;
+@@ -650,14 +705,29 @@ coap_socket_write(coap_socket_t *sock, const uint8_t *data, size_t data_len) {
+     if (errno==EAGAIN || errno == EINTR) {
+ #endif
+       sock->flags |= COAP_SOCKET_WANT_WRITE;
++#ifdef HAVE_EPOLL_SUPPORT
++      coap_epoll_ctl_mod(sock,
++                         EPOLLOUT |
++                          ((sock->flags & COAP_SOCKET_WANT_READ) ?
++                           EPOLLIN : 0),
++                         __FUNCTION__);
++#endif /* HAVE_EPOLL_SUPPORT */
+       return 0;
+     }
+     coap_log(LOG_WARNING, "coap_socket_write: send: %s\n",
+              coap_socket_strerror());
+     return -1;
+   }
+-  if (r < (ssize_t)data_len)
++  if (r < (ssize_t)data_len) {
+     sock->flags |= COAP_SOCKET_WANT_WRITE;
++#ifdef HAVE_EPOLL_SUPPORT
++      coap_epoll_ctl_mod(sock,
++                         EPOLLOUT |
++                          ((sock->flags & COAP_SOCKET_WANT_READ) ?
++                           EPOLLIN : 0),
++                         __FUNCTION__);
++#endif /* HAVE_EPOLL_SUPPORT */
++  }
+   return r;
+ }
+ 
+@@ -1126,6 +1196,10 @@ coap_write(coap_context_t *ctx,
+   coap_tick_t session_timeout;
+   coap_tick_t timeout = 0;
+   coap_session_t *tmp;
++#ifdef HAVE_EPOLL_SUPPORT
++  (void)sockets;
++  (void)max_sockets;
++#endif /* HAVE_EPOLL_SUPPORT */
+ 
+   *num_sockets = 0;
+ 
+@@ -1138,10 +1212,12 @@ coap_write(coap_context_t *ctx,
+     session_timeout = COAP_DEFAULT_SESSION_TIMEOUT * COAP_TICKS_PER_SECOND;
+ 
+   LL_FOREACH(ctx->endpoint, ep) {
++#ifndef HAVE_EPOLL_SUPPORT
+     if (ep->sock.flags & (COAP_SOCKET_WANT_READ | COAP_SOCKET_WANT_WRITE | COAP_SOCKET_WANT_ACCEPT)) {
+       if (*num_sockets < max_sockets)
+         sockets[(*num_sockets)++] = &ep->sock;
+     }
++#endif /* ! HAVE_EPOLL_SUPPORT */
+     LL_FOREACH_SAFE(ep->sessions, s, tmp) {
+       if (s->type == COAP_SESSION_TYPE_SERVER && s->ref == 0 &&
+           s->delayqueue == NULL &&
+@@ -1154,10 +1230,12 @@ coap_write(coap_context_t *ctx,
+           if (timeout == 0 || s_timeout < timeout)
+             timeout = s_timeout;
+         }
++#ifndef HAVE_EPOLL_SUPPORT
+         if (s->sock.flags & (COAP_SOCKET_WANT_READ | COAP_SOCKET_WANT_WRITE)) {
+           if (*num_sockets < max_sockets)
+             sockets[(*num_sockets)++] = &s->sock;
+         }
++#endif /* ! HAVE_EPOLL_SUPPORT */
+       }
+     }
+   }
+@@ -1208,10 +1286,12 @@ coap_write(coap_context_t *ctx,
+         timeout = s_timeout;
+     }
+ 
++#ifndef HAVE_EPOLL_SUPPORT
+     if (s->sock.flags & (COAP_SOCKET_WANT_READ | COAP_SOCKET_WANT_WRITE | COAP_SOCKET_WANT_CONNECT)) {
+       if (*num_sockets < max_sockets)
+         sockets[(*num_sockets)++] = &s->sock;
+     }
++#endif /* ! HAVE_EPOLL_SUPPORT */
+   }
+ 
+   nextpdu = coap_peek_next(ctx);
+@@ -1283,20 +1363,30 @@ coap_write(coap_context_t *ctx,
+ 
+ int
+ coap_run_once(coap_context_t *ctx, unsigned timeout_ms) {
++# ifndef HAVE_EPOLL_SUPPORT
+   fd_set readfds, writefds, exceptfds;
++# endif /* ! HAVE_EPOLL_SUPPORT */
++  coap_socket_t *sockets[64];
+   coap_fd_t nfds = 0;
+-  struct timeval tv;
+   coap_tick_t before, now;
++  unsigned int num_sockets = 0, timeout;
++#ifndef HAVE_EPOLL_SUPPORT
++  struct timeval tv;
+   int result;
+-  coap_socket_t *sockets[64];
+-  unsigned int num_sockets = 0, i, timeout;
++  unsigned int i;
++#endif /* ! HAVE_EPOLL_SUPPORT */
+ 
+   coap_ticks(&before);
+ 
+   timeout = coap_write(ctx, sockets, (unsigned int)(sizeof(sockets) / sizeof(sockets[0])), &num_sockets, before);
++#ifdef HAVE_EPOLL_SUPPORT
++  /* Save when the next expected I/O is to take place */
++  ctx->next_timeout = timeout ? before + timeout : 0;
++#endif /* HAVE_EPOLL_SUPPORT */
+   if (timeout == 0 || timeout_ms < timeout)
+     timeout = timeout_ms;
+ 
++#ifndef HAVE_EPOLL_SUPPORT
+   FD_ZERO(&readfds);
+   FD_ZERO(&writefds);
+   FD_ZERO(&exceptfds);
+@@ -1316,6 +1406,8 @@ coap_run_once(coap_context_t *ctx, unsigned timeout_ms) {
+   }
+ 
+   if ( timeout > 0 ) {
++    if (timeout == 1)
++      timeout = 0;
+     tv.tv_usec = (timeout % 1000) * 1000;
+     tv.tv_sec = (long)(timeout / 1000);
+   }
+@@ -1349,6 +1441,69 @@ coap_run_once(coap_context_t *ctx, unsigned timeout_ms) {
+   coap_ticks(&now);
+   coap_read(ctx, now);
+ 
++#else /* HAVE_EPOLL_SUPPORT */
++  do {
++    struct epoll_event events[COAP_MAX_EPOLL_EVENTS];
++    int etimeout = timeout;
++
++    /* Potentially adjust based on what the caller wants */
++    if (timeout_ms == 0)
++      etimeout = -1;
++    else if (timeout_ms == 1)
++      etimeout = 0;
++
++    nfds = epoll_wait(ctx->epfd, events, COAP_MAX_EPOLL_EVENTS, etimeout);
++    if (nfds < 0) {
++      if (errno != EINTR) {
++        coap_log (LOG_ERR, "epoll_wait: unexpected error: %s (%d)\n",
++                            coap_socket_strerror(), nfds);
++      }
++      break;
++    }
++
++    if (coap_io_do_events(ctx, events, nfds)) {
++      /* timeout event occurred, need to see what timedout for processing */
++      coap_ticks(&now);
++      coap_write(ctx, sockets,
++                 (unsigned int)(sizeof(sockets) / sizeof(sockets[0])),
++                  &num_sockets, now);
++      /* fake nfds so we go around the loop again */
++      nfds = COAP_MAX_EPOLL_EVENTS;
++    }
++
++    /*
++     * reset to 1 (which causes etimeout to become 0)
++     * incase we have to do another iteration
++     */
++    timeout_ms = 1;
++    /* Keep retrying until less than COAP_MAX_EPOLL_EVENTS are returned */
++  } while (nfds == COAP_MAX_EPOLL_EVENTS);
++
++  if (ctx->eptimerfd != -1) {
++    struct itimerspec new_value;
++    struct itimerspec old_value;
++    int ret;
++
++    memset(&new_value, 0, sizeof(new_value));
++    coap_ticks(&now);
++    if (ctx->next_timeout != 0 && ctx->next_timeout > now) {
++      coap_tick_t rem_timeout = ctx->next_timeout - now;
++      /* Need to trigger an event on ctx->epfd in the future */
++      new_value.it_value.tv_sec = rem_timeout / 1000;
++      new_value.it_value.tv_nsec = (rem_timeout % 1000) * 1000000;
++    }
++    /* reset, or specify a future time for eptimerfd to trigger */
++    ret = timerfd_settime(ctx->eptimerfd, 0, &new_value, &old_value);
++    if (ret == -1) {
++      coap_log(LOG_ERR,
++                "%s: timerfd_settime failed: %s (%d)\n",
++                "coap_run_once",
++                coap_socket_strerror(), errno);
++    }
++  }
++  coap_ticks(&now);
++#endif /* HAVE_EPOLL_SUPPORT */
++
+   return (int)(((now - before) * 1000) / COAP_TICKS_PER_SECOND);
+ }
+ 
+diff --git a/src/coap_openssl.c b/src/coap_openssl.c
+index 39a9dc4..0feefbd 100644
+--- a/src/coap_openssl.c
++++ b/src/coap_openssl.c
+@@ -50,6 +50,10 @@
+ #include <openssl/hmac.h>
+ #include <openssl/x509v3.h>
+ 
++#ifdef HAVE_SYS_EPOLL_H
++# include <sys/epoll.h>
++#endif /* HAVE_SYS_EPOLL_H */
++
+ #if OPENSSL_VERSION_NUMBER < 0x10100000L
+ #error Must be compiled against OpenSSL 1.1.0 or later
+ #endif
+@@ -2057,8 +2061,16 @@ void *coap_tls_new_client_session(coap_session_t *session, int *connected) {
+       r = 0;
+     if (ret == SSL_ERROR_WANT_READ)
+       session->sock.flags |= COAP_SOCKET_WANT_READ;
+-    if (ret == SSL_ERROR_WANT_WRITE)
++    if (ret == SSL_ERROR_WANT_WRITE) {
+       session->sock.flags |= COAP_SOCKET_WANT_WRITE;
++#ifdef HAVE_SYS_EPOLL_H
++      coap_epoll_ctl_mod(&session->sock,
++                         EPOLLOUT |
++                          ((session->sock.flags & COAP_SOCKET_WANT_READ) ?
++                           EPOLLIN : 0),
++                         __FUNCTION__);
++#endif /* HAVE_SYS_EPOLL_H */
++    }
+   }
+ 
+   if (r == 0)
+@@ -2107,8 +2119,16 @@ void *coap_tls_new_server_session(coap_session_t *session, int *connected) {
+       r = 0;
+     if (err == SSL_ERROR_WANT_READ)
+       session->sock.flags |= COAP_SOCKET_WANT_READ;
+-    if (err == SSL_ERROR_WANT_WRITE)
++    if (err == SSL_ERROR_WANT_WRITE) {
+       session->sock.flags |= COAP_SOCKET_WANT_WRITE;
++#ifdef HAVE_SYS_EPOLL_H
++      coap_epoll_ctl_mod(&session->sock,
++                         EPOLLOUT |
++                          ((session->sock.flags & COAP_SOCKET_WANT_READ) ?
++                           EPOLLIN : 0),
++                         __FUNCTION__);
++#endif /* HAVE_SYS_EPOLL_H */
++    }
+   }
+ 
+   if (r == 0)
+@@ -2159,8 +2179,16 @@ ssize_t coap_tls_write(coap_session_t *session,
+       }
+       if (err == SSL_ERROR_WANT_READ)
+         session->sock.flags |= COAP_SOCKET_WANT_READ;
+-      if (err == SSL_ERROR_WANT_WRITE)
++      if (err == SSL_ERROR_WANT_WRITE) {
+         session->sock.flags |= COAP_SOCKET_WANT_WRITE;
++#ifdef HAVE_SYS_EPOLL_H
++        coap_epoll_ctl_mod(&session->sock,
++                           EPOLLOUT |
++                            ((session->sock.flags & COAP_SOCKET_WANT_READ) ?
++                             EPOLLIN : 0),
++                           __FUNCTION__);
++#endif /* HAVE_SYS_EPOLL_H */
++      }
+       r = 0;
+     } else {
+       coap_log(LOG_WARNING, "***%s: coap_tls_write: cannot send PDU\n",
+@@ -2210,8 +2238,16 @@ ssize_t coap_tls_read(coap_session_t *session,
+       }
+       if (err == SSL_ERROR_WANT_READ)
+         session->sock.flags |= COAP_SOCKET_WANT_READ;
+-      if (err == SSL_ERROR_WANT_WRITE)
++      if (err == SSL_ERROR_WANT_WRITE) {
+         session->sock.flags |= COAP_SOCKET_WANT_WRITE;
++#ifdef HAVE_SYS_EPOLL_H
++        coap_epoll_ctl_mod(&session->sock,
++                           EPOLLOUT |
++                            ((session->sock.flags & COAP_SOCKET_WANT_READ) ?
++                             EPOLLIN : 0),
++                           __FUNCTION__);
++#endif /* HAVE_SYS_EPOLL_H */
++      }
+       r = 0;
+     } else {
+       if (err == SSL_ERROR_ZERO_RETURN)        /* Got a close notify alert from the remote side */
+diff --git a/src/coap_session.c b/src/coap_session.c
+index 9fc52e0..a85119e 100644
+--- a/src/coap_session.c
++++ b/src/coap_session.c
+@@ -21,6 +21,12 @@
+ #include "encode.h"
+ #include <stdio.h>
+ 
++#if defined(HAVE_SYS_EPOLL_H) && defined(HAVE_SYS_TIMERFD_H)
++#include <sys/epoll.h>
++#include <sys/timerfd.h>
++#define HAVE_EPOLL_SUPPORT
++#endif /* HAVE_SYS_EPOLL_H && HAVE_SYS_TIMERFD_H*/
++#include <errno.h>
+ 
+ void
+ coap_session_set_max_retransmit (coap_session_t *session, unsigned int value) {
+@@ -546,6 +552,39 @@ coap_endpoint_new_dtls_session(coap_endpoint_t *endpoint,
+   return session;
+ }
+ 
++#ifdef HAVE_EPOLL_SUPPORT
++static void
++coap_epoll_ctl_add(coap_socket_t *sock,
++                   uint32_t events,
++                   const char *func
++) {
++  int ret;
++  struct epoll_event event;
++  coap_context_t *context;
++
++  if (sock == NULL)
++    return;
++
++  context = sock->session ? sock->session->context :
++                            sock->endpoint ? sock->endpoint->context : NULL;
++  if (context == NULL)
++    return;
++
++  /* Needed if running 32bit as ptr is only 32bit */
++  memset(&event, 0, sizeof(event));
++  event.events = events;
++  event.data.ptr = sock;
++
++  ret = epoll_ctl(context->epfd, EPOLL_CTL_ADD, sock->fd, &event);
++  if (ret == -1) {
++     coap_log(LOG_ERR,
++              "%s: epoll_ctl ADD failed: %s (%d)\n",
++              func,
++              coap_socket_strerror(), errno);
++  }
++}
++#endif /* HAVE_EPOLL_SUPPORT */
++
+ static coap_session_t *
+ coap_session_create_client(
+   coap_context_t *ctx,
+@@ -579,6 +618,15 @@ coap_session_create_client(
+     }
+   }
+ 
++  session->sock.session = session;
++#ifdef HAVE_EPOLL_SUPPORT
++  coap_epoll_ctl_add(&session->sock,
++                     EPOLLIN |
++                      ((session->sock.flags & COAP_SOCKET_WANT_CONNECT) ?
++                       EPOLLOUT : 0),
++                   __FUNCTION__);
++#endif /* HAVE_EPOLL_SUPPORT */
++
+   session->sock.flags |= COAP_SOCKET_NOT_EMPTY | COAP_SOCKET_WANT_READ;
+   if (local_if)
+     session->sock.flags |= COAP_SOCKET_BOUND;
+@@ -792,6 +840,12 @@ coap_session_t *coap_new_server_session(
+     goto error;
+   session->sock.flags |= COAP_SOCKET_NOT_EMPTY | COAP_SOCKET_CONNECTED
+                        | COAP_SOCKET_WANT_READ;
++  session->sock.session = session;
++#ifdef HAVE_EPOLL_SUPPORT
++  coap_epoll_ctl_add(&session->sock,
++                     EPOLLIN,
++                   __FUNCTION__);
++#endif /* HAVE_EPOLL_SUPPORT */
+   LL_PREPEND(ep->sessions, session);
+   if (session) {
+     coap_log(LOG_DEBUG, "***%s: new incoming session\n",
+@@ -885,6 +939,13 @@ coap_new_endpoint(coap_context_t *context, const coap_address_t *listen_addr, co
+ 
+   ep->default_mtu = COAP_DEFAULT_MTU;
+ 
++  ep->sock.endpoint = ep;
++#ifdef HAVE_EPOLL_SUPPORT
++  coap_epoll_ctl_add(&ep->sock,
++                     EPOLLIN,
++                   __FUNCTION__);
++#endif /* HAVE_EPOLL_SUPPORT */
++
+   LL_PREPEND(context->endpoint, ep);
+   return ep;
+ 
+diff --git a/src/net.c b/src/net.c
+index 106dbd6..7ec2ac4 100644
+--- a/src/net.c
++++ b/src/net.c
+@@ -1,6 +1,6 @@
+ /* net.c -- CoAP network interface
+  *
+- * Copyright (C) 2010--2016 Olaf Bergmann <bergmann@tzi.org>
++ * Copyright (C) 2010--2019 Olaf Bergmann <bergmann@tzi.org>
+  *
+  * This file is part of the CoAP library libcoap. Please see
+  * README for terms of use.
+@@ -31,6 +31,11 @@
+ #ifdef HAVE_ARPA_INET_H
+ #include <arpa/inet.h>
+ #endif
++#if defined(HAVE_SYS_EPOLL_H) && defined(HAVE_SYS_TIMERFD_H)
++#include <sys/epoll.h>
++#include <sys/timerfd.h>
++#define HAVE_EPOLL_SUPPORT
++#endif /* HAVE_SYS_EPOLL_H && HAVE_SYS_TIMERFD_H*/
+ #ifdef HAVE_WS2TCPIP_H
+ #include <ws2tcpip.h>
+ #endif
+@@ -418,6 +423,15 @@ void coap_context_set_keepalive(coap_context_t *context, unsigned int seconds) {
+   context->ping_timeout = seconds;
+ }
+ 
++int coap_context_get_coap_fd(coap_context_t *context) {
++#ifdef HAVE_EPOLL_SUPPORT
++  return context->epfd;
++#else /* ! HAVE_EPOLL_SUPPORT */
++  (void)context;
++  return -1;
++#endif /* ! HAVE_EPOLL_SUPPORT */
++}
++
+ coap_context_t *
+ coap_new_context(
+   const coap_address_t *listen_addr) {
+@@ -452,6 +466,41 @@ coap_new_context(
+ 
+   memset(c, 0, sizeof(coap_context_t));
+ 
++#ifdef HAVE_EPOLL_SUPPORT
++  c->epfd = epoll_create1(0);
++  if (c->epfd == -1) {
++    coap_log(LOG_ERR, "coap_new_context: Unable to epoll_create: %s (%d)\n",
++             coap_socket_strerror(),
++             errno);
++  }
++  if (c->epfd != -1) {
++    c->eptimerfd = timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK);
++    if (c->eptimerfd == -1) {
++      coap_log(LOG_ERR, "coap_new_context: Unable to timerfd_create: %s (%d)\n",
++               coap_socket_strerror(),
++               errno);
++    }
++    else {
++      int ret;
++      struct epoll_event event;
++
++      /* Needed if running 32bit as ptr is only 32bit */
++      memset(&event, 0, sizeof(event));
++      event.events = EPOLLIN;
++      /* We special case this event by setting to NULL */
++      event.data.ptr = NULL;
++
++      ret = epoll_ctl(c->epfd, EPOLL_CTL_ADD, c->eptimerfd, &event);
++      if (ret == -1) {
++         coap_log(LOG_ERR,
++                  "%s: epoll_ctl ADD failed: %s (%d)\n",
++                  "coap_new_context",
++                  coap_socket_strerror(), errno);
++      }
++    }
++  }
++#endif /* HAVE_EPOLL_SUPPORT */
++
+   if (coap_dtls_is_supported()) {
+     c->dtls_context = coap_dtls_new_context(c);
+     if (!c->dtls_context) {
+@@ -548,6 +597,28 @@ coap_free_context(coap_context_t *context) {
+   if (context->psk_key)
+     coap_free(context->psk_key);
+ 
++#ifdef HAVE_EPOLL_SUPPORT
++  if (context->eptimerfd != -1) {
++    int ret;
++    struct epoll_event event;
++
++    /* Kernels prior to 2.6.9 expect non NULL event parameter */
++    ret = epoll_ctl(context->epfd, EPOLL_CTL_DEL, context->eptimerfd, &event);
++    if (ret == -1) {
++       coap_log(LOG_ERR,
++                "%s: epoll_ctl DEL failed: %s (%d)\n",
++                "coap_free_context",
++                coap_socket_strerror(), errno);
++    }
++    close(context->eptimerfd);
++    context->eptimerfd = -1;
++  }
++  if (context->epfd != -1) {
++    close(context->epfd);
++    context->epfd = -1;
++  }
++#endif /* HAVE_EPOLL_SUPPORT */
++
+ #ifndef WITH_CONTIKI
+   coap_free_type(COAP_CONTEXT, context);
+ #endif/* not WITH_CONTIKI */
+@@ -869,6 +940,32 @@ coap_wait_ack(coap_context_t *context, coap_session_t *session,
+     coap_session_str(node->session), node->id,
+     (unsigned)(node->t * 1000 / COAP_TICKS_PER_SECOND));
+ 
++#ifdef HAVE_EPOLL_SUPPORT
++  if (context->eptimerfd != -1) {
++    coap_ticks(&now);
++    if (context->next_timeout == 0 ||
++        context->next_timeout > now + (node->t * 1000 / COAP_TICKS_PER_SECOND)) {
++      struct itimerspec new_value;
++      struct itimerspec old_value;
++      int ret;
++
++      context->next_timeout = now + (node->t * 1000 / COAP_TICKS_PER_SECOND);
++      memset(&new_value, 0, sizeof(new_value));
++      coap_tick_t rem_timeout = (node->t * 1000 / COAP_TICKS_PER_SECOND);
++      /* Need to trigger an event on context->epfd in the future */
++      new_value.it_value.tv_sec = rem_timeout / 1000;
++      new_value.it_value.tv_nsec = (rem_timeout % 1000) * 1000000;
++      ret = timerfd_settime(context->eptimerfd, 0, &new_value, &old_value);
++      if (ret == -1) {
++        coap_log(LOG_ERR,
++                  "%s: timerfd_settime failed: %s (%d)\n",
++                  "coap_wait_ack",
++                  coap_socket_strerror(), errno);
++      }
++    }
++  }
++#endif /* HAVE_EPOLL_SUPPORT */
++
+   return node->id;
+ }
+ 
+@@ -1365,6 +1462,104 @@ coap_read(coap_context_t *ctx, coap_tick_t now) {
+   }
+ }
+ 
++#ifdef HAVE_EPOLL_SUPPORT
++/*
++ * While this code in part replicates coap_read(), doing the functions
++ * directly saves having to iterate through the endpoints / sessions.
++ */
++int
++coap_io_do_events(coap_context_t *ctx, struct epoll_event *events, int nevents) {
++  coap_tick_t now;
++  int j;
++  int timer_trig = 0;
++
++  coap_ticks(&now);
++  for(j = 0; j < nevents; j++) {
++    coap_socket_t *sock = (coap_socket_t*)events[j].data.ptr;
++
++    /* Ignore 'timer trigger' ptr  which is NULL */
++    if (sock) {
++      if (sock->endpoint) {
++        coap_endpoint_t *endpoint = sock->endpoint;
++        if ((sock->flags & COAP_SOCKET_WANT_READ) &&
++            (events[j].events & EPOLLIN)) {
++          sock->flags |= COAP_SOCKET_CAN_READ;
++          coap_read_endpoint(endpoint->context, endpoint, now);
++        }
++
++        if ((sock->flags & COAP_SOCKET_WANT_WRITE) &&
++            (events[j].events & EPOLLOUT)) {
++          /*
++           * Need to update this to EPOLLIN as EPOLLOUT will normally always
++           * be true causing epoll_wait to return early
++           */
++          coap_epoll_ctl_mod(sock, EPOLLIN, __FUNCTION__);
++          sock->flags |= COAP_SOCKET_CAN_WRITE;
++          coap_write_endpoint(endpoint->context, endpoint, now);
++        }
++
++        if ((sock->flags & COAP_SOCKET_WANT_ACCEPT) &&
++            (events[j].events & EPOLLIN)) {
++          sock->flags |= COAP_SOCKET_CAN_ACCEPT;
++          coap_accept_endpoint(endpoint->context, endpoint, now);
++        }
++
++      }
++      else if (sock->session) {
++        coap_session_t *session = sock->session;
++
++        if ((sock->flags & COAP_SOCKET_WANT_CONNECT) &&
++            (events[j].events & (EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP))) {
++          sock->flags |= COAP_SOCKET_CAN_CONNECT;
++          /* Make sure the session object is not deleted
++             in one of the callbacks  */
++          coap_session_reference(session);
++          coap_connect_session(session->context, session, now);
++          coap_session_release(session);
++        }
++
++        if ((sock->flags & COAP_SOCKET_WANT_READ) &&
++            (events[j].events & (EPOLLIN|EPOLLERR|EPOLLHUP|EPOLLRDHUP))) {
++          sock->flags |= COAP_SOCKET_CAN_READ;
++          /* Make sure the session object is not deleted
++             in one of the callbacks  */
++          coap_session_reference(session);
++          coap_read_session(session->context, session, now);
++          coap_session_release(session);
++        }
++
++        if ((sock->flags & COAP_SOCKET_WANT_WRITE) &&
++            (events[j].events & (EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP))) {
++          /*
++           * Need to update this to EPOLLIN as EPOLLOUT will normally always
++           * be true causing epoll_wait to return early
++           */
++          coap_epoll_ctl_mod(sock, EPOLLIN, __FUNCTION__);
++          sock->flags |= COAP_SOCKET_CAN_WRITE;
++          /* Make sure the session object is not deleted
++             in one of the callbacks  */
++          coap_session_reference(session);
++          coap_write_session(session->context, session, now);
++          coap_session_release(session);
++        }
++      }
++    }
++    else if (ctx->eptimerfd != -1) {
++      /*
++       * 'timer trigger' must have fired. eptimerfd needs to be read to clear
++       *  it so that it does not set EPOLLIN in the next epoll_wait().
++       */
++      uint64_t count;
++      int ret;
++
++      ret = read(ctx->eptimerfd, &count, sizeof(count));
++      timer_trig = 1;
++    }
++  }
++  return timer_trig;
++}
++#endif /* HAVE_EPOLL_SUPPORT */
++
+ int
+ coap_handle_dgram(coap_context_t *ctx, coap_session_t *session,
+   uint8_t *msg, size_t msg_len) {
+-- 
+1.9.1
+

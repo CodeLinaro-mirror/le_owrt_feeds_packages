@@ -1,0 +1,81 @@
+From ef2a86531b972ee6beef829c6ff16da3592ab2dc Mon Sep 17 00:00:00 2001
+From: Jon Shallow <supjps-libcoap@jpshallow.com>
+Date: Mon, 3 Jun 2019 20:58:08 +0100
+Subject: [PATCH 2/8] Fix handling ICMP Port Unreachable messages
+
+Once a ICMP Port Unreachable message is received, the session is
+disconnected by a call to coap_session_disconnect().  However if the session
+is of type CON,  the logic currently tries to retransmit the packet, but
+nothing gets sent out.
+
+src/coap_session.c:
+
+Make sure that any entries on the context->sendqueue for the disconnected
+session are removed.
+
+examples/client.c:
+
+Add in a Nack handler so that the client immediately exits on the session
+disconnect.  Additionally this also tidies up the exit after transmission
+retries.
+---
+ examples/client.c  | 21 +++++++++++++++++++++
+ src/coap_session.c |  3 +++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/examples/client.c b/examples/client.c
+index 8c560e4..7b76afd 100644
+--- a/examples/client.c
++++ b/examples/client.c
+@@ -325,6 +325,26 @@ event_handler(coap_context_t *ctx UNUSED_PARAM,
+ }
+ 
+ static void
++nack_handler(coap_context_t *context UNUSED_PARAM,
++             coap_session_t *session UNUSED_PARAM,
++             coap_pdu_t *sent UNUSED_PARAM,
++             coap_nack_reason_t reason,
++             const coap_tid_t id UNUSED_PARAM) {
++
++  switch(reason) {
++  case COAP_NACK_TOO_MANY_RETRIES:
++  case COAP_NACK_NOT_DELIVERABLE:
++  case COAP_NACK_RST:
++  case COAP_NACK_TLS_FAILED:
++    quit = 1;
++    break;
++  default:
++    break;
++  }
++  return;
++}
++
++static void
+ message_handler(struct coap_context_t *ctx,
+                 coap_session_t *session,
+                 coap_pdu_t *sent,
+@@ -1423,6 +1443,7 @@ main(int argc, char **argv) {
+   coap_register_option(ctx, COAP_OPTION_BLOCK2);
+   coap_register_response_handler(ctx, message_handler);
+   coap_register_event_handler(ctx, event_handler);
++  coap_register_nack_handler(ctx, nack_handler);
+ 
+   /* construct CoAP message */
+ 
+diff --git a/src/coap_session.c b/src/coap_session.c
+index a85119e..9582709 100644
+--- a/src/coap_session.c
++++ b/src/coap_session.c
+@@ -434,6 +434,9 @@ void coap_session_disconnected(coap_session_t *session, coap_nack_reason_t reaso
+     if (q)
+       coap_delete_node(q);
+   }
++
++  coap_cancel_session_messages(session->context, session, reason);
++
+   if ( COAP_PROTO_RELIABLE(session->proto) ) {
+     if (session->sock.flags != COAP_SOCKET_EMPTY) {
+       coap_socket_close(&session->sock);
+-- 
+1.9.1
+

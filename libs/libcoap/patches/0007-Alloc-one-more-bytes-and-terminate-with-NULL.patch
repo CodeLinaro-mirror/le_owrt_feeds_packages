@@ -1,0 +1,30 @@
+diff --git a/src/net.c b/src/net.c
+index 3c64690..c6d399a 100644
+--- a/src/net.c
++++ b/src/net.c
+@@ -1571,7 +1571,7 @@ coap_handle_dgram(coap_context_t *ctx, coap_session_t *session,
+ 
+   assert(COAP_PROTO_NOT_RELIABLE(session->proto));
+ 
+-  pdu = coap_pdu_init(0, 0, 0, msg_len - 4);
++  pdu = coap_pdu_init(0, 0, 0, msg_len - 4 + 1);
+   if (!pdu)
+     goto error;
+ 
+diff --git a/src/pdu.c b/src/pdu.c
+index fa8d47e..fdbcf18 100644
+--- a/src/pdu.c
++++ b/src/pdu.c
+@@ -568,10 +568,11 @@ coap_pdu_parse(coap_proto_t proto,
+     return 0;
+   if (hdr_size > pdu->max_hdr_size)
+     return 0;
+-  if (!coap_pdu_resize(pdu, length - hdr_size))
++  if (!coap_pdu_resize(pdu, length - hdr_size + 1))
+     return 0;
+ #ifndef WITH_LWIP
+   memcpy(pdu->token - hdr_size, data, length);
++  *(pdu->token - hdr_size + length) = 0;
+ #endif
+   pdu->hdr_size = (uint8_t)hdr_size;
+   pdu->used_size = length - hdr_size;

@@ -1,0 +1,159 @@
+From 815148286e5daaaff390e1506400bbfbde611718 Mon Sep 17 00:00:00 2001
+From: Jon Shallow <supjps-libcoap@jpshallow.com>
+Date: Wed, 5 Jun 2019 17:25:08 +0100
+Subject: [PATCH 3/8] Split COAP_NACK_RST into COAP_NACK_RST and
+ COAP_NACK_ICMP_ISSUE
+
+As COAP_NACK_RST is used for
+1. ICMP Port Unreachable message is received
+2. CoAP reply RST message.
+there needs to be a way to differentiate between these conditions.
+
+If there is detected to be an ICMP response issue to sending a UDP
+packet, report this as COAP_NACK_ICMP_ISSUE instead of COAP_NACK_RST.
+
+If the reported issue to coap_session_disconnected() is COAP_NACK_ICMP_ISSUE,
+then make sure that the packet (plain or DTLS) gets re-transmitted.
+
+As hinted in #131 discussion, retry of the packet should be attempted,
+(as per https://tools.ietf.org/html/rfc7252#section-4.2 ICMP Unreachable)
+this fix will cause the plain packet to get retransmitted up to the maximum
+retry count if type CON.
+
+Likewise, DTLS will get restarted up to the maximum retry count if type CON.
+
+examples/client.c:
+
+Include COAP_NACK_ICMP_ISSUE in the nack_handler.
+
+include/coap2/coap_io.h:
+
+Add in COAP_NACK_ICMP_ISSUE to coap_nack_reason_t.
+
+src/coap_session.c:
+
+Update coap_session_disconnected() so that plain/DTLS can restart.
+
+src/net.c:
+
+Fix coap_wait_ack() to exponentially back off the re-transmit times.
+
+Update coap_read_session() to report COAP_NACK_ICMP_ISSUE instead of
+COAP_NACK_RST.
+---
+ examples/client.c       |  1 +
+ include/coap2/coap_io.h |  3 ++-
+ src/coap_session.c      | 14 +++++++++-----
+ src/net.c               | 10 ++++++----
+ 4 files changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/examples/client.c b/examples/client.c
+index 7b76afd..ff15246 100644
+--- a/examples/client.c
++++ b/examples/client.c
+@@ -338,6 +338,7 @@ nack_handler(coap_context_t *context UNUSED_PARAM,
+   case COAP_NACK_TLS_FAILED:
+     quit = 1;
+     break;
++  case COAP_NACK_ICMP_ISSUE:
+   default:
+     break;
+   }
+diff --git a/include/coap2/coap_io.h b/include/coap2/coap_io.h
+index 1cf1b9e..2fefb7d 100644
+--- a/include/coap2/coap_io.h
++++ b/include/coap2/coap_io.h
+@@ -228,7 +228,8 @@ typedef enum {
+   COAP_NACK_TOO_MANY_RETRIES,
+   COAP_NACK_NOT_DELIVERABLE,
+   COAP_NACK_RST,
+-  COAP_NACK_TLS_FAILED
++  COAP_NACK_TLS_FAILED,
++  COAP_NACK_ICMP_ISSUE
+ } coap_nack_reason_t;
+ 
+ #endif /* COAP_IO_H_ */
+diff --git a/src/coap_session.c b/src/coap_session.c
+index 9582709..9b2aba0 100644
+--- a/src/coap_session.c
++++ b/src/coap_session.c
+@@ -404,7 +404,12 @@ void coap_session_disconnected(coap_session_t *session, coap_nack_reason_t reaso
+     session->tls = NULL;
+   }
+ 
+-  session->state = COAP_SESSION_STATE_NONE;
++  if (session->proto == COAP_PROTO_UDP)
++    session->state = COAP_SESSION_STATE_ESTABLISHED;
++  else
++    session->state = COAP_SESSION_STATE_NONE;
++
++  session->con_active = 0;
+ 
+   if (session->partial_pdu) {
+     coap_delete_pdu(session->partial_pdu);
+@@ -416,12 +421,13 @@ void coap_session_disconnected(coap_session_t *session, coap_nack_reason_t reaso
+     coap_queue_t *q = session->delayqueue;
+     session->delayqueue = q->next;
+     q->next = NULL;
+-    coap_log(LOG_DEBUG, "** %s: tid=%d: not transmitted after delay\n",
++    coap_log(LOG_DEBUG, "** %s: tid=%d: not transmitted after disconnect\n",
+              coap_session_str(session), q->id);
+     if (q->pdu->type==COAP_MESSAGE_CON
+       && COAP_PROTO_NOT_RELIABLE(session->proto)
+-      && reason != COAP_NACK_RST)
++      && reason == COAP_NACK_ICMP_ISSUE)
+     {
++      /* Make sure that we try a re-transmit later on ICMP error */
+       if (coap_wait_ack(session->context, session, q) >= 0)
+         q = NULL;
+     }
+@@ -435,8 +441,6 @@ void coap_session_disconnected(coap_session_t *session, coap_nack_reason_t reaso
+       coap_delete_node(q);
+   }
+ 
+-  coap_cancel_session_messages(session->context, session, reason);
+-
+   if ( COAP_PROTO_RELIABLE(session->proto) ) {
+     if (session->sock.flags != COAP_SOCKET_EMPTY) {
+       coap_socket_close(&session->sock);
+diff --git a/src/net.c b/src/net.c
+index 7ec2ac4..2ea144d 100644
+--- a/src/net.c
++++ b/src/net.c
+@@ -908,11 +908,12 @@ coap_wait_ack(coap_context_t *context, coap_session_t *session,
+   */
+   coap_ticks(&now);
+   if (context->sendqueue == NULL) {
+-    node->t = node->timeout;
++    node->t = node->timeout << node->retransmit_cnt;
+     context->sendqueue_basetime = now;
+   } else {
+     /* make node->t relative to context->sendqueue_basetime */
+-    node->t = (now - context->sendqueue_basetime) + node->timeout;
++    node->t = (now - context->sendqueue_basetime) +
++              (node->timeout << node->retransmit_cnt);
+   }
+ 
+   coap_insert_node(&context->sendqueue, node);
+@@ -936,7 +937,7 @@ coap_wait_ack(coap_context_t *context, coap_session_t *session,
+   }
+ #endif /* WITH_CONTIKI */
+ 
+-  coap_log(LOG_DEBUG, "** %s: tid=%d added to retransmit queue (%ums)\n",
++  coap_log(LOG_DEBUG, "** %s: tid=%d: added to retransmit queue (%ums)\n",
+     coap_session_str(node->session), node->id,
+     (unsigned)(node->t * 1000 / COAP_TICKS_PER_SECOND));
+ 
+@@ -1240,7 +1241,8 @@ coap_read_session(coap_context_t *ctx, coap_session_t *session, coap_tick_t now)
+ 
+     if (bytes_read < 0) {
+       if (bytes_read == -2)
+-        coap_session_disconnected(session, COAP_NACK_RST);
++        /* Reset the session back to startup defaults */
++        coap_session_disconnected(session, COAP_NACK_ICMP_ISSUE);
+       else
+         coap_log(LOG_WARNING, "*  %s: read error\n",
+                  coap_session_str(session));
+-- 
+1.9.1
+

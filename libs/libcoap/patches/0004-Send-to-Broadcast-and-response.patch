@@ -1,0 +1,79 @@
+diff --git a/include/coap2/address.h b/include/coap2/address.h
+index a51236d..4d50633 100644
+--- a/include/coap2/address.h
++++ b/include/coap2/address.h
+@@ -163,6 +163,12 @@ coap_address_isany(const coap_address_t *a) {
+  * returns @c 1 if @p a is multicast, @c 0 otherwise.
+  */
+ int coap_is_mcast(const coap_address_t *a);
++
++/**
++ * Checks if given address @p a denotes a broadcast address. This function
++ * returns @c 1 if @p a is multicast, @c 0 otherwise.
++ */
++int coap_is_bcast(const coap_address_t *a);
+ #else /* !WITH_LWIP && !WITH_CONTIKI */
+ /**
+  * Checks if given address @p a denotes a multicast address. This function
+diff --git a/src/address.c b/src/address.c
+index 6762627..bb7b527 100644
+--- a/src/address.c
++++ b/src/address.c
+@@ -70,6 +70,19 @@ int coap_is_mcast(const coap_address_t *a) {
+   }
+  return 0;
+ }
++
++int coap_is_bcast(const coap_address_t *a) {
++  if (!a)
++    return 0;
++
++ switch (a->addr.sa.sa_family) {
++ case AF_INET:
++   return INADDR_BROADCAST == ntohl(a->addr.sin.sin_addr.s_addr);
++ default:  /* fall through and signal error */
++   ;
++  }
++ return 0;
++}
+ #else /* !defined(WITH_CONTIKI) && !defined(WITH_LWIP) */
+ 
+ #ifdef __clang__
+diff --git a/src/coap_io.c b/src/coap_io.c
+index 871ee64..093c3d1 100644
+--- a/src/coap_io.c
++++ b/src/coap_io.c
+@@ -541,6 +541,7 @@ coap_socket_connect_udp(coap_socket_t *sock,
+ #endif
+   coap_address_t connect_addr;
+   int is_mcast = coap_is_mcast(server);
++  int is_bcast = coap_is_bcast(server);
+   coap_address_copy(&connect_addr, server);
+ 
+   sock->flags &= ~(COAP_SOCKET_CONNECTED | COAP_SOCKET_MULTICAST);
+@@ -593,7 +594,14 @@ coap_socket_connect_udp(coap_socket_t *sock,
+   }
+ 
+   /* special treatment for sockets that are used for multicast communication */
+-  if (is_mcast) {
++  if (is_mcast || is_bcast) {
++    if (is_bcast) {
++      if (setsockopt(sock->fd, SOL_SOCKET, SO_BROADCAST, OPTVAL_T(&on), sizeof(on)) == COAP_SOCKET_ERROR)
++        coap_log(LOG_WARNING,
++                 "coap_socket_connect_udp: setsockopt SO_BROADCAST: %s\n",
++                 coap_socket_strerror());
++    }
++
+     if (getsockname(sock->fd, &local_addr->addr.sa, &local_addr->size) == COAP_SOCKET_ERROR) {
+       coap_log(LOG_WARNING,
+               "coap_socket_connect_udp: getsockname for multicast socket: %s\n",
+@@ -864,7 +872,8 @@ coap_network_send(coap_socket_t *sock, const coap_session_t *session, const uint
+     mhdr.msg_iov = iov;
+     mhdr.msg_iovlen = 1;
+ 
+-    if (!coap_address_isany(&session->local_addr) && !coap_is_mcast(&session->local_addr)) switch (session->local_addr.addr.sa.sa_family) {
++    if (!coap_address_isany(&session->local_addr) && !coap_is_mcast(&session->local_addr) && !coap_is_bcast(&session->local_addr))
++    switch (session->local_addr.addr.sa.sa_family) {
+     case AF_INET6:
+     {
+       struct cmsghdr *cmsg;

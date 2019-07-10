@@ -1,0 +1,13 @@
+diff --git a/src/coap_session.c b/src/coap_session.c
+index 9b2aba0..a0f5e66 100644
+--- a/src/coap_session.c
++++ b/src/coap_session.c
+@@ -982,6 +982,8 @@ coap_free_endpoint(coap_endpoint_t *ep) {
+       }
+     }
+ 
++    if (ep->context)
++      LL_DELETE(ep->context->endpoint, ep);
+     coap_mfree_endpoint(ep);
+   }
+ }
