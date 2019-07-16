@@ -106,7 +106,6 @@ CONFIGURE_ARGS += \
 	--disable-libdv \
 	--disable-osx_audio \
 	--disable-osx_video \
-	--disable-pulse \
 	--disable-qtdemux \
 	--disable-rtp \
 	--disable-rtspmanager \
@@ -208,7 +207,7 @@ $(eval $(call GstBuildPlugin,navigationtest,navigationtest support,video,,))
 $(eval $(call GstBuildPlugin,oss4,OSS 4 audio support,audio tag,,))
 $(eval $(call GstBuildPlugin,ossaudio,OSS audio support,audio,,))
 $(eval $(call GstBuildPlugin,png,png support,video,,+libpng))
-#$(eval $(call GstBuildPlugin,pulse,pulse support,audio pbutils tag video,,))
+$(eval $(call GstBuildPlugin,pulseaudio,pulseaudio support,audio pbutils tag video,,+adk-pulseaudio))
 $(eval $(call GstBuildPlugin,replaygain,volume normalization,pbutils,,))
 $(eval $(call GstBuildPlugin,rtpmanager,RTP manager,audio net rtp tag pbutils video,,))
 #$(eval $(call GstBuildPlugin,rtp,RTP,audio rtp tag pbutils video,,))
