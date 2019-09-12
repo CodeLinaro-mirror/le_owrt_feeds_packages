@@ -11,6 +11,7 @@ PKG_NAME:=gstreamer1
 PKG_VERSION:=1.16.2
 PKG_RELEASE:=1
 
+PKG_CPE_ID:=cpe:/a:gstreamer_project:gstreamer
 PKG_SOURCE:=gstreamer-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://gstreamer.freedesktop.org/src/gstreamer
 PKG_HASH:=e3f044246783fd685439647373fa13ba14f7ab0b346eadd06437092f8419e94e

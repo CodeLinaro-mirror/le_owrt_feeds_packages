@@ -17,7 +17,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-2_9_2
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 PKG_LICENSE:=GPL-2.0-or-later
 PKG_LICENSE_FILES:=COPYING
-PKG_CPE_ID:=cpe:/a:audiocoding:freeware_advanced_audio_decoder_2
+PKG_CPE_ID:=cpe:/a:audiocoding:faad2
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
