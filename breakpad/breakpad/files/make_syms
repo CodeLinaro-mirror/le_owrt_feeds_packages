@@ -1,0 +1,32 @@
+#!/bin/bash
+
+create_symbols() {
+    if [ $(file $1 | awk '{print $2}') = "ELF" ]; then
+        local BIN_FILE=$1
+        local SYM_FILE_NAME="$(basename -- $BIN_FILE)"
+        `$DIR_PATH/dump_syms $BIN_FILE > $DIR_PATH/"${SYM_FILE_NAME}".sym`
+        local app_name="$(head -n1 $DIR_PATH/"${SYM_FILE_NAME}".sym | awk '{print $5}')"
+        local sym_folder="$(head -n1 $DIR_PATH/"${SYM_FILE_NAME}".sym | awk '{print $4}')"
+        mkdir -p $DIR_PATH/symbols/$app_name/$sym_folder
+        mv $DIR_PATH/"${SYM_FILE_NAME}".sym $DIR_PATH/symbols/$app_name/$sym_folder
+    fi
+}
+
+#----------------------------------------------------------------------
+# main entry
+#----------------------------------------------------------------------
+
+if [ "$#" -eq 0  ]; then
+    echo 'Usage: make_syms "binaryfile", e.g. make_syms {path}/testApp'
+    echo 'Usage: make_syms "directoryfile", e.g. make_syms {path}/testApp/'
+    exit 1
+fi
+DIR_PATH="$(dirname $0)"
+if [ -d "$1" ] ; then
+    for file in "$1"/*
+    do
+        create_symbols "$file"
+    done
+else
+    create_symbols $1
+fi
