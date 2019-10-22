@@ -21,7 +21,7 @@ define Package/avs-device-sdk
   CATEGORY:=ALEXA software
   TITLE:=Alexa
   URL:=
-  DEPENDS:=+libcurl +glib2 +gst1-plugins-base +libgstreamer1 +libstdcpp +libsqlite3 +libopenssl
+  DEPENDS:=+libcurl +glib2 +libgst1app +gst1-plugins-base +libgstreamer1 +libstdcpp +libsqlite3 +libopenssl
 endef
 
 TARGET_LDFLAGS += -lcurl -lsqlite3
