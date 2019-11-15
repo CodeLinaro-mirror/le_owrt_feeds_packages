@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libssh2
-PKG_VERSION:=1.6.0
+PKG_VERSION:=1.9.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://www.libssh2.org/download
-PKG_MD5SUM:=00aabd6e714a5f42a4fb82ace20db1dd
+PKG_SOURCE_URL:=https://github.com/libssh2/libssh2/
+PKG_MD5SUM:=1beefafe8963982adc84b408b2959927
 
 PKG_INSTALL:=1
 
