@@ -24,7 +24,7 @@ PKG_HASH:=c1296ae44a7b176150915e33bc497cc0a7a02caeba84ea43ce9b6a2509d9b5dc
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
 
-PKG_BUILD_DEPENDS+=python3/host python-six/host
+PKG_BUILD_DEPENDS+=python/host python-six/host
 PKG_USE_MIPS16:=0
 PKG_BUILD_PARALLEL:=1
 PKG_FIXUP:=autoreconf
@@ -33,9 +33,7 @@ PKG_INSTALL:=1
 PKG_MAINTAINER:=Yousong Zhou <yszhou4tech@gmail.com>
 
 include $(INCLUDE_DIR)/package.mk
-include ../../lang/python/python3-host.mk
-include ../../lang/python/python-package.mk
-include ../../lang/python/python3-package.mk
+include ../../lang/python/files/python-package.mk
 
 
 ovs_kmod_packages:=
@@ -56,7 +54,6 @@ ifeq ($(if $(call ovs_kmod_is_intree,$(1)),$(ovs_kmod_intree_not_supported)),)
      SUBMENU:=Network Support
      TITLE:=$(ovs_kmod_$(1)_title)
      DEPENDS:=$(ovs_kmod_$(1)_depends) $(if $(call ovs_kmod_is_intree,$(1)),@DEVEL)
-     PROVIDES:=$(call ovs_kmod_package_provides,$(1))
      KCONFIG:=$(ovs_kmod_$(1)_kconfig)
      FILES:=$(ovs_kmod_$(1)_files)
      AUTOLOAD:=$(call AutoProbe,$(foreach m,$(ovs_kmod_$(1)_files),$(patsubst %.ko,%,$(basename $(m)))))
@@ -315,8 +312,8 @@ CONFIGURE_ARGS+= \
 
 CONFIGURE_VARS += \
 	ovs_cv_flake8=no \
-	ovs_cv_python=$(PYTHON3) \
-	ovs_cv_python_host=$(HOST_PYTHON3_BIN) \
+	ovs_cv_python=$(PYTHON) \
+	ovs_cv_python_host=$(HOST_PYTHON_BIN) \
 	ovs_cv_sphinx=no \
 	ovs_cv_python2=no \
 	KARCH=$(LINUX_KARCH) \
@@ -333,7 +330,7 @@ ifneq ($(ovs_intree_kmod_enabled),)
 endif
 
 TARGET_CFLAGS += -flto -std=gnu99
-MAKE_VARS += PYTHONPATH="$(HOST_PYTHON3PATH)"
+MAKE_VARS += PYTHONPATH="$(HOST_PYTHONPATH)"
 
 $(foreach p,$(ovs_kmod_packages),\
   $(eval $(call KernelPackage,$(p)))\
