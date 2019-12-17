@@ -1,3 +1,4 @@
+#!/bin/sh /etc/rc.common
 # Copyright (c) 2019, The Linux Foundation. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
@@ -12,30 +13,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#!/bin/sh
+START=12
 
-SERVER=$(fw_printenv serverip | cut -c10-24);
+start () {
+   /usr/bin/breakpad/breakpad_reporter &
+}
 
-#Local Path where breakpad dump files are stored.
-LOCAL_PATH="/tmp"
-
-#Directory Name where sent dump files are stored.
-DUMP_SENT_DIR="breakpad_sent"
-
-if [ ! -n "$SERVER" ]; then
-	printf "%s\n" "Wrong configuaration SERVER = $SERVER" > /dev/console
-	exit 0
-fi
-
-$(tftp -l $LOCAL_PATH/$1 -r $1 -p $SERVER 2>&1)
-if [ $? -eq 0 ]; then
-    printf "%s\n" "$1 collected in $SERVER" \
-                > /dev/console
-        if [ ! -d $LOCAL_PATH/$DUMP_SENT_DIR ]; then
-            mkdir -p $LOCAL_PATH/$DUMP_SENT_DIR
-        fi
-    mv $LOCAL_PATH/$1 $LOCAL_PATH/$DUMP_SENT_DIR
-else
-    printf "%s\n" "$1 collection failed in $SERVER" \
-                 > /dev/console
-fi

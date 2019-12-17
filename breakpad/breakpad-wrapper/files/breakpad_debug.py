@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # Copyright (c) 2019, The Linux Foundation. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
@@ -12,7 +13,6 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#!/usr/bin/python
 import os
 import os.path
 from os import path
@@ -35,9 +35,9 @@ def get_qsdk_path():
 
 def run_commands(binPath, dumpPath, hostToolsPath):
     #Function to run breakpad stack-trace commands
-    CMD_RM_SYMBOLS = RM + " " + hostToolsPath + "/"  + SYMBOLS
-    print(CMD_RM_SYMBOLS)
-    os.system(CMD_RM_SYMBOLS)
+    #CMD_RM_SYMBOLS = RM + " " + hostToolsPath + "/"  + SYMBOLS
+    #print(CMD_RM_SYMBOLS)
+    #os.system(CMD_RM_SYMBOLS)
     if path.exists(binPath):
         CMD_MAKE_SYMBOLS = hostToolsPath + "/"  + MAKE_SYMS + " " + binPath
         print(CMD_MAKE_SYMBOLS)
