@@ -45,7 +45,14 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/libbreakpad_qcawrapper.so $(1)/usr/lib
 
 	$(INSTALL_DIR) $(1)/usr/bin/breakpad
-	$(INSTALL_BIN) ./files/breakpad_crash_reporter $(1)/usr/bin/breakpad
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/breakpad_reporter $(1)/usr/bin/breakpad
+
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/dump
+	$(INSTALL_BIN) ./files/breakpad_crash_reporter $(1)/etc/hotplug.d/dump/10-breakpad-dump
+
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/breakpad_reporter_init $(1)/etc/init.d/breakpad
+
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
