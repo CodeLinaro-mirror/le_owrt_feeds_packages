@@ -26,10 +26,10 @@ diff --git a/acinclude.m4 b/acinclude.m4
 index f15b1ff67..84098f2a5 100644
 --- a/acinclude.m4
 +++ b/acinclude.m4
-@@ -967,6 +967,8 @@ AC_DEFUN([OVS_CHECK_LINUX_COMPAT], [
-                         [OVS_DEFINE([HAVE_NF_CONNTRACK_IN_TAKES_NF_HOOK_STATE])])
-   OVS_GREP_IFELSE([$KSRC/include/net/ipv6_frag.h], [IP6_DEFRAG_CONNTRACK_IN],
-                   [OVS_DEFINE([HAVE_IPV6_FRAG_H])])
+@@ -1005,6 +1005,8 @@ AC_DEFUN([OVS_CHECK_LINUX_COMPAT], [
+                   [OVS_DEFINE([HAVE_GRE_CALC_HLEN])])
+   OVS_GREP_IFELSE([$KSRC/include/net/gre.h], [ip_gre_calc_hlen],
+                   [OVS_DEFINE([HAVE_IP_GRE_CALC_HLEN])])
 +  OVS_GREP_IFELSE([$KSRC/include/net/dst_ops.h], [bool confirm_neigh],
 +                  [OVS_DEFINE([HAVE_DST_OPS_CONFIRM_NEIGH])])
  
@@ -58,7 +58,7 @@ index d16e60fbf..f1c8ba7cd 100644
 @@ -266,7 +266,12 @@ static int rpl_tnl_update_pmtu(struct net_device *dev, struct sk_buff *skb,
  		mtu = skb_dst(skb) ? dst_mtu(skb_dst(skb)) : dev->mtu;
  
- 	if (skb_dst(skb))
+ 	if (skb_valid_dst(skb))
 +#ifndef HAVE_DST_OPS_CONFIRM_NEIGH
  		skb_dst(skb)->ops->update_pmtu(skb_dst(skb), NULL, skb, mtu);
 +#else
