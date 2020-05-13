@@ -1,0 +1,122 @@
+diff -Nur a/extensions/pknock/xt_pknock.c xtables-addons-2.14/extensions/pknock/xt_pknock.c
+--- a/extensions/pknock/xt_pknock.c	2020-05-12 15:59:27.249676734 -0700
++++ xtables-addons-2.14/extensions/pknock/xt_pknock.c	2020-05-12 16:00:02.089435508 -0700
+@@ -1150,7 +1150,6 @@
+ 
+ 	crypto.size = crypto_shash_digestsize(crypto.tfm);
+ 	crypto.desc.tfm = crypto.tfm;
+-	crypto.desc.flags = 0;
+ 
+ 	pde = proc_mkdir("xt_pknock", init_net.proc_net);
+ 	if (pde == NULL) {
+diff -Nur a/extensions/rtsp/nf_conntrack_rtsp.c xtables-addons-2.14/extensions/rtsp/nf_conntrack_rtsp.c
+--- a/extensions/rtsp/nf_conntrack_rtsp.c	2020-05-12 15:59:27.249676734 -0700
++++ xtables-addons-2.14/extensions/rtsp/nf_conntrack_rtsp.c	2020-05-12 16:00:02.089435508 -0700
+@@ -466,8 +466,8 @@
+ 					  &expinfo, rtp_exp, rtcp_exp);
+ #endif
+ 		else {
+-			if (nf_ct_expect_related(rtp_exp) == 0) {
+-				if (rtcp_exp && nf_ct_expect_related(rtcp_exp) != 0) {
++			if (nf_ct_expect_related(rtp_exp, 0) == 0) {
++				if (rtcp_exp && nf_ct_expect_related(rtcp_exp, 0) != 0) {
+ 					nf_ct_unexpect_related(rtp_exp);
+ 					pr_info("nf_conntrack_expect_related failed for rtcp\n");
+ 					ret = NF_DROP;
+diff -Nur a/extensions/rtsp/nf_nat_rtsp.c xtables-addons-2.14/extensions/rtsp/nf_nat_rtsp.c
+--- a/extensions/rtsp/nf_nat_rtsp.c	2020-05-12 15:59:27.249676734 -0700
++++ xtables-addons-2.14/extensions/rtsp/nf_nat_rtsp.c	2020-05-12 16:00:02.089435508 -0700
+@@ -202,7 +202,7 @@
+ 	case pb_single:
+ 		for (loport = prtspexp->loport; loport != 0; loport++) { /* XXX: improper wrap? */
+ 			rtp_t->dst.u.udp.port = htons(loport);
+-			if (nf_ct_expect_related(rtp_exp) == 0) {
++			if (nf_ct_expect_related(rtp_exp, 0) == 0) {
+ 				pr_debug("using port %hu\n", loport);
+ 				break;
+ 			}
+@@ -215,12 +215,12 @@
+ 	case pb_range:
+ 		for (loport = prtspexp->loport; loport != 0; loport += 2) { /* XXX: improper wrap? */
+ 			rtp_t->dst.u.udp.port = htons(loport);
+-			if (nf_ct_expect_related(rtp_exp) != 0) {
++			if (nf_ct_expect_related(rtp_exp, 0) != 0) {
+ 				continue;
+ 			}
+ 			hiport = loport + 1;
+ 			rtcp_exp->tuple.dst.u.udp.port = htons(hiport);
+-			if (nf_ct_expect_related(rtcp_exp) != 0) {
++			if (nf_ct_expect_related(rtcp_exp, 0) != 0) {
+ 				nf_ct_unexpect_related(rtp_exp);
+ 				continue;
+ 			}
+@@ -243,14 +243,14 @@
+ 	case pb_discon:
+ 		for (loport = prtspexp->loport; loport != 0; loport++) { /* XXX: improper wrap? */
+ 			rtp_t->dst.u.udp.port = htons(loport);
+-			if (nf_ct_expect_related(rtp_exp) == 0) {
++			if (nf_ct_expect_related(rtp_exp, 0) == 0) {
+ 				pr_debug("using port %hu (1 of 2)\n", loport);
+ 				break;
+ 			}
+ 		}
+ 		for (hiport = prtspexp->hiport; hiport != 0; hiport++) { /* XXX: improper wrap? */
+ 			rtp_t->dst.u.udp.port = htons(hiport);
+-			if (nf_ct_expect_related(rtp_exp) == 0) {
++			if (nf_ct_expect_related(rtp_exp, 0) == 0) {
+ 				pr_debug("using port %hu (2 of 2)\n", hiport);
+ 				break;
+ 			}
+diff -Nur a/extensions/xt_DHCPMAC.c xtables-addons-2.14/extensions/xt_DHCPMAC.c
+--- a/extensions/xt_DHCPMAC.c	2020-05-12 15:59:27.249676734 -0700
++++ xtables-addons-2.14/extensions/xt_DHCPMAC.c	2020-05-12 16:00:02.089435508 -0700
+@@ -96,7 +96,7 @@
+ 	struct udphdr udpbuf, *udph;
+ 	unsigned int i;
+ 
+-	if (!skb_make_writable(skb, 0))
++	if (!skb_ensure_writable(skb, 0))
+ 		return NF_DROP;
+ 
+ 	udph = skb_header_pointer(skb, ip_hdrlen(skb),
+diff -Nur a/extensions/xt_SYSRQ.c xtables-addons-2.14/extensions/xt_SYSRQ.c
+--- a/extensions/xt_SYSRQ.c	2020-05-12 15:59:27.249676734 -0700
++++ xtables-addons-2.14/extensions/xt_SYSRQ.c	2020-05-12 16:00:20.149311700 -0700
+@@ -114,7 +114,6 @@
+ 	}
+ 
+ 	desc.tfm   = sysrq_tfm;
+-	desc.flags = 0;
+ 	ret = crypto_shash_init(&desc);
+ 	if (ret != 0)
+ 		goto hash_fail;
+@@ -314,7 +313,7 @@
+ static int __init sysrq_crypto_init(void)
+ {
+ #if defined(WITH_CRYPTO)
+-	struct timeval now;
++	struct timespec64 now;
+ 	int ret;
+ 
+ 	sysrq_tfm = crypto_alloc_shash(sysrq_hash, 0, 0);
+@@ -339,7 +338,7 @@
+ 		    sizeof(sysrq_password), GFP_KERNEL);
+ 	if (sysrq_digest_password == NULL)
+ 		goto fail;
+-	do_gettimeofday(&now);
++	ktime_get_real_ts64(&now);
+ 	sysrq_seqno = now.tv_sec;
+ 	return 0;
+ 
+diff -Nur a/extensions/xt_TARPIT.c xtables-addons-2.14/extensions/xt_TARPIT.c
+--- a/extensions/xt_TARPIT.c	2020-05-12 15:59:27.249676734 -0700
++++ xtables-addons-2.14/extensions/xt_TARPIT.c	2020-05-12 16:00:34.689212606 -0700
+@@ -205,7 +205,7 @@
+ 		return;
+ 
+ 	/* This packet will not be the same as the other: clear nf fields */
+-	nf_reset(nskb);
++	nf_reset_ct(nskb);
+ 	skb_nfmark(nskb) = 0;
+ 	skb_init_secmark(nskb);
+ 	skb_shinfo(nskb)->gso_size = 0;
