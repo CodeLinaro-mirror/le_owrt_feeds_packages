@@ -155,7 +155,7 @@ define OvsPackageTemplate
      URL:=https://www.openvswitch.org
      TITLE:=$(ovs_$(1)_title)
      HIDDEN:=$(ovs_$(1)_hidden)
-     DEPENDS:=$(ovs_$(1)_depends) +libatomic +libunbound
+     DEPENDS:=$(ovs_$(1)_depends) +libatomic +libunbound-light
   endef
 
   define Package/$(call ovs_package_name,$(1))/install
