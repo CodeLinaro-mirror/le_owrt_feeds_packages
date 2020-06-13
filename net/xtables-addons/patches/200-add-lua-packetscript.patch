@@ -17927,7 +17927,7 @@
 +
 +	L = lua_envs[info->state_id]->L;
 +
-+	if (!skb_make_writable(pskb, pskb->len))
++	if (!skb_ensure_writable(pskb, pskb->len))
 +		return NF_DROP;
 +
 +	/* call the function provided by --function parameter or the default 'process_packet' defined in Lua */
@@ -17984,7 +17984,7 @@
 +	int32_t ret;
 +	struct lua_env * env = kmalloc(sizeof(struct lua_env), GFP_KERNEL);
 +
-+	if (!script_size > 0) {
++	if (!(script_size > 0)) {
 +		pr_debug("LUA [%d]: script_size %lu < 0\n", state_id, script_size);
 +		return false;
 +	}
