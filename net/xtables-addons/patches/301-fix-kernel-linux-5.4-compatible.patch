@@ -1,6 +1,6 @@
 diff -Nur a/extensions/pknock/xt_pknock.c xtables-addons-2.14/extensions/pknock/xt_pknock.c
---- a/extensions/pknock/xt_pknock.c	2020-05-12 15:59:27.249676734 -0700
-+++ xtables-addons-2.14/extensions/pknock/xt_pknock.c	2020-05-12 16:00:02.089435508 -0700
+--- a/extensions/pknock/xt_pknock.c	2020-06-15 15:11:56.327844496 -0700
++++ xtables-addons-2.14/extensions/pknock/xt_pknock.c	2020-06-15 15:12:12.687756035 -0700
 @@ -1150,7 +1150,6 @@
  
  	crypto.size = crypto_shash_digestsize(crypto.tfm);
@@ -10,8 +10,8 @@ diff -Nur a/extensions/pknock/xt_pknock.c xtables-addons-2.14/extensions/pknock/
  	pde = proc_mkdir("xt_pknock", init_net.proc_net);
  	if (pde == NULL) {
 diff -Nur a/extensions/rtsp/nf_conntrack_rtsp.c xtables-addons-2.14/extensions/rtsp/nf_conntrack_rtsp.c
---- a/extensions/rtsp/nf_conntrack_rtsp.c	2020-05-12 15:59:27.249676734 -0700
-+++ xtables-addons-2.14/extensions/rtsp/nf_conntrack_rtsp.c	2020-05-12 16:00:02.089435508 -0700
+--- a/extensions/rtsp/nf_conntrack_rtsp.c	2020-06-15 15:11:56.327844496 -0700
++++ xtables-addons-2.14/extensions/rtsp/nf_conntrack_rtsp.c	2020-06-15 15:12:12.687756035 -0700
 @@ -466,8 +466,8 @@
  					  &expinfo, rtp_exp, rtcp_exp);
  #endif
@@ -24,8 +24,8 @@ diff -Nur a/extensions/rtsp/nf_conntrack_rtsp.c xtables-addons-2.14/extensions/r
  					pr_info("nf_conntrack_expect_related failed for rtcp\n");
  					ret = NF_DROP;
 diff -Nur a/extensions/rtsp/nf_nat_rtsp.c xtables-addons-2.14/extensions/rtsp/nf_nat_rtsp.c
---- a/extensions/rtsp/nf_nat_rtsp.c	2020-05-12 15:59:27.249676734 -0700
-+++ xtables-addons-2.14/extensions/rtsp/nf_nat_rtsp.c	2020-05-12 16:00:02.089435508 -0700
+--- a/extensions/rtsp/nf_nat_rtsp.c	2020-06-15 15:11:56.327844496 -0700
++++ xtables-addons-2.14/extensions/rtsp/nf_nat_rtsp.c	2020-06-15 15:12:12.687756035 -0700
 @@ -202,7 +202,7 @@
  	case pb_single:
  		for (loport = prtspexp->loport; loport != 0; loport++) { /* XXX: improper wrap? */
@@ -67,9 +67,35 @@ diff -Nur a/extensions/rtsp/nf_nat_rtsp.c xtables-addons-2.14/extensions/rtsp/nf
  				pr_debug("using port %hu (2 of 2)\n", hiport);
  				break;
  			}
+diff -Nur a/extensions/xt_DELUDE.c xtables-addons-2.14/extensions/xt_DELUDE.c
+--- a/extensions/xt_DELUDE.c	2020-06-15 15:11:56.327844496 -0700
++++ xtables-addons-2.14/extensions/xt_DELUDE.c	2020-06-15 15:12:12.687756035 -0700
+@@ -34,6 +34,11 @@
+ 	unsigned int addr_type;
+ 	struct sk_buff *nskb;
+ 	struct iphdr *niph;
++#ifdef CONFIG_BRIDGE_NETFILTER
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
++	struct nf_bridge_info *nf_bridge;
++#endif
++#endif
+ 
+ 	oiph = ip_hdr(oldskb);
+ 
+@@ -108,8 +113,8 @@
+ 	addr_type = RTN_UNSPEC;
+ #ifdef CONFIG_BRIDGE_NETFILTER
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
+-	if (hook != NF_INET_FORWARD || (nskb->nf_bridge != NULL &&
+-	    nskb->nf_bridge->physoutdev))
++	nf_bridge = nf_bridge_info_get(nskb);
++	if (hook != NF_INET_FORWARD || (nf_bridge != NULL && nf_bridge->physoutdev))
+ #else
+ 	if (hook != NF_INET_FORWARD || (nskb->nf_bridge != NULL &&
+ 	    nskb->nf_bridge->mask & BRNF_BRIDGED))
 diff -Nur a/extensions/xt_DHCPMAC.c xtables-addons-2.14/extensions/xt_DHCPMAC.c
---- a/extensions/xt_DHCPMAC.c	2020-05-12 15:59:27.249676734 -0700
-+++ xtables-addons-2.14/extensions/xt_DHCPMAC.c	2020-05-12 16:00:02.089435508 -0700
+--- a/extensions/xt_DHCPMAC.c	2020-06-15 15:11:56.327844496 -0700
++++ xtables-addons-2.14/extensions/xt_DHCPMAC.c	2020-06-15 15:12:12.687756035 -0700
 @@ -96,7 +96,7 @@
  	struct udphdr udpbuf, *udph;
  	unsigned int i;
@@ -80,8 +106,8 @@ diff -Nur a/extensions/xt_DHCPMAC.c xtables-addons-2.14/extensions/xt_DHCPMAC.c
  
  	udph = skb_header_pointer(skb, ip_hdrlen(skb),
 diff -Nur a/extensions/xt_SYSRQ.c xtables-addons-2.14/extensions/xt_SYSRQ.c
---- a/extensions/xt_SYSRQ.c	2020-05-12 15:59:27.249676734 -0700
-+++ xtables-addons-2.14/extensions/xt_SYSRQ.c	2020-05-12 16:00:20.149311700 -0700
+--- a/extensions/xt_SYSRQ.c	2020-06-15 15:11:56.327844496 -0700
++++ xtables-addons-2.14/extensions/xt_SYSRQ.c	2020-06-15 15:12:12.687756035 -0700
 @@ -114,7 +114,6 @@
  	}
  
@@ -109,10 +135,44 @@ diff -Nur a/extensions/xt_SYSRQ.c xtables-addons-2.14/extensions/xt_SYSRQ.c
  	return 0;
  
 diff -Nur a/extensions/xt_TARPIT.c xtables-addons-2.14/extensions/xt_TARPIT.c
---- a/extensions/xt_TARPIT.c	2020-05-12 15:59:27.249676734 -0700
-+++ xtables-addons-2.14/extensions/xt_TARPIT.c	2020-05-12 16:00:34.689212606 -0700
-@@ -205,7 +205,7 @@
+--- a/extensions/xt_TARPIT.c	2020-06-15 15:11:56.327844496 -0700
++++ xtables-addons-2.14/extensions/xt_TARPIT.c	2020-06-15 15:12:32.515648987 -0700
+@@ -180,6 +180,12 @@
+ 	const struct iphdr *oldhdr;
+ 	struct iphdr *niph;
+ 	uint16_t tmp, payload;
++#ifdef CONFIG_BRIDGE_NETFILTER
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
++	struct nf_bridge_info *nf_bridge;
++#endif
++#endif
++
+ 
+ 	/* A truncated TCP header is not going to be useful */
+ 	if (oldskb->len < ip_hdrlen(oldskb) + sizeof(struct tcphdr))
+@@ -205,7 +211,7 @@
  		return;
+ 
+ 	/* This packet will not be the same as the other: clear nf fields */
+-	nf_reset(nskb);
++	nf_reset_ct(nskb);
+ 	skb_nfmark(nskb) = 0;
+ 	skb_init_secmark(nskb);
+ 	skb_shinfo(nskb)->gso_size = 0;
+@@ -250,8 +256,9 @@
+ 
+ #ifdef CONFIG_BRIDGE_NETFILTER
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
+-	if (hook != NF_INET_FORWARD || (nskb->nf_bridge != NULL &&
+-	    nskb->nf_bridge->physoutdev != NULL))
++	nf_bridge = nf_bridge_info_get(nskb);
++	if (hook != NF_INET_FORWARD || (nf_bridge != NULL &&
++				nf_bridge->physoutdev != NULL))
+ #else
+ 	if (hook != NF_INET_FORWARD || (nskb->nf_bridge != NULL &&
+ 	    nskb->nf_bridge->mask & BRNF_BRIDGED))
+@@ -355,7 +362,7 @@
+ 	}
  
  	/* This packet will not be the same as the other: clear nf fields */
 -	nf_reset(nskb);
