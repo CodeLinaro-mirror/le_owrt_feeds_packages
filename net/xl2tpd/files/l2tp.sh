@@ -40,12 +40,11 @@ proto_l2tp_init_config() {
 proto_l2tp_setup() {
 	local interface="$1"
 	local optfile="/tmp/l2tp/options.${interface}"
-	local ip serv_addr server host
+	local ip serv_addr server
 
 	local ip serv_addr server l2tpoipsec_en
-	host="${server%:*}"
 	json_get_var server server && {
-		for ip in $(resolveip -t 5 "$host"); do
+		for ip in $(resolveip -t 5 "$server"); do
 			json_get_var l2tpoipsec_en l2tpoipsec
 			if [ "$l2tpoipsec_en" != "yes" ]; then
 				( proto_add_host_dependency "$interface" "$ip" )
