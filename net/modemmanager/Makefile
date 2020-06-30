@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=modemmanager
-PKG_VERSION:=1.12.4
+PKG_VERSION:=1.12.10
 PKG_RELEASE:=2
 
 PKG_SOURCE:=ModemManager-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://www.freedesktop.org/software/ModemManager
-PKG_HASH:=852d61755e0c1a8d0c609b17192d742b324fdd2e513f3ed64b228befb859a95b
+PKG_HASH:=b2b3058bbb72adf98b24707fdbebe58e590644a38145e30d574f685f154bf8aa
 PKG_BUILD_DIR:=$(BUILD_DIR)/ModemManager-$(PKG_VERSION)
 
 PKG_MAINTAINER:=Nicholas Smith <nicholas.smith@telcoantennas.com.au>
@@ -26,6 +26,7 @@ PKG_BUILD_PARALLEL:=1
 PKG_BUILD_DEPENDS:=glib2/host libxslt/host
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/nls.mk
 
 define Package/modemmanager/config
   source "$(SOURCE)/Config.in"
