@@ -14,12 +14,12 @@ PYTHON_VERSION:=$(PYTHON3_VERSION)
 PYTHON_VERSION_MICRO:=$(PYTHON3_VERSION_MICRO)
 
 PKG_NAME:=python3
-PKG_RELEASE:=3
+PKG_RELEASE:=2
 PKG_VERSION:=$(PYTHON_VERSION).$(PYTHON_VERSION_MICRO)
 
 PKG_SOURCE:=Python-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://www.python.org/ftp/python/$(PKG_VERSION)
-PKG_HASH:=06a0a9f1bf0d8cd1e4121194d666c4e28ddae4dd54346de6c343206599f02136
+PKG_HASH:=43a543404b363f0037f89df8478f19db2dbc0d6f3ffee310bc2997fa71854a63
 
 PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>, Jeffery To <jeffery.to@gmail.com>
 PKG_LICENSE:=Python/2.0
@@ -131,7 +131,6 @@ TARGET_CONFIGURE_OPTS+= \
 	READELF="$(TARGET_CROSS)readelf"
 
 MAKE_FLAGS+=\
-	CROSS_COMPILE=yes \
 	LD="$(TARGET_CC)" \
 	PGEN=pgen3
 
@@ -144,13 +143,6 @@ ENABLE_IPV6:=
 ifeq ($(CONFIG_IPV6),y)
 	ENABLE_IPV6 += --enable-ipv6
 endif
-
-PYTHON_FOR_BUILD:= \
-	_PYTHON_PROJECT_BASE=$(PKG_BUILD_DIR) \
-	_PYTHON_HOST_PLATFORM=linux2 \
-	PYTHONPATH="$(PKG_BUILD_DIR)/Lib:$(PKG_BUILD_DIR)/build/lib.linux2-$(PYTHON_VERSION)" \
-	_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata \
-	$(HOST_PYTHON3_BIN)
 
 DISABLE_BLUETOOTH:= \
 	ac_cv_header_bluetooth_bluetooth_h=no \
@@ -165,7 +157,6 @@ CONFIGURE_ARGS+= \
 	--with-ensurepip=no \
 	--without-pymalloc \
 	$(if $(CONFIG_PYTHON3_BLUETOOTH_SUPPORT),,$(DISABLE_BLUETOOTH)) \
-	PYTHON_FOR_BUILD="$(PYTHON_FOR_BUILD)" \
 	$(ENABLE_IPV6) \
 	CONFIG_SITE="$(PKG_BUILD_DIR)/config.site" \
 	OPT="$(TARGET_CFLAGS)"
@@ -192,7 +183,7 @@ define Build/Compile/python3-setuptools
 		--ignore-installed \
 		--root=$(PKG_BUILD_DIR)/install-setuptools \
 		--prefix=/usr \
-		$(PKG_BUILD_DIR)/Lib/ensurepip/_bundled/setuptools-$(PYTHON3_SETUPTOOLS_VERSION)-py2.py3-none-any.whl
+		$(PKG_BUILD_DIR)/Lib/ensurepip/_bundled/setuptools-$(PYTHON3_SETUPTOOLS_VERSION)-py3-none-any.whl
 	$(call PatchDir,$(PKG_BUILD_DIR)/install-setuptools/usr/lib/python$(PYTHON3_VERSION)/site-packages,./patches-setuptools,)
 endef
 endif # CONFIG_PACKAGE_python3-setuptools
@@ -228,6 +219,10 @@ define Build/InstallDev
 		$(PKG_INSTALL_DIR)/usr/lib/python$(PYTHON_VERSION) \
 		$(PKG_INSTALL_DIR)/usr/lib/libpython$(PYTHON_VERSION).so* \
 		$(1)/usr/lib/
+	grep \
+		'^_PYTHON_HOST_PLATFORM=' \
+		$(PKG_INSTALL_DIR)/usr/lib/python$(PYTHON_VERSION)/config-$(PYTHON_VERSION)/Makefile > \
+		$(1)/usr/lib/python$(PYTHON_VERSION)/config-$(PYTHON_VERSION)/Makefile-vars
 	$(CP) \
 		$(PKG_INSTALL_DIR)/usr/lib/pkgconfig/python*.pc \
 		$(1)/usr/lib/pkgconfig
