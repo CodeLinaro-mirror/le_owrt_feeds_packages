@@ -47,19 +47,19 @@ endef
 
 
 PCI_IDS_VER:=0.324
-PCI_IDS_FILE:=v$(PCI_IDS_VER).tar.gz
+PCI_IDS_FILE:=pci.ids.$(PCI_IDS_VER)
 define Download/pci_ids
   FILE:=$(PCI_IDS_FILE)
-  URL:=https://github.com/vcrhonek/hwdata/archive/
-  HASH:=711e5e6f1d9397604ebe68693a060eb9b99df8a84d20ecfc0efa2b3be0d32d50
+  URL_FILE:=pci.ids
+  URL:=@GITHUB/vcrhonek/hwdata/v$(PCI_IDS_VER)
+  HASH:=6dba287b4aaafb9582d6139eda22ee6580651b8557828b9598d99078a5f4217e
 endef
 $(eval $(call Download,pci_ids))
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
 	$(RM) $(PKG_BUILD_DIR)/pci.ids
-	$(TAR) xzvf $(DL_DIR)/$(PCI_IDS_FILE) -C $(PKG_BUILD_DIR)
-	$(CP) $(PKG_BUILD_DIR)/hwdata-$(PCI_IDS_VER)/pci.ids $(PKG_BUILD_DIR)/pci.ids
+	$(CP) $(DL_DIR)/$(PCI_IDS_FILE) $(PKG_BUILD_DIR)/pci.ids
 endef
 
 TARGET_CFLAGS += $(FPIC)
