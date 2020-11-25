@@ -9,9 +9,9 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lxc
 PKG_VERSION:=2.1.1
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
-PKG_LICENSE:=LGPL-2.1+ BSD-2-Clause GPL-2.0
+PKG_LICENSE:=LGPL-2.1-or-later BSD-2-Clause GPL-2.0
 PKG_MAINTAINER:=Marko Ratkaj <marko.ratkaj@sartura.hr>
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -124,7 +124,7 @@ define Package/liblxc
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=LXC userspace library
-  DEPENDS:= lxc +libcap +libpthread
+  DEPENDS:= lxc +libcap +libpthread +LXC_SECCOMP:libseccomp
 endef
 
 define Package/lxc-lua
@@ -148,7 +148,13 @@ CONFIGURE_ARGS += \
 	--disable-selinux \
 	--disable-python \
 	--enable-lua=yes \
-	--with-lua-pc="$(STAGING_DIR)/usr/lib/pkgconfig/lua.pc" \
+	--with-lua-pc="$(STAGING_DIR)/usr/lib/pkgconfig/lua.pc"
+
+ifeq ($(CONFIG_LXC_SECCOMP),y)
+CONFIGURE_ARGS += --enable-seccomp
+else
+CONFIGURE_ARGS += --disable-seccomp
+endif
 
 MAKE_FLAGS += \
 	LUA_INSTALL_CMOD="/usr/lib/lua" \
@@ -209,11 +215,6 @@ define Package/lxc-common/install
 		./files/lxc.conf \
 		$(1)/etc/lxc/lxc.conf
 
-	$(INSTALL_DIR) $(1)/etc/init.d/
-	$(CP) \
-		./files/lxc \
-		$(1)/etc/init.d/lxc
-
 	$(INSTALL_DIR) $(1)/srv/lxc/
 endef
 
@@ -230,11 +231,10 @@ define Package/lxc-templates/install
 		$(PKG_INSTALL_DIR)/usr/share/lxc/templates/lxc-* \
 		$(1)/usr/share/lxc/templates/
 
-	 $(INSTALL_DIR) $(1)/usr/share/lxc/templates/
+	$(INSTALL_DIR) $(1)/usr/share/lxc/templates/
 	$(CP) \
 		./files/lxc-qsdk \
 		$(1)/usr/share/lxc/templates/lxc-qsdk
-
 endef
 
 define Package/lxc-configs/install
