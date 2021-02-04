@@ -230,11 +230,6 @@ define Package/lxc-templates/install
 	$(CP) \
 		$(PKG_INSTALL_DIR)/usr/share/lxc/templates/lxc-* \
 		$(1)/usr/share/lxc/templates/
-
-	$(INSTALL_DIR) $(1)/usr/share/lxc/templates/
-	$(CP) \
-		./files/lxc-qsdk \
-		$(1)/usr/share/lxc/templates/lxc-qsdk
 endef
 
 define Package/lxc-configs/install
