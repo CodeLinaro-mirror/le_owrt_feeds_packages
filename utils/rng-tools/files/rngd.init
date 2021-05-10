@@ -10,9 +10,6 @@ start_service() {
 	local enabled=$(uci -q get system.@rngd[0].enabled)
 	local precmd=$(uci -q get system.@rngd[0].precmd)
 	local device=$(uci -q get system.@rngd[0].device)
-	if [ -e /dev/hwrng ]; then
-		device="/dev/hwrng"
-	fi
 	local watermark=$(uci -q get system.@rngd[0].fill_watermark)
 
 	[ "$enabled" = "1" ] || return
