@@ -8,17 +8,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gpsd
-PKG_VERSION:=3.19
+PKG_VERSION:=3.23
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@SAVANNAH/$(PKG_NAME)
-PKG_HASH:=27dd24d45b2ac69baab7933da2bf6ae5fb0be90130f67e753c110a3477155f39
+PKG_HASH:=e36429b9f6fc42004894dff3dc4453f5b43f95af8533b96d3d135987418da9df
 
 PKG_MAINTAINER:=Pushpal Sidhu <psidhu.devel@gmail.com>
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:berlios:gps_daemon
+
+PKG_BUILD_DEPENDS:=scons/host
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/scons.mk
@@ -68,11 +70,24 @@ define Package/gpsd-clients/description
   testing the GPS daemon.
 endef
 
+define Package/gpsd-utils
+  $(call Package/gpsd/Default)
+  SECTION:=utils
+  CATEGORY:=Utilities
+  TITLE:=GPS daemon utils
+endef
+
+define Package/gpsd-utils/description
+  $(call Package/gpsd/Default/description)
+  This package contains utilities for interacting with GPS daemon.
+endef
+
 define Package/libgps
   $(call Package/gpsd/Default)
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=C service library for communicating with the GPS daemon
+  ABI_VERSION:=29
 endef
 
 define Package/libgps/description
@@ -81,6 +96,7 @@ define Package/libgps/description
 endef
 
 SCONS_VARS += \
+	CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS) -L$(STAGING_DIR)/usr/lib" \
 	LINKFLAGS="$(TARGET_LDFLAGS)"
 
 SCONS_OPTIONS += \
@@ -102,6 +118,7 @@ SCONS_OPTIONS += \
 	implicit_link=no \
 	chrpath=no \
 	manbuild=no \
+	sysroot="$(TOOLCHAIN_DIR)" \
 	target="$(TARGET_CROSS:-=)"
 
 define Build/InstallDev
@@ -110,9 +127,9 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libgps*.so* $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
-	$(CP) \
-		$(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libgps*.pc \
-		$(1)/usr/lib/pkgconfig/
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libgps.pc $(1)/usr/lib/pkgconfig
+	$(SED) 's,/usr/include,$$$${prefix}/include,g' $(1)/usr/lib/pkgconfig/libgps.pc
+	$(SED) 's,/usr/lib,$$$${exec_prefix}/lib,g' $(1)/usr/lib/pkgconfig/libgps.pc
 endef
 
 define Package/gpsd/install
@@ -134,11 +151,17 @@ define Package/gpsd-clients/install
 		$(1)/usr/bin/
 endef
 
+define Package/gpsd-utils/install
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/gpsdctl $(1)/usr/sbin/
+endef
+
 define Package/libgps/install
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libgps.so.* $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libgps.so.$(ABI_VERSION)* $(1)/usr/lib/
 endef
 
 $(eval $(call BuildPackage,gpsd))
 $(eval $(call BuildPackage,gpsd-clients))
+$(eval $(call BuildPackage,gpsd-utils))
 $(eval $(call BuildPackage,libgps))
