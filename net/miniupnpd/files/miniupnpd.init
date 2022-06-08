@@ -64,7 +64,7 @@ upnpd() {
 	local ipv6_disable
 
 	local enabled
-	config_get_bool enabled config enabled 1
+	config_get_bool enabled config enabled 0
 	[ "$enabled" -eq 0 ] && return 1
 
 	config_get external_iface config external_iface
