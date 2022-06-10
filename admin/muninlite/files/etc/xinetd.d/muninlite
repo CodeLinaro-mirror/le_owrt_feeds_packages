@@ -5,6 +5,6 @@ service munin
 	wait		= no
 	user		= root
 	group		= root
-	server		= /usr/sbin/munin-node
+	server		= /usr/sbin/muninlite
 	disable		= no
 }
