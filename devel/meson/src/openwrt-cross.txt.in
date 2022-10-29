@@ -13,6 +13,7 @@ c_link_args = [@LDFLAGS@]
 cpp_args = [@CXXFLAGS@]
 cpp_link_args = [@LDFLAGS@]
 needs_exe_wrapper = true
+platform = 'generic'
 
 [host_machine]
 system = 'linux'
