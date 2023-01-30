@@ -353,6 +353,10 @@ ifeq ($(CONFIG_SAMBA4_SERVER_AD_DC),)
 endif
 endef
 
+ifeq ($(ARCH),aarch64_be)
+ARCH=aarch64
+endif
+
 define Build/Configure
 	$(CP) ./waf-cross-answers/$(ARCH).txt $(PKG_BUILD_DIR)/cross-answers.txt
 	echo 'Checking uname sysname type: "$(VERSION_DIST)"' >> $(PKG_BUILD_DIR)/cross-answers.txt

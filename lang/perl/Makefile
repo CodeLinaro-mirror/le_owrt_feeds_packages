@@ -77,6 +77,10 @@ define Package/perl/config
 	source "$(SOURCE)/Config.in"
 endef
 
+ifneq ($(findstring aarch64_be,$(CONFIG_ARCH)),)
+ARCH=aarch64
+endif
+
 # Static host perl
 define Host/Configure
 	( cd $(HOST_BUILD_DIR); ./Configure -der -Uusedl -Duserelocatableinc -Dprefix=$(HOST_PERL_PREFIX) $(if $(CONFIG_PERL_THREADS),-Dusethreads,))
