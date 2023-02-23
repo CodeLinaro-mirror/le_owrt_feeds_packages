@@ -1,0 +1,30 @@
+From 4c3b7f979fd5772190db98ba63824beed28243a6 Mon Sep 17 00:00:00 2001
+From: Ronghua Zeng <quic_ronghuaz@quicinc.com>
+Date: Thu, 23 Feb 2023 14:49:55 +0800
+Subject: [PATCH] rp-pppoe: Fixed compilation with uclibc
+
+Do not inlcude <linux/in.h> when using uclibc to avoid various
+redefinitions.
+
+Signed-off-by: Ronghua Zeng <quic_ronghuaz@quicinc.com>
+---
+ src/pppoe.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/pppoe.h b/src/pppoe.h
+index da77c07..d5fc319 100644
+--- a/src/pppoe.h
++++ b/src/pppoe.h
+@@ -132,6 +132,9 @@ typedef unsigned long UINT32_t;
+ #endif
+ 
+ #include <netinet/in.h>
++/* avoid redefinitions if <linux/in.h> and <linux/in6.h> get included. */
++#define _LINUX_IN_H
++#define _LINUX_IN6_H
+ 
+ #ifdef HAVE_NETINET_IF_ETHER_H
+ #include <sys/types.h>
+-- 
+2.7.4
+
