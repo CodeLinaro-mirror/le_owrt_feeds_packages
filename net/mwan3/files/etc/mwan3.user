@@ -18,3 +18,14 @@
 #
 # Further documentation can be found here:
 # https://openwrt.org/docs/guide-user/network/wan/multiwan/mwan3#alertsnotifications
+
+. /lib/mwan3/mwan3.sh
+
+LOG="logger -t $(basename "$0")[$$] -p"
+
+case "$ACTION" in
+	ifdown)
+		$LOG notice "conntrack flush due to $INTERFACE is $ACTION"
+		echo f > /proc/net/nf_conntrack
+		;;
+esac
