@@ -310,7 +310,7 @@ endef
 define Package/strongswan-isakmp/description
 $(call Package/strongswan/description/Default)
  This meta-package contains only dependencies to establish  ISAKMP /
- IKE PSK connections, dropping other capabilities in favor of small size 
+ IKE PSK connections, dropping other capabilities in favor of small size
  Can fit most routers even with 4Mb flash (after removing IPv6 support).
 endef
 
@@ -629,6 +629,8 @@ define Plugin/updown/install
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/ipsec
 	$(CP) ./files/etc/hotplug.d/ipsec/01-user \
 		$(1)/etc/hotplug.d/ipsec/01-user
+	$(CP) ./files/etc/hotplug.d/ipsec/00-nss-ipsec-offload \
+		$(1)/etc/hotplug.d/ipsec/00-nss-ipsec-offload
 endef
 
 define Plugin/vici/install
