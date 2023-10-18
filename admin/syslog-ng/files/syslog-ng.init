@@ -18,5 +18,5 @@ reload_service() {
 
 
 stop_service() {
-        kill -9 $(pgrep syslog-ng)
+	procd_kill /usr/sbin/syslog-ng &>/dev/null
 }
