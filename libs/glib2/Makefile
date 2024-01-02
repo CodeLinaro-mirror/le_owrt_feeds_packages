@@ -16,7 +16,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/glib-$(PKG_VERSION)
 PKG_SOURCE_URL:=@GNOME/glib/2.44
 PKG_MD5SUM:=83efba4722a9674b97437d1d99af79db
 
-PKG_BUILD_DEPENDS:=glib2/host libpthread zlib libintl libffi
+PKG_BUILD_DEPENDS:=perl/host glib2/host libpthread zlib libintl libffi
 HOST_BUILD_DEPENDS:=libintl/host libiconv/host libffi/host
 PKG_INSTALL:=1
 PKG_USE_MIPS16:=0
@@ -43,7 +43,8 @@ define Package/glib2/description
 endef
 
 HOST_CONFIGURE_ARGS += \
-	--disable-selinux
+	--disable-selinux \
+	--with-selfbuild-perl-path=$(STAGING_DIR_HOST)/usr/bin/perl
 
 CONFIGURE_ARGS += \
 	--enable-shared \

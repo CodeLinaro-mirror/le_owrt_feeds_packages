@@ -1,0 +1,18 @@
+diff --git a/configure.ac b/configure.ac
+index b6640da..6b52371 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -365,6 +365,13 @@ AC_SUBST(REBUILD)
+ if test "x$PERL" != x ; then
+   AC_PATH_PROG(PERL_PATH, [$PERL])
+ fi
++
++AC_ARG_WITH([selfbuild-perl-path],
++    AS_HELP_STRING([--with-selfbuild-perl-path=PATH], [Specify a custom perl path]),
++    [PERL_PATH="$withval"])
++
++AC_MSG_NOTICE([the perl path is: $PERL_PATH])
++
+ if test "x$PERL_PATH" = x ; then
+   PERL_PATH="/usr/bin/env perl"
+ fi
