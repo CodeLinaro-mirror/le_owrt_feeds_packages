@@ -76,9 +76,9 @@ define Build/Prepare
 	( cd "$(PKG_BUILD_DIR)"; \
 		printf "all:\ninstall:\n" >po/Makefile.in.in; \
 	)
-	$(SED) 's|^\(GLIB_MKENUMS\)=.*|\1=$(STAGING_DIR_HOST)/bin/glib-mkenums|' \
+	$(SED) 's|^\(GLIB_MKENUMS\)=.*|\1=\"perl $(STAGING_DIR_HOST)/bin/glib-mkenums\"|' \
 		$(PKG_BUILD_DIR)/configure.ac
-	$(SED) 's|^\(GDBUS_CODEGEN\)=.*|\1=$(STAGING_DIR_HOST)/bin/gdbus-codegen|' \
+	$(SED) 's|^\(GDBUS_CODEGEN\)=.*|\1=\"python $(STAGING_DIR_HOST)/bin/gdbus-codegen\"|' \
 		$(PKG_BUILD_DIR)/configure.ac
 endef
 

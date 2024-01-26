@@ -64,6 +64,12 @@ CONFIGURE_ARGS += \
 	--without-udev \
 	--without-udev-base-dir
 
+define Build/Prepare
+	$(call Build/Prepare/Default)
+	$(SED) 's|^\(GLIB_MKENUMS\)=.*|\1=\"perl $(STAGING_DIR_HOST)/bin/glib-mkenums\"|' \
+		$(PKG_BUILD_DIR)/configure
+endef
+
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
 	$(CP) \
