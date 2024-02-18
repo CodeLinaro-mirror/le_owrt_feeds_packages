@@ -269,7 +269,7 @@ ifneq ($(ovs_intree_kmod_enabled),)
 endif
 
 TARGET_CFLAGS += -std=gnu99
-MAKE_VARS += PYTHONPATH="$(HOST_PYTHON3PATH)"
+MAKE_VARS += PYTHONPATH="$(PKG_BUILD_DIR)/python:$(HOST_PYTHON3PATH)"
 
 export OVS_KERNEL_MAKE_FLAGS=$(KERNEL_MAKE_FLAGS)
 
