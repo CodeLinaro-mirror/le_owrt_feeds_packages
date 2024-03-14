@@ -268,6 +268,10 @@ ifneq ($(ovs_intree_kmod_enabled),)
   endif
 endif
 
+ifeq ($(CONFIG_LINUX_6_6),y)
+TARGET_CFLAGS += -DLINUX_VERSION_SRC_6_6
+endif
+
 TARGET_CFLAGS += -std=gnu99
 MAKE_VARS += PYTHONPATH="$(PKG_BUILD_DIR)/python:$(HOST_PYTHON3PATH)"
 
