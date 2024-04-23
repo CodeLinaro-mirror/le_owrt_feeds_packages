@@ -195,6 +195,7 @@ up_delay
 up_restart
 username_as_common_name
 vlan_tagging
+enable_dca
 '
 
 OPENVPN_LIST='

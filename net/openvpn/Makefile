@@ -27,6 +27,8 @@ PKG_BUILD_FLAGS:=gc-sections
 PKG_LICENSE:=GPL-2.0
 PKG_CPE_ID:=cpe:/a:openvpn:openvpn
 
+PKG_BUILD_DEPENDS:=TARGET_ipq_ipq807x_QSDK_Premium:kmod-qca-nss-drv-ovpn-mgr TARGET_ipq_ipq807x_64_QSDK_Premium:kmod-qca-nss-drv-ovpn-mgr
+
 include $(INCLUDE_DIR)/package.mk
 
 define Package/openvpn/Default
@@ -36,7 +38,8 @@ define Package/openvpn/Default
   URL:=http://openvpn.net
   SUBMENU:=VPN
   MENU:=1
-  DEPENDS:=+kmod-tun +OPENVPN_$(1)_ENABLE_LZO:liblzo +OPENVPN_$(1)_ENABLE_IPROUTE2:ip $(3)
+  DEPENDS:=PACKAGE_kmod-qca-nss-drv-ovpn-mgr:kmod-qca-nss-drv-ovpn-mgr PACKAGE_kmod-qca-nss-drv-ovpn-link:kmod-qca-nss-drv-ovpn-link \
+          +kmod-tun +OPENVPN_$(1)_ENABLE_LZO:liblzo +OPENVPN_$(1)_ENABLE_IPROUTE2:ip $(3)
   VARIANT:=$(1)
   PROVIDES:=openvpn openvpn-crypto
 endef
@@ -84,6 +87,7 @@ define Build/Configure
 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_IPROUTE2),--enable,--disable)-iproute2 \
 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_DEF_AUTH),--enable,--disable)-def-auth \
 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_PF),--enable,--disable)-pf \
+		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_DCA),--enable,--disable)-dca \
 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_PORT_SHARE),--enable,--disable)-port-share \
 		$(if $(CONFIG_OPENVPN_OPENSSL),--with-crypto-library=openssl --with-openssl-engine=no) \
 		$(if $(CONFIG_OPENVPN_MBEDTLS),--with-crypto-library=mbedtls) \
