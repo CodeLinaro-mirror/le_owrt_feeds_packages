@@ -27,31 +27,18 @@ f_mkdir "${ban_backupdir}"
 f_mkfile "${ban_allowlist}"
 f_mkfile "${ban_blocklist}"
 
-# firewall check
+# firewall/fw4 pre-check
 #
-if [ "${ban_action}" != "reload" ]; then
-	if [ -x "${ban_fw4cmd}" ]; then
-		cnt="0"
-		while [ "${cnt}" -lt "30" ] && ! /etc/init.d/firewall status >/dev/null 2>&1; do
-			cnt="$((cnt + 1))"
-			sleep 1
-		done
-		if ! /etc/init.d/firewall status >/dev/null 2>&1; then
-			f_log "err" "error in nft based firewall/fw4"
-		fi
-	else
-		f_log "err" "no nft based firewall/fw4"
-	fi
+if [ ! -x "${ban_fw4cmd}" ] || [ ! -x "/etc/init.d/firewall" ]; then
+	f_log "err" "firewall/fw4 not found"
+elif ! /etc/init.d/firewall status >/dev/null 2>&1; then
+	f_log "info" "firewall/fw4 is not running"
 fi
 
 # init banIP nftables namespace
 #
-if [ "${ban_action}" != "reload" ] || ! "${ban_nftcmd}" -t list set inet banIP allowlistv4MAC >/dev/null 2>&1; then
-	if f_nftinit "${ban_tmpfile}".init.nft; then
-		f_log "info" "initialize banIP nftables namespace"
-	else
-		f_log "err" "can't initialize banIP nftables namespace"
-	fi
+if [ "${ban_action}" != "reload" ] || ! "${ban_nftcmd}" list chain inet banIP pre-routing >/dev/null 2>&1; then
+	f_nftinit "${ban_tmpfile}".init.nft
 fi
 
 # handle downloads

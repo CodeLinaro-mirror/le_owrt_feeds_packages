@@ -14,7 +14,7 @@ PKG_RELEASE:=2
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://gitlab.freedesktop.org/mobile-broadband/libqmi.git
 PKG_SOURCE_VERSION:=$(PKG_VERSION)
-PKG_MIRROR_HASH:=05211a43de53b7bf967fe29ca62dbe8332f42748dbfc8d32880cda765d00020c
+PKG_MIRROR_HASH:=65ee91b81c6f68d908cc94a0b5d670eefa29d550ecf8ef94cb836981fbfa4c2a
 
 PKG_BUILD_FLAGS:=gc-sections
 
