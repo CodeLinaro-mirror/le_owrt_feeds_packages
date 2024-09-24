@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=glib2
-PKG_VERSION:=2.74.7
-PKG_RELEASE:=3
+PKG_VERSION:=2.82.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=glib-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@GNOME/glib/$(basename $(PKG_VERSION))
-PKG_HASH:=196ab86c27127a61b7a70c3ba6af7b97bdc01c07cd3b21abd5e778b955eccb1b
+PKG_HASH:=f4c82ada51366bddace49d7ba54b33b4e4d6067afa3008e4847f41cb9b5c38d3
 
 PKG_MAINTAINER:=Peter Wagner <tripolar@gmx.at>
 PKG_LICENSE:=LGPL-2.1-or-later
@@ -56,19 +56,20 @@ COMP_ARGS+=-Dlibmount=disabled
 # default feature=auto see meson_options.txt
 COMP_ARGS+=-Dselinux=disabled
 
-
-# default boolean=false see meson_options.txt
-COMP_ARGS+=-Dforce_posix_threads=true
-
 # default boolean=true see meson_options.txt
 COMP_ARGS+=-Dglib_assert=false
 
 # default boolean=true see meson_options.txt
 COMP_ARGS+=-Dtests=false
 
+# default feature=auto see meson_options.txt
+COMP_ARGS+=-Dintrospection=disabled
 
-MESON_HOST_ARGS += $(COMP_ARGS) -Dxattr=false -Ddefault_library=static -Dnls=disabled -Dforce_fallback_for=libpcre2-8
-MESON_ARGS += $(COMP_ARGS) -Dxattr=true -Db_lto=true -Ddefault_library=both -Dnls=$(if $(CONFIG_BUILD_NLS),en,dis)abled
+# set runtime dir to /var/run
+COMP_ARGS+=-Druntime_dir=/var/run
+
+MESON_HOST_ARGS += $(COMP_ARGS) -Dxattr=false -Dnls=disabled
+MESON_ARGS += $(COMP_ARGS) -Dxattr=true -Db_lto=true -Dnls=$(if $(CONFIG_BUILD_NLS),en,dis)abled
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/bin
