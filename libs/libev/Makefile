@@ -48,6 +48,7 @@ define Build/InstallDev
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/event.h $(1)/usr/include/ev_event_compat.h
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/ev.h $(1)/usr/include/
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/ev++.h $(1)/usr/include/
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/ev_trace.h $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libev.{a,so*} $(1)/usr/lib/
 endef
