@@ -76,6 +76,7 @@ endef
 CONFIGURE_ARGS = \
 	$(if $(CONFIG_IPV6),--ipv6) \
 	--igd2 \
+	$(if $(CONFIG_OPENSYNC_SUPPORTED),--iptscript) \
 	--leasefile \
 	--portinuse \
 	--firewall=$(BUILD_VARIANT) \
@@ -104,6 +105,11 @@ define Package/miniupnpd-iptables/install
 	$(call Package/miniupnpd/install/Default,$1)
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/usr/share/miniupnpd
+ifeq ($(CONFIG_OPENSYNC_SUPPORTED),y)
+	$(INSTALL_DIR) $(1)/etc/miniupnpd
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/iptscript/iptscript.sh \
+		$(1)/etc/miniupnpd
+endif
 	$(INSTALL_BIN) ./files/miniupnpd.defaults.iptables $(1)/etc/uci-defaults/99-miniupnpd
 	$(INSTALL_DATA) ./files/firewall3.include $(1)/usr/share/miniupnpd/firewall.include
 endef
