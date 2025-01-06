@@ -16,6 +16,13 @@ start_container() {
 
 	config_get name "$cfg" name
 	config_list_foreach "$cfg" command run_command
+
+	# Create the lxcbr0 bridge if it doesn't exist
+	if ! ip link show lxcbr0 > /dev/null 2>&1; then
+		brctl addbr lxcbr0
+		ip link set lxcbr0 up
+	fi
+
 	if [ -n "$name" ]; then
 		/usr/bin/lxc-start -n "$name"
 	fi
