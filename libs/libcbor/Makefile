@@ -20,7 +20,8 @@ PKG_LICENSE_FILES:=COPYING
 PKG_MAINTAINER:=Linos Giannopoulos <linosgian00+openwrt@gmail.com>
 
 CMAKE_OPTIONS += \
-        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=ON \
+	-DCMAKE_BUILD_TYPE=Release
 CMAKE_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
