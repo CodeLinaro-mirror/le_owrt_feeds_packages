@@ -54,11 +54,13 @@ define Package/libiperf3
   CATEGORY:=Libraries
   TITLE:=Internet Protocol bandwidth measuring library
   URL:=https://github.com/esnet/iperf
-  DEPENDS+=+libatomic
+  DEPENDS+=+libatomic +kmod-qca-nss-netfn-sk-offload
 endef
 
-TARGET_CFLAGS += -D_GNU_SOURCE
+TARGET_CFLAGS += -D_GNU_SOURCE -I$(STAGING_DIR)/usr/include/qca-nss-netfn
 TARGET_LDFLAGS += -latomic
+
+#TODO: Add build variant for offload enabled/disabled similar to below.
 
 ifeq ($(BUILD_VARIANT),ssl)
 	CONFIGURE_ARGS += --with-openssl="$(STAGING_DIR)/usr" --disable-shared
