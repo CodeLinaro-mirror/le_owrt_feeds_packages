@@ -23,7 +23,16 @@
 
 case "$ACTION" in
 	disconnected)
-		LOG notice "conntrack flush due to $INTERFACE is $ACTION"
-		echo f > /proc/net/nf_conntrack
+		if [ "${INTERFACE}" = "wan6" ] || [ "${INTERFACE}" = "wan" ] ; then
+			LOG notice "conntrack flush due to $INTERFACE is $ACTION"
+			echo f > /proc/net/nf_conntrack
+		fi
+                ;;
+
+		connected)
+		if [ "${INTERFACE}" = "wan" ] || [ "${INTERFACE}" = "wan6" ] ; then
+			LOG notice "conntrack flush due to $INTERFACE is $ACTION"
+			echo f > /proc/net/nf_conntrack
+		fi
 		;;
 esac
