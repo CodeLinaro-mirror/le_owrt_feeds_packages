@@ -1,12 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luajit2
-PKG_VERSION:=2.1-20240626
+PKG_SOURCE_DATE:=2025-05-29
+PKG_VERSION:=2.1.$(subst -,.,$(PKG_SOURCE_DATE))
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/openresty/luajit2/archive/refs/tags/v$(PKG_VERSION).tar.gz?
-PKG_HASH:=1e53822a1105df216b9657ccb0293a152ac5afd875abc848453bfa353ca8181b
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/openresty/luajit2
+PKG_SOURCE_VERSION:=afc74313c6f919f713e2a25003cf0066852bb24a
+PKG_MIRROR_HASH:=cd3048e818c14e0f7b904de0bb3767d0e2e9c556096ed06401ad79ccb7defcda
 
 PKG_MAINTAINER:=Javier Marcet <javier@marcet.info>
 PKG_LICENSE:=MIT
@@ -45,7 +47,7 @@ define Build/Compile
 	$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 		HOST_CC="$(HOSTCC) $(HOST_CFLAGS) $(HOST_BITS)" \
 		CROSS="$(TARGET_CROSS)" \
-		DPREFIX=$(PKG_INSTALL_DIR)/usr \
+		DESTDIR=$(PKG_INSTALL_DIR) \
 		PREFIX=/usr \
 		TARGET_SYS=Linux \
 		TARGET_CFLAGS="$(TARGET_CFLAGS)" \
@@ -53,7 +55,7 @@ define Build/Compile
 	$(RM) -rf $(PKG_INSTALL_DIR)
 	mkdir -p $(PKG_INSTALL_DIR)
 	$(MAKE) -C $(PKG_BUILD_DIR) \
-		DPREFIX=$(PKG_INSTALL_DIR)/usr \
+		DESTDIR=$(PKG_INSTALL_DIR) \
 		PREFIX=/usr \
 		TARGET_SYS=Linux \
 		install
