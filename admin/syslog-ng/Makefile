@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=syslog-ng
-PKG_VERSION:=4.7.1
-PKG_RELEASE:=2
+PKG_VERSION:=4.10.1
+PKG_RELEASE:=1
 
 PKG_MAINTAINER:=Josef Schlehofer <pepe.schlehofer@gmail.com>
 PKG_LICENSE:=LGPL-2.1-or-later GPL-2.0-or-later
@@ -11,7 +11,7 @@ PKG_CPE_ID:=cpe:/a:oneidentity:syslog-ng
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/syslog-ng/syslog-ng/releases/download/$(PKG_NAME)-$(PKG_VERSION)/
-PKG_HASH:=5477189a2d12325aa4faebfcf59f5bdd9084234732f0c3ec16dd253847dacf1c
+PKG_HASH:=dea90cf1dc4b8674ff191e0032f9dabc24b291abfd7f110fd092ae5f21cde5d7
 
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1
@@ -92,11 +92,13 @@ CONFIGURE_ARGS +=  \
 	--disable-linux-caps \
 	--with-jsonc=system \
 	--enable-cpp=no \
+	--disable-example-modules \
 	--enable-json=yes \
 	$(if $(CONFIG_LIBCURL_ZLIB),--enable-http=yes,--enable-http=no) \
 	--disable-smtp \
 	--disable-mqtt \
 	--disable-redis \
+	--disable-stackdump \
 	--disable-dependency-tracking \
 	--disable-python \
 	--disable-geoip2 \
@@ -107,7 +109,10 @@ CONFIGURE_ARGS +=  \
 
 CONFIGURE_VARS += \
 	$(if $(CONFIG_HOST_OS_MACOS),PATH=$(FAKEUNAME_PATH):$(PATH)) \
-	LIBDBI_CFLAGS="-I$(STAGING_DIR)/usr/include"
+	LIBDBI_CFLAGS="-I$(STAGING_DIR)/usr/include" \
+        ac_cv_header_liburing_h=no \
+        ac_cv_func_io_uring_queue_init=no \
+        ac_cv_search_io_uring_queue_init=no
 
 define Package/syslog-ng/install
 	cd $(PKG_BUILD_DIR); make DESTDIR=$(1) install
