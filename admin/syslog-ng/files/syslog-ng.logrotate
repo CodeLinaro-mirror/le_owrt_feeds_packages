@@ -1,12 +1,13 @@
 /var/log/messages {
+	su root root
 	compress
 	copytruncate
 	delaycompress
 	notifempty
-	maxsize @MAXSIZE@
+	maxsize 300K
 	missingok
 	postrotate
 		/usr/sbin/syslog-ng-ctl reload > /dev/null
 	endscript
-	rotate @ROTATE@
+	rotate 2
 }
