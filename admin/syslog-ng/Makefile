@@ -34,7 +34,7 @@ define Package/syslog-ng
   CATEGORY:=Administration
   TITLE:=A powerful syslog daemon
   URL:=https://www.syslog-ng.com/products/open-source-log-management/
-  DEPENDS:=+libpcre2 +glib2 +libopenssl +libpthread +librt +libdbi +libjson-c +libcurl +libuuid +librdkafka +ivykis +SYSLOGNG_LOGROTATE:logrotate +LIBCURL_ZLIB:zlib
+  DEPENDS:=+libpcre2 +glib2 +libopenssl +libpthread +librt +libjson-c +libuuid +ivykis +SYSLOGNG_LOGROTATE:logrotate
   ALTERNATIVES:=300:/sbin/logread:/usr/libexec/logread.sh
 endef
 
@@ -90,14 +90,17 @@ CONFIGURE_ARGS +=  \
 	--disable-spoof-source \
 	--disable-sql \
 	--disable-linux-caps \
-	--with-jsonc=system \
 	--with-ivykis=system \
 	--enable-cpp=no \
 	--disable-example-modules \
-	--enable-json=yes \
-	$(if $(CONFIG_LIBCURL_ZLIB),--enable-http=yes,--enable-http=no) \
 	--disable-smtp \
 	--disable-mqtt \
+	--disable-json \
+	--disable-http \
+	--disable-kafka \
+	--disable-geoip2 \
+	--disable-stats \
+	--disable-sql \
 	--disable-redis \
 	--disable-stackdump \
 	--disable-dependency-tracking \

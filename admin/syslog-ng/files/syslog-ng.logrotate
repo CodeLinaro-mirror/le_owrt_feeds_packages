@@ -2,7 +2,6 @@
 	su root root
 	compress
 	copytruncate
-	delaycompress
 	notifempty
 	maxsize 300K
 	missingok
