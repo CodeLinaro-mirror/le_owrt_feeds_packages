@@ -761,6 +761,11 @@ service_trigger_ipsec() {
 }
 
 start_service() {
+	grep -qE 'mem-profile=(balanced|optimized)' /proc/cmdline && {
+		echo " strongswan is supported on mem-profile=high only"
+		return
+	}
+
 	prepare_env
 
 	[ $WAIT_FOR_INTF -eq 1 ] && return
