@@ -2,13 +2,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=https-dns-proxy
-PKG_VERSION:=2025.10.07
+PKG_VERSION:=2026.05.06
 PKG_RELEASE:=1
+PKG_CPE_ID:=cpe:/a:mossdef:https-dns-proxy
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/aarond10/https_dns_proxy/
-PKG_MIRROR_HASH:=2d0e5f031c8de7f42fa7f2e79d5638f9e4899c056d710fc3638a03112b383be5
-PKG_SOURCE_VERSION:=7b27ecd5598d03bbe79651cc80efca886d433cd9
+PKG_MIRROR_HASH:=345f14e0a05e032754cea440f5e8798c6896cf5bc7cc12b3c7ed1c8d34e4daad
+PKG_SOURCE_VERSION:=0ba0525fa7c10115cc7c92e99621bfe484ae96e7
 
 PKG_MAINTAINER:=Stan Grishin <stangri@melmac.ca>
 PKG_LICENSE:=MIT
@@ -25,17 +26,23 @@ define Package/https-dns-proxy
 	SECTION:=net
 	CATEGORY:=Network
 	TITLE:=DNS Over HTTPS Proxy
-	URL:=https://github.com/stangri/https-dns-proxy/
-	DEPENDS:=+libcares +libcurl +libev +ca-bundle +jsonfilter +resolveip
-	DEPENDS+=+!BUSYBOX_DEFAULT_GREP:grep
-	DEPENDS+=+!BUSYBOX_DEFAULT_SED:sed
+	URL:=https://github.com/mossdef-org/https-dns-proxy/
+	DEPENDS:= \
+		+libcares \
+		+libcurl \
+		+libev \
+		+ca-bundle \
+		+jsonfilter \
+		+resolveip \
+		+!BUSYBOX_DEFAULT_GREP:grep \
+		+!BUSYBOX_DEFAULT_SED:sed
 	CONFLICTS:=https_dns_proxy
 endef
 
 define Package/https-dns-proxy/description
 Light-weight DNS-over-HTTPS, non-caching translation proxy for the RFC 8484 DoH standard.
 It receives regular, unencrypted (UDP) DNS requests and resolves them via DoH resolver.
-Please see https://docs.openwrt.melmac.ca/https-dns-proxy/ for more information.
+Please see https://docs.mossdef.org/https-dns-proxy/ for more information.
 endef
 
 define Package/https-dns-proxy/conffiles
@@ -52,6 +59,8 @@ define Package/https-dns-proxy/install
 	$(INSTALL_CONF) ./files/etc/config/https-dns-proxy $(1)/etc/config/https-dns-proxy
 	$(INSTALL_DIR) $(1)/etc/uci-defaults/
 	$(INSTALL_BIN) ./files/etc/uci-defaults/50-https-dns-proxy-migrate-options.sh $(1)/etc/uci-defaults/50-https-dns-proxy-migrate-options.sh
+	$(INSTALL_DIR) $(1)/usr/share/nftables.d/ruleset-post
+	$(INSTALL_DATA) ./files/usr/share/nftables.d/ruleset-post/.placeholder $(1)/usr/share/nftables.d/ruleset-post/.placeholder
 endef
 
 $(eval $(call BuildPackage,https-dns-proxy))
