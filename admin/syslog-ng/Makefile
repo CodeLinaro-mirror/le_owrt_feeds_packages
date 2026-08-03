@@ -34,7 +34,7 @@ define Package/syslog-ng
   CATEGORY:=Administration
   TITLE:=A powerful syslog daemon
   URL:=https://www.syslog-ng.com/products/open-source-log-management/
-  DEPENDS:=+libpcre2 +glib2 +libopenssl +libpthread +librt +libjson-c +libuuid +ivykis +SYSLOGNG_LOGROTATE:logrotate
+  DEPENDS:=+libpcre2 +glib2 +libopenssl +libpthread +librt +libjson-c +libuuid +ivykis +logrotate
   ALTERNATIVES:=300:/sbin/logread:/usr/libexec/logread.sh
 endef
 
@@ -45,6 +45,7 @@ define Package/syslog-ng/description
 endef
 
 define Package/syslog-ng/conffiles
+/etc/config/syslog-ng
 /etc/syslog-ng.conf
 /etc/syslog-ng.d/
 /etc/scl.conf
@@ -133,19 +134,19 @@ define Package/syslog-ng/install
 	$(INSTALL_DATA) ./files/syslog-ng.conf $(1)/etc
 	touch $(1)/etc/syslog-ng.d/.keep
 
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) ./files/syslog-ng.uci $(1)/etc/config/syslog-ng
+
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) ./files/syslog-ng-config.sh $(1)/usr/sbin/syslog-ng-config
+
 	$(INSTALL_DIR) $(1)/usr/libexec
 	$(INSTALL_BIN) ./files/logread.sh $(1)/usr/libexec/logread.sh
 
 	$(INSTALL_DIR) $(1)/usr/share/syslog-ng/include/
 	$(CP) -r ./files/scl $(1)/usr/share/syslog-ng/include/
 
-ifneq ($(strip $(CONFIG_SYSLOGNG_LOGROTATE)),)
 	$(INSTALL_DIR) $(1)/etc/logrotate.d
-	sed \
-		-e 's#@MAXSIZE@#$(LOGROTATE_MAXSIZE)#g' \
-		-e 's#@ROTATE@#$(LOGROTATE_ROTATE)#g' \
-		./files/syslog-ng.logrotate > $(1)/etc/logrotate.d/syslog-ng.conf
-endif
 endef
 
 define Package/syslog-ng/postinst

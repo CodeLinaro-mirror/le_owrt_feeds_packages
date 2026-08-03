@@ -1,0 +1,136 @@
+# syslog-ng UCI configuration
+# /etc/config/syslog-ng
+#
+# This file is the single source of truth for syslog-ng configuration.
+# Use 'syslog-ng-config' to manage filters and apply changes without reboot.
+#
+# Quick start:
+#   syslog-ng-config add-source hostapd --path /tmp/hapd.log --program-override hostapd
+#   syslog-ng-config add-filter ath12k
+#   syslog-ng-config add-filter hostapd --program hostapd
+#   syslog-ng-config add-filter kern_err --facility kern --level err
+#   syslog-ng-config list
+#   syslog-ng-config apply
+
+# ── Global daemon options ─────────────────────────────────────────────────────
+config syslog-ng 'global'
+	option chain_hostnames	'no'
+	option create_dirs	'yes'
+	option keep_hostname	'yes'
+	option log_fifo_size	'64'
+	option log_msg_size	'1024'
+	option stats_freq	'0'
+	option flush_lines	'1'
+	option use_fqdn		'no'
+	option keep_timestamp	'no'
+	option threaded		'no'
+
+# ── Logrotate defaults (apply to ALL log files) ───────────────────────────────
+# These values are used for /var/log/messages and every per-filter log file.
+# Override per-filter with 'option maxsize' / 'option rotate' in a filter section.
+config logrotate 'logrotate'
+	option enabled		'1'
+	option maxsize		'300K'
+	option rotate		'2'
+	option compress		'1'
+	option copytruncate	'1'
+	option notifempty	'1'
+	option missingok	'1'
+	# rotate_when: empty = size-only; daily / weekly / monthly = time-based
+	option rotate_when	''
+	# schedule: cron schedule for the logrotate job
+	# values: minutely | hourly | daily | weekly | monthly | custom cron expression
+	# 'minutely' = every minute (*/1 * * * *) — matches original behaviour.
+	# logrotate only rotates when maxsize is actually exceeded, so frequent runs are safe.
+	option schedule		'minutely'
+
+# ── Remote forwarding (disabled by default) ───────────────────────────────────
+# Enable with: syslog-ng-config set-remote <host>
+# Or manually: uci set syslog-ng.remote.enabled=1
+#              uci set syslog-ng.remote.host=10.0.0.5
+#              uci commit syslog-ng && syslog-ng-config apply
+config remote 'remote'
+	option enabled		'0'
+	option type		'udp'		# udp | tcp
+	option host		''
+	option port		'514'
+
+# ── Custom sources ────────────────────────────────────────────────────────────
+# Add sources with: syslog-ng-config add-source <name> [options]
+# Remove with:      syslog-ng-config remove-source <name>
+#
+# Built-in sources (always present, cannot be removed):
+#   src    — internal() + unix-dgram("/dev/log")  [all user-space apps]
+#   kernel — file("/proc/kmsg")                   [kernel messages]
+#
+# Custom sources are automatically included in ALL log rules alongside
+# the built-in sources. Messages from custom sources go to /var/log/messages
+# and to any matching filter destinations.
+#
+# Source options:
+#   option type             'file'          file | unix-dgram | network
+#   option path             '<path>'        file path, socket path, or IP address
+#   option program_override '<name>'        tag all messages with this program name
+#   option enabled          '1'             enable/disable this source
+#
+# Examples (uncomment and run 'syslog-ng-config apply' to activate):
+#
+# config source 'hostapd'
+#	option enabled		'1'
+#	option type		'file'
+#	option path		'/tmp/hapd.log'
+#	option program_override	'hostapd'
+#
+# config source 'wpa_supplicant'
+#	option enabled		'1'
+#	option type		'file'
+#	option path		'/tmp/wpa_supp.log'
+#	option program_override	'wpa_supplicant'
+#
+# config source 'myapp_socket'
+#	option enabled		'1'
+#	option type		'unix-dgram'
+#	option path		'/var/run/myapp.sock'
+
+# ── Per-subsystem filters ─────────────────────────────────────────────────────
+# Add filters with: syslog-ng-config add-filter <name> [options]
+# Remove with:      syslog-ng-config remove-filter <name>
+#
+# Each filter section auto-creates:
+#   filter f_<name>          { match("<pattern>") / program(...) / facility(...) / level(...) }
+#   destination <name>_messages { file("/var/log/<name>_messages") }
+#   log rule                 { src + kernel + custom_sources + filter → destination }
+#   logrotate stanza         for /var/log/<name>_messages
+#
+# Filter matching options (at least one required):
+#   option match    '<regex>'    regex on message text
+#   option program  '<name>'     match by program/process name
+#   list   facility '<fac>'      match by syslog facility
+#   option level    '<level>'    match by severity (e.g. err, warning, debug)
+#
+# Optional overrides:
+#   option logfile  '/var/log/<name>_messages'   override auto-derived log path
+#   option maxsize  '300K'                        override global logrotate maxsize
+#   option rotate   '2'                           override global rotate count
+#
+# Examples (uncomment and run 'syslog-ng-config apply' to activate):
+#
+# config filter 'ath12k'
+#	option enabled	'1'
+#	option match	'ath12k'
+#
+# config filter 'hostapd'
+#	option enabled	'1'
+#	option program	'hostapd'
+#
+# config filter 'kern_err'
+#	option enabled	'1'
+#	list   facility	'kern'
+#	option level	'err'
+#
+# config filter 'wlan'
+#	option enabled	'1'
+#	option match	'wlan\|ath\|wifi'
+#	option logfile	'/var/log/wlan_messages'
+#	option maxsize	'500K'
+#	option rotate	'3'
