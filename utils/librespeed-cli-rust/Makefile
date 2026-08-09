@@ -11,15 +11,13 @@ PKG_NAME:=librespeed-cli-rust
 PKG_VERSION:=0.1.0
 PKG_RELEASE:=1
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/BKPepe/speedtest-cli-rust.git
-PKG_SOURCE_VERSION:=b4c53ddc9a61e70cbc1de195d6c8f974d3005713
-PKG_SOURCE_DATE:=2026-08-08
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.zst
-PKG_MIRROR_HASH:=a04e428ad9c3fd007495eeaf995134bf79ef29cf70a0e91da7f7bda55c59729f
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/BKPepe/speedtest-cli-rust/tar.gz/refs/tags/v$(PKG_VERSION)?
+PKG_HASH:=d6b88befe573a9d2f93656fadeb69c194c6aa0027749662e2f0dafd972cee8f5
+PKG_BUILD_DIR:=$(BUILD_DIR)/speedtest-cli-rust-$(PKG_VERSION)
 
 PKG_MAINTAINER:=Josef Schlehofer <pepe.schlehofer@gmail.com>
-PKG_LICENSE:=LGPL-3.0-or-later
+PKG_LICENSE:=LGPL-3.0-only
 PKG_LICENSE_FILES:=LICENSE
 
 PKG_BUILD_DEPENDS:=rust/host
