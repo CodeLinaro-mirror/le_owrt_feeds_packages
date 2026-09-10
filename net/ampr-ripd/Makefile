@@ -29,7 +29,7 @@ define Package/ampr-ripd/description
 endef
 
 CONFIGURE_VARS+= \
-	CC="$(TOOLCHAIN_DIR)/bin/$(TARGET_CC)"
+	CC="$(TARGET_CC)"
 	COPT="$(TARGET_COPT)"
 
 define Package/ampr-ripd/install
