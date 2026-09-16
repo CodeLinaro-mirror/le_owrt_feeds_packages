@@ -508,12 +508,76 @@ update_cron() {
 # ─────────────────────────────────────────────────────────────────────────────
 
 reload_syslog_ng() {
+	local reload_output reload_rc
+
 	if pidof syslog-ng >/dev/null 2>&1; then
-		/usr/sbin/syslog-ng-ctl reload
+		# Capture both stdout/stderr and exit code. syslog-ng-ctl can exit 0
+		# even when the daemon rejects the new config and reverts to the
+		# previous one — the failure is only visible in the output text
+		# (e.g. "Config reload failed, reverted to previous config").
+		# Blindly printing "reloaded" here would silently hide such failures.
+		reload_output=$(/usr/sbin/syslog-ng-ctl reload 2>&1)
+		reload_rc=$?
+
+		if [ "$reload_rc" -ne 0 ] || echo "$reload_output" | grep -qi "fail\|error\|revert"; then
+			[ -n "$reload_output" ] && echo "$reload_output" >&2
+			return 1
+		fi
+
+		[ -n "$reload_output" ] && echo "$reload_output"
 		echo "syslog-ng reloaded"
 	else
 		info "syslog-ng not running — skipping reload"
 	fi
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Auto-rollback on invalid configuration
+# ─────────────────────────────────────────────────────────────────────────────
+# If a newly added/changed section makes syslog-ng reject the generated
+# config (e.g. a network() source bound to an address the device doesn't
+# own), the daemon itself reverts to the last known-good config — but our
+# UCI store still has the bad section, so every future 'apply' keeps
+# regenerating and re-failing on the same entry. These helpers detect that
+# failure right after the change is made and automatically undo the change
+# in UCI, restoring a working configuration without user intervention.
+
+_rollback_delete_section() {
+	local section="$1"
+	uci -q delete "${UCI_PKG}.${section}" 2>/dev/null
+	uci commit "$UCI_PKG"
+}
+
+_rollback_disable_remote() {
+	uci -q set "${UCI_PKG}.remote.enabled"='0' 2>/dev/null
+	uci commit "$UCI_PKG"
+}
+
+# _apply_or_rollback <description> <rollback_function> [rollback_arg]
+# Regenerates configs and reloads syslog-ng. On failure, invokes the given
+# rollback function to undo the just-made UCI change, re-applies, and exits
+# with a clear message. On success, returns normally.
+_apply_or_rollback() {
+	local desc="$1" rollback_func="$2" rollback_arg="$3"
+
+	cmd_generate
+	if reload_syslog_ng; then
+		return 0
+	fi
+
+	echo "ERROR: '$desc' caused syslog-ng to reject the generated config." >&2
+	echo "Rolling back automatically ..." >&2
+	"$rollback_func" "$rollback_arg"
+
+	cmd_generate
+	if reload_syslog_ng; then
+		echo "Rollback successful — syslog-ng is running with the previous known-good configuration." >&2
+	else
+		echo "WARNING: rollback did not fully restore a working config." >&2
+		echo "Run 'syslog-ng-config list' and inspect /etc/config/syslog-ng manually." >&2
+	fi
+
+	die "'$desc' was invalid and has been removed automatically."
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -528,7 +592,15 @@ cmd_generate() {
 
 cmd_apply() {
 	cmd_generate
-	reload_syslog_ng
+	if ! reload_syslog_ng; then
+		echo "ERROR: syslog-ng rejected the regenerated config and reverted to the previous one." >&2
+		echo "Run 'syslog-ng-config list' to review sources/filters/remote settings," >&2
+		echo "identify the invalid entry, and remove or fix it with one of:" >&2
+		echo "  syslog-ng-config remove-source <name>" >&2
+		echo "  syslog-ng-config remove-filter <name>" >&2
+		echo "  syslog-ng-config disable-remote" >&2
+		return 1
+	fi
 }
 
 cmd_list() {
@@ -626,7 +698,7 @@ cmd_add_source() {
 
 	uci commit "$UCI_PKG"
 	echo "Added source '$name' (type=$type path=$path)"
-	cmd_apply
+	_apply_or_rollback "source '$name'" _rollback_delete_section "$name"
 }
 
 cmd_remove_source() {
@@ -689,7 +761,7 @@ cmd_add_filter() {
 
 	uci commit "$UCI_PKG"
 	echo "Added filter '$name'"
-	cmd_apply
+	_apply_or_rollback "filter '$name'" _rollback_delete_section "$name"
 }
 
 cmd_remove_filter() {
@@ -735,7 +807,7 @@ cmd_set_remote() {
 
 	uci commit "$UCI_PKG"
 	echo "Remote forwarding configured: $host ($type:$port)"
-	cmd_apply
+	_apply_or_rollback "remote forwarding to '$host'" _rollback_disable_remote ""
 }
 
 cmd_disable_remote() {
