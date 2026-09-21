@@ -10,6 +10,7 @@ SYSLOG_CONF="/etc/syslog-ng.conf"
 SYSLOG_CONFIG_BIN="/usr/sbin/syslog-ng-config"
 
 start_service() {
+	[ -d /var/lib ] || mkdir -p /var/lib
 	# Generate syslog-ng.conf and logrotate config from UCI before starting
 	if [ -x "$SYSLOG_CONFIG_BIN" ]; then
 		echo "$(date '+%b %d %H:%M:%S') Generating syslog-ng configuration from UCI..."
