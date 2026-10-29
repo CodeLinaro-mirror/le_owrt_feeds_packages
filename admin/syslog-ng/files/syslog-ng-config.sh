@@ -107,7 +107,13 @@ EOF
 _gen_default_destination() {
 	cat <<'EOF'
 destination messages {
-	file("/var/log/messages");
+        file("/var/log/messages"
+        logrotate(
+            enable(yes)
+            size(500K)
+            rotations(1)
+        )
+        );
 };
 
 EOF
